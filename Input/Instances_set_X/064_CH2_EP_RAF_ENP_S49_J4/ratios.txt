@@ -1,0 +1,7 @@
+Ratio;Prio;Ident;
+1/5;1;HPRC1;
+1/2;1;HPRC2;
+8/10;1;HPRC3;
+1/100;1;HPRC4;
+1/20;1;HPRC5;
+1/2;1;HPRC6;

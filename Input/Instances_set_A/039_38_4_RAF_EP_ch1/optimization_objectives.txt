@@ -1,0 +1,4 @@
+rank;objective name;
+1;paint_color_batches;
+2;high_priority_level_and_easy_to_satisfy_ratio_constraints;
+
