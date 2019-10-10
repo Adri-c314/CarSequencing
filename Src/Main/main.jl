@@ -29,6 +29,3 @@ ratio = datas[4]
 
 # Ecriture dans le fichier output
 ecriture(txt, string("../../Output/", Dates.now(), ".txt"))
-=======
-println("test")
->>>>>>> db61180061daaefa38bca00ad6f33ba11d91944d
