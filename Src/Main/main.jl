@@ -1,63 +1,85 @@
 include("../Util/includes.jl")
 include("../Util/lecture.jl")
+include("fonction_rand.jl")
+
 using Dates
 using DataFrames
 using CSV
 using Dates
-
+using Random
+Random.seed!(0)
 
 function evaluation(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int64,Hprio::Int32)
     col = instance[1][2]
     nbcol = 0
     Hpriofail=0
     Lpriofail=0
+    prio = [[0,0]]
+    for i in 1:(size(instance)[1]-1)
+        append!(prio,[[0,0]])
+    end
     evalrat = [Int32[]]
     nbrat = zeros(Int32,size(ratio)[1])
     for i in 1:size(ratio)[1]
         append!(evalrat,[zeros(Int64, ratio[i][2])])
     end
     popfirst!(evalrat)
-
     tmpi=1
     for n in instance
-
         tmprio = 1
         for eval in evalrat
             for i in 1:length(eval)
+
+                #on ajoute 1 si la vouture n a bien la prio
+                if i<=tmpi
+                    if n[tmprio+2]==1
+                        eval[i]+=1
+                    end
+                end
+
                 #on reset quand on a regarde plus de x voitures avec x => y/x
-                if mod(tmpi,ratio[tmprio][2]+i)==0
+                if mod(tmpi+i,ratio[tmprio][2])==0
                     if eval[i]>ratio[tmprio][1]
+
+                        if tmprio<=Hprio
+                            for i in 1:ratio[tmprio][2]
+                                if tmpi-i+1>0
+                                    prio[tmpi-i+1][1]+=1
+                                end
+                            end
+                        else
+                            for i in 1:ratio[tmprio][2]
+                                if tmpi-i+1>0
+                                    prio[tmpi-i+1][2]+=1
+                                end
+                            end
+                        end
+
                         if tmprio>Hprio
                             Lpriofail+=eval[i]-ratio[tmprio][1]
                         else
                             Hpriofail+=eval[i]-ratio[tmprio][1]
                         end
-                    eval[i]=0
-                end
-                #on ajoute 1 si la vouture n a bien la prio
-                if i<=tmpi
-                    #faudra enlever le +2 et a ma place mettre (#Hprio -1)
-                    if n[tmprio+Hprio-1]==1
-                        eval[i]+=1
                     end
+                    eval[i]=0
+
                 end
 
-            
+
+
             end
             tmprio+=1
         end
-
-
-
         if n[2]!= col
             nbcol+=1
             col=n[2]
         end
         tmpi+=1
     end
-    println(Lpriofail)
     println(Hpriofail)
+    println(Lpriofail)
     println(nbcol)
+    return prio
 end
 
 function tri_car(instance::Array{Array{Int32,1},1})
@@ -70,8 +92,8 @@ function lecture()
 
     # Gestion de l'instance :
     instance = "A"
-    reference = "022_3_4_RAF_EP_ENP"
-    #reference = "039_38_4_RAF_EP_ch1"
+    #reference = "022_3_4_RAF_EP_ENP"
+    reference = "039_38_4_RAF_EP_ch1"
     datas = lectureCSV(instance, reference)
 
     # Initialisation de la variable txt du fichier output :
@@ -88,17 +110,10 @@ function lecture()
     oo = datas[2] #optimization_objectives
     pbl = datas[3] #paint_batch_limi
     ratio = datas[4]
-    #=
-    colnames = ["Date","Seqrank","Ident","Paint_Color","HPRC1","HPRC2","HPRC3","LPRC1","LPRC2"]#,"LPRC3","LPRC4","LPRC5","LPRC6"]
-    names!(vehicles, Symbol.(colnames))
-    colnames = ["rank","objective_name","tamere"]
-    names!(oo, Symbol.(colnames))
-    =#
+
 
     instance = [Int32[]]
 
-
-    println(size(vehicles)[2])
     for i in 1:size(vehicles)[1]
 
         tmp = Int32[0]
@@ -107,6 +122,7 @@ function lecture()
 
             append!(tmp,vehicles[i,ii+3])
         end
+        append!(tmp,[0,0,i])
 
         append!(instance,[tmp])
 
@@ -135,7 +151,7 @@ function lecture()
     end
     pbl = pbl.limitation[1]
 
-    obj= [0,0,0]
+    obj= zeros(size(oo)[1])
     for i in 1:size(oo)[1]
         if oo[i,2] == "high_priority_level_and_easy_to_satisfy_ratio_constraints"
             obj[i]=2
@@ -165,6 +181,7 @@ end
 
 function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int64,Hprio::Int32)
     sz =size(instance)[1]
+    szcar = size(instance[1])[1]
     pi = [Int32[0,0]]
     PI = [Int32[0,sz]]
     ## ici remplacer 3 par le nb de Hprio
@@ -194,23 +211,43 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
 
 
     tmpplace=1
-    tmpcol=1
+    tmpdebcol=tmpplace
+    tmpcol=0
     tmpi = argmax(color)[2]
-    println(tmpi)
-
-    println(color)
     tmp=0
     for n in color
         tmp+=ceil(Int,n/pbl)
     end
-    println(tmp)
+    if color[tmpi]>pbl
+        mm = tmpplace+pbl-1
+    else
+        mm = tmpplace+color[tmpi]-1
+    end
+
+    tmpfincol=mm
+
     while sum(color)!=0 && tmpplace != size(instance)[1]+1
         if tmpcol==pbl && color[tmpi]!=0
             tmpi = argmax2(color,tmpi)
             tmpcol=0
+            tmpdebcol=tmpplace
+            if color[tmpi]>pbl
+                mm = tmpplace+pbl-1
+            else
+                mm = tmpplace+color[tmpi]-1
+            end
+
+            tmpfincol=mm
         elseif color[tmpi]==0
             tmpi = argmax(color)[2]
             tmpcol=0
+            tmpdebcol=tmpplace
+            if color[tmpi]>pbl
+                mm = tmpplace+pbl-1
+            else
+                mm = tmpplace+color[tmpi]-1
+            end
+            tmpfincol=mm
         end
         tmpdur=-1
         tmpduri=instance[1]
@@ -241,6 +278,8 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
 
         elseif tmpduri[1]==0 && tmpduri[2]==tmpi && color[tmpi]>0
             tmpduri[1]=tmpplace
+            tmpduri[szcar-1]=tmpfincol
+            tmpduri[szcar-2]=tmpdebcol
             tmpplace+=1
             tmpcol+=1
             color[tmpi]-=1
@@ -254,9 +293,6 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
 
 
     end
-    println(tmpplace)
-    println(size(instance)[1])
-    println(color)
     return tri_car(instance)
 end
 
@@ -333,26 +369,33 @@ function GreedyEP(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},
     return tri_car(instance)
 end
 
+function generic(size::Int64)
 
+    a = rand(1:size,2)
 
+    return a
 
+end
 
 
 function main()
-## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
-##            les voitures avec [2]= leurs couleurs
-##            les voitures avec [3:3+Hprio]= leurs Hprio
-##            les voitures avec [3+Hprio:]= leurs Lprio
-## Ratio x/y: Les ratio avec [1] = x
-##            Les ratio avec [2] = y
-## pbl      : Le paint batch limit
-## obj      : Les obj des l'ordre
-## Hprio    : le nombre de Hprio
-instance, ratio ,pbl,obj,Hprio = lecture()
-println(Hprio)
+    ## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
+    ##            les voitures avec [2]= leurs couleurs
+    ##            les voitures avec [3:3+Hprio]= leurs Hprio
+    ##            les voitures avec [3+Hprio:]= leurs Lprio
+    ## Ratio x/y: Les ratio avec [1] = x
+    ##            Les ratio avec [2] = y
+    ## pbl      : Le paint batch limit
+    ## obj      : Les obj des l'ordre
+    ## Hprio    : le nombre de Hprio
+    instance, ratio ,pbl,obj,Hprio = lecture()
+    sz=size(instance)[1]
 
-evaluation(instance,ratio,pbl,Hprio)
+    evaluation(instance,ratio,pbl,Hprio)
 
-instance = GreedyRAF(instance,ratio,pbl,Hprio)
-evaluation(instance,ratio,pbl,Hprio)
+    instance = GreedyRAF(instance,ratio,pbl,Hprio)
+
+    prio = evaluation(instance,ratio,pbl,Hprio)
+    k,l = denominator(instance,ratio,sz)
+
 end
