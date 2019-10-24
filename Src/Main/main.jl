@@ -335,6 +335,10 @@ function GreedyEP(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},
 end
 
 
+
+
+
+
 function main()
 ## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
 ##            les voitures avec [2]= leurs couleurs
@@ -347,9 +351,9 @@ function main()
 ## Hprio    : le nombre de Hprio
 instance, ratio ,pbl,obj,Hprio = lecture()
 println(Hprio)
-#println(Type(instance))
+
 evaluation(instance,ratio,pbl,Hprio)
-#println(instance[1])
+
 instance = GreedyRAF(instance,ratio,pbl,Hprio)
 evaluation(instance,ratio,pbl,Hprio)
 end
