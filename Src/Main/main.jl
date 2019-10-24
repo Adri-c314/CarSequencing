@@ -26,6 +26,12 @@ function evaluation(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1
             for i in 1:length(eval)
                 #on reset quand on a regarde plus de x voitures avec x => y/x
                 if mod(tmpi,ratio[tmprio][2]+i)==0
+                    if eval[i]>ratio[tmprio][1]
+                        if tmprio>Hprio
+                            Lpriofail+=eval[i]-ratio[tmprio][1]
+                        else
+                            Hpriofail+=eval[i]-ratio[tmprio][1]
+                        end
                     eval[i]=0
                 end
                 #on ajoute 1 si la vouture n a bien la prio
@@ -36,14 +42,7 @@ function evaluation(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1
                     end
                 end
 
-                if eval[i]>ratio[tmprio][1]
-
-                    if tmprio>3
-                        Lpriofail+=1
-                    else
-                        Hpriofail+=1
-                    end
-                end
+            
             end
             tmprio+=1
         end
