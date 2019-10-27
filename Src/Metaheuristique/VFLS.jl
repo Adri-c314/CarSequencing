@@ -1,5 +1,11 @@
 # Fonction principale de l'heuristique, par Xavier
 
+include("swap.jl")
+include("fw_insertion.jl")
+include("bw_insertion.jl")
+include("reflection.jl")
+include("permutation.jl")
+
 const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
 const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
 const ID_LS = (:swap!, :fw_insertion!, :bw_insertion!, :reflection!, :permutation!) #Macro pour identifier les fonctions de LS
