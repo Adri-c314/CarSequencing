@@ -11,7 +11,7 @@ const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte po
 const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
 const ID_LS = (:swap!, :fw_insertion!, :bw_insertion!, :reflection!, :permutation!) #Macro pour identifier les fonctions de LS
 
-function VFLS(data, temps_max::Float64 = 10.0)
+function VFLS(data, temps_max::Float32 = 10.0)
     sequence_courrante::Array{Array{Int32,1},1} = init_sequence(data) #Le glouton
     score_courrant::Array{Int32,1} = evaluation_init(sequence_courrante) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = deepcopy(sequence_courrante)
