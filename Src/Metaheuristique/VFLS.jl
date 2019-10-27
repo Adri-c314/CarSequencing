@@ -5,6 +5,7 @@ include("fw_insertion.jl")
 include("bw_insertion.jl")
 include("reflection.jl")
 include("permutation.jl")
+include("choisir_klLS.jl")
 
 const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
 const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
@@ -31,11 +32,4 @@ end
 
 function estMieux(score_courrant::Array{Int32,1}, score_meilleur::Array{Int32,1})
     return score_courrant >= score_meilleur # Comparaison lexicographique.
-end
-
-# @param opt::Symbol : doit appartenir :OptA, :OptB, :OptC.
-# @return k::UInt32, l::UInt32 , idLS::Symbol : idLS doit appartenir a global ID_LS. Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
-function choisir_klLS(sequence_courrante::Array{Array{Int32,1},1}, opt::Symbol)
-    #TODO : determiner les k et l en fonction de OptA, OptB et OptC et de la sequence courrante.
-    return k, l, idLS
 end
