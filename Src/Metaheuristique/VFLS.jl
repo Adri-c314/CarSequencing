@@ -5,7 +5,7 @@ const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et
 const ID_LS = (:swap!, :fw_insertion!, :bw_insertion!, :reflection!, :permutation!) #Macro pour identifier les fonctions de LS
 
 function VFLS(data, temps_max::Float64 = 10.0)
-    sequence_courrante = init_sequence(data) #Le glouton
+    sequence_courrante::Array{Array{Int32,1},1} = init_sequence(data) #Le glouton
     score_courrant::Array{Int32,1} = evaluation_init(sequence_courrante) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = deepcopy(sequence_courrante)
     score_meilleur = deepcopy(score_courrant)
@@ -29,7 +29,7 @@ end
 
 # @param opt::Symbol : doit appartenir :OptA, :OptB, :OptC.
 # @return k::UInt32, l::UInt32 , idLS::Symbol : idLS doit appartenir a global ID_LS. Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
-function choisir_klLS(sequence_courrante, opt::Symbol)
+function choisir_klLS(sequence_courrante::Array{Array{Int32,1},1}, opt::Symbol)
     #TODO : determiner les k et l en fonction de OptA, OptB et OptC et de la sequence courrante.
     return k, l , idLS
 end
