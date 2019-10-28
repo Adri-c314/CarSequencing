@@ -1,10 +1,5 @@
 # Fonction principale de l'heuristique, par Xavier
 
-include("swap.jl")
-include("fw_insertion.jl")
-include("bw_insertion.jl")
-include("reflection.jl")
-include("permutation.jl")
 include("choisir_klLS.jl")
 
 const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
@@ -20,8 +15,8 @@ function VFLS(data, temps_max::Float32 = 10.0)
     global OPT
     while temps_max > time() - debut
         for opt in OPT
-            local k::UInt32, l::UInt32, idLS::Symbol = choisir_klLS(sequence_courrante, opt) #Choix des param de la LS
-            getfield(Main, idLS)(sequence_courrante, k, l, score_courrant) #Appel de la fonction de nom (Symbol) LS
+            local k::UInt32, l::UInt32, LSfoo::Function = choisir_klLS(sequence_courrante, opt) #Choix des param de la LS
+            LSfoo(sequence_courrante, k, l, score_courrant) #Appel de la fonction de nom (Symbol) LS
             if estMieux(score_courrant, score_meilleur)
                 sequence_meilleure = deepcopy(sequence_courrante)
                 score_meilleur = deepcopy(sequence_courrante)
