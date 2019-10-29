@@ -1,6 +1,3 @@
-include("../Util/includes.jl")
-include("../Util/lecture.jl")
-
 function init_sequence(instance::String,reference::String)
 
 
@@ -54,8 +51,8 @@ function init_sequence(instance::String,reference::String)
         end
         tmp = ratio.Ratio[i]
         tmp = split(tmp,"/")
-        rat[i][1]= parse(Int,tmp[1])
-        rat[i][2]= parse(Int,tmp[2])
+        rat[i][1]= parse(Int32,tmp[1])
+        rat[i][2]= parse(Int32,tmp[2])
     end
     Hprio = 0
 
@@ -95,7 +92,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
     evalrat = [Int32[]]
     nbrat = zeros(Int32,size(ratio)[1])
     for i in 1:size(ratio)[1]
-        append!(evalrat,[zeros(Int64, ratio[i][2])])
+        append!(evalrat,[zeros(Int32, ratio[i][2])])
     end
     popfirst!(evalrat)
     tmpi=1
@@ -147,7 +144,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
     return [nbcol,Hpriofail,Lpriofail], prio
 end
 
-function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int,Hprio::Int)
+function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int32,Hprio::Int32)
     sz =size(instance)[1]
     szcar = size(instance[1])[1]
     pi = [Int32[0,0]]
@@ -184,7 +181,7 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
     tmpi = argmax(color)[2]
     tmp=0
     for n in color
-        tmp+=ceil(Int,n/pbl)
+        tmp+=ceil(Int32,n/pbl)
     end
     if color[tmpi]>pbl
         mm = tmpplace+pbl-1
@@ -292,7 +289,7 @@ function tri_car(instance::Array{Array{Int32,1},1})
 end
 
 
-function GreedyEP(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int,Hprio::Int)
+function GreedyEP(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int32,Hprio::Int32)
     szcar = size(instance[1])[1]
     sz =size(instance)[1]
     pi = [Int32[0,0]]
