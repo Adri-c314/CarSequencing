@@ -79,21 +79,31 @@ function init_sequence(instance::String,reference::String)
     return instance, rat,pbl,obj,Hprio
 end
 
-
-function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},Hprio::Int32)
+##
+#return : [nbcol,Hpriofail,Lpriofail] : l'array des 3 fonctions objectifs
+#         prio l'array des violations des contraintes avec prio[i][j] le nombre
+#         de fois ou l'option j est rencontrée dans la fenetre commencant a i
+#         voir p937 proposition 1
+function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},Hprio::Int)
     col = instance[1][2]
     nbcol = 0
     Hpriofail=0
     Lpriofail=0
-    prio = [[0,0]]
+
+
+    prio = [zeros(size(ratio)[1])]
+
     for i in 1:(size(instance)[1]-1)
-        append!(prio,[[0,0]])
+        append!(prio,[zeros(size(ratio)[1])])
     end
-    evalrat = [Int32[]]
-    nbrat = zeros(Int32,size(ratio)[1])
+
+    evalrat = [Int[]]
+    nbrat = zeros(Int,size(ratio)[1])
     for i in 1:size(ratio)[1]
-        append!(evalrat,[zeros(Int32, ratio[i][2])])
+        append!(evalrat,[zeros(Int, ratio[i][2])])
     end
+    println("------------------------------------")
+    #println(evalrat)
     popfirst!(evalrat)
     tmpi=1
     for n in instance
@@ -110,19 +120,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
                 if mod(tmpi+i,ratio[tmprio][2])==0
                     if eval[i]>ratio[tmprio][1]
 
-                        if tmprio<=Hprio
-                            for i in 1:ratio[tmprio][2]
-                                if tmpi-i+1>0
-                                    prio[tmpi-i+1][1]+=1
-                                end
-                            end
-                        else
-                            for i in 1:ratio[tmprio][2]
-                                if tmpi-i+1>0
-                                    prio[tmpi-i+1][2]+=1
-                                end
-                            end
-                        end
+                        prio[tmpi][tmprio]+=eval[i]
 
                         if tmprio>Hprio
                             Lpriofail+=eval[i]-ratio[tmprio][1]
@@ -141,6 +139,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
         end
         tmpi+=1
     end
+    #println(prio)
     return [nbcol,Hpriofail,Lpriofail], prio
 end
 
