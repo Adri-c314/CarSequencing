@@ -1,8 +1,5 @@
 # Fonction principale de l'heuristique, par Xavier.
 
-include("choisir_klLS.jl")
-include("fonction_moche_mais_j_ai_la_flemme.jl")
-
 const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
 const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
 const ID_LS = (:swap!, :fw_insertion!, :bw_insertion!, :reflection!, :permutation!) #Macro pour identifier les fonctions de LS
