@@ -1,5 +1,4 @@
 include("../Util/includes.jl")
-
 function main()
     #=
     ## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
@@ -29,7 +28,8 @@ function main()
     instance = "A"
     #reference = "022_3_4_RAF_EP_ENP"
     reference = "039_38_4_RAF_EP_ch1"
-    b = 0.0
-    VFLS(instance,reference,b)
+    b = 0.
+    VFLS(instance,reference)
+    println("fin")
 
 end

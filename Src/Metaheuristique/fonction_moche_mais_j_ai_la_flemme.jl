@@ -82,46 +82,43 @@ end
 ##
 #return : [nbcol,Hpriofail,Lpriofail] : l'array des 3 fonctions objectifs
 #         prio l'array des violations des contraintes avec prio[i][j] le nombre
-#         de fois ou l'option j est rencontrée dans la fenetre commencant a i
+#         de fois ou l'option j est rencontrée dans la fenetre finissant a i
 #         voir p937 proposition 1
 function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},Hprio::Int)
     col = instance[1][2]
     nbcol = 0
     Hpriofail=0
     Lpriofail=0
-
-
-    prio = [zeros(size(ratio)[1])]
-
-    for i in 1:(size(instance)[1]-1)
-        append!(prio,[zeros(size(ratio)[1])])
+    ra = Int[]
+    for rat in ratio
+        append!(ra,[-rat[1]])
     end
 
-    evalrat = [Int[]]
+    prio = [copy(ra)]
+    for i in 1:(size(instance)[1]-1)
+        append!(prio,[copy(ra)])
+    end
+
+    evalrat = [zeros(Int, ratio[1][2])]
     nbrat = zeros(Int,size(ratio)[1])
-    for i in 1:size(ratio)[1]
+    for i in 2:size(ratio)[1]
         append!(evalrat,[zeros(Int, ratio[i][2])])
     end
-    println("------------------------------------")
-    #println(evalrat)
-    popfirst!(evalrat)
+
+
     tmpi=1
     for n in instance
         tmprio = 1
         for eval in evalrat
-            for i in 1:length(eval)
+            for i in 1:size(eval)[1]
                 #on ajoute 1 si la vouture n a bien la prio
-                if i<=tmpi
-                    if n[tmprio+2]==1
-                        eval[i]+=1
-                    end
+                if n[tmprio+2]==1
+                    eval[i]+=1
                 end
                 #on reset quand on a regarde plus de x voitures avec x => y/x
-                if mod(tmpi+i,ratio[tmprio][2])==0
+                if mod(tmpi-i,ratio[tmprio][2])==0
+                    prio[tmpi][tmprio]+=eval[i]
                     if eval[i]>ratio[tmprio][1]
-
-                        prio[tmpi][tmprio]+=eval[i]
-
                         if tmprio>Hprio
                             Lpriofail+=eval[i]-ratio[tmprio][1]
                         else
@@ -139,7 +136,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
         end
         tmpi+=1
     end
-    #println(prio)
+
     return [nbcol,Hpriofail,Lpriofail], prio
 end
 
@@ -313,7 +310,7 @@ function GreedyEP(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},
     tmppbl=1
     color=0
     tmpplace=1
-    println("ui")
+
     for i in 1:size(instance)[1]
         tmpdur=-1
         tmpduri=instance[1]
