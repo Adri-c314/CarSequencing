@@ -1,6 +1,13 @@
+# Fichier contenant toutes les methodes de lecture/ecriture
+# @author Corentin Pelhâtre
+# @date 22/10/2019
+# @version 2
+
 using CSV
 using DataFrames
 using Query
+
+
 
 # Fonction qui permet de lire un fichier csv
 # @param path l'adresse du fichier à etudier
@@ -14,6 +21,8 @@ function lectureCSV(instance::String, ref::String)
     path = string("../../Input/Instances_set_", instance, "/", ref, "/")
     return (CSV.read(string(path, "vehicles.txt")), CSV.read(string(path, "optimization_objectives.txt")), CSV.read(string(path, "paint_batch_limit.txt")), CSV.read(string(path, "ratios.txt")))
 end
+
+
 
 # Fonction qui permet de verifier la presence d'un dossier
 # @param path : l'adresse du dossier
