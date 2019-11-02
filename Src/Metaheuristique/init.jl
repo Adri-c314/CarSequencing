@@ -12,14 +12,16 @@
 
 # Fonction de réalisation de l'operation initial de l'algorithm VFLS
 # @param Datas : Tableau de DataFrame bien degueu qu'on s'empresse de nettoyer
-# @return
+# @return ::Array{Array{Int32,1},1} : la sequence apres toute l'initialisation
+# @return ::Array{Int32,1} : Le score courant
+# @return ::Array{Array{Int32,1},1} : tab violation
 function compute_initial_sequence(datas)
-    sequence::Array{Array{Int32,1},1},prio::Array{Array{Int32,1},1},pbl::Int32,obj::Array{Int32,1},Hprio::Int32 = init_sequence(instance,reference)
+    sequence::Array{Array{Int32,1},1},prio::Array{Array{Int32,1},1},pbl::Int32,obj::Array{Int32,1},Hprio::Int32 = init_sequence(datas)
     obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,prio,pbl,Hprio)
     score_courrant::Array{Int32,1},tab_violation::Array{Array{Int32,1},1} = evaluation_init(sequence_courrante,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = deepcopy(sequence_courrante)
     score_meilleur = deepcopy(score_courrant)
-    return
+    return sequence_meilleure, score_meilleur, tab_violation
 end
 
 
@@ -95,7 +97,7 @@ end
 
 
 # Fonction d'initialisation de l'evaluation
-# @param instance : l'instance courante 
+# @param instance : l'instance courante
 # @param ratio : le tableau de ratio
 # @param hprio : Le nombre de prioritaire h
 # @return [nbcol,Hpriofail,Lpriofail] : l'array des 3 fonctions objectifs
@@ -108,23 +110,26 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
     Hpriofail=0
     Lpriofail=0
     ra = Int[]
+
     for rat in ratio
         append!(ra,[-rat[1]])
     end
 
     prio = [copy(ra)]
+
     for i in 1:(size(instance)[1]-1)
         append!(prio,[copy(ra)])
     end
 
     evalrat = [zeros(Int, ratio[1][2])]
     nbrat = zeros(Int,size(ratio)[1])
+
     for i in 2:size(ratio)[1]
         append!(evalrat,[zeros(Int, ratio[i][2])])
     end
 
-
     tmpi=1
+
     for n in instance
         tmprio = 1
         for eval in evalrat
@@ -156,4 +161,36 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
     end
 
     return [nbcol,Hpriofail,Lpriofail], prio
+end
+
+
+
+# Fonction qui initialise les differentes phases et le temps accordé à chacune
+# @return ::Array{Int32,1} : timeOPT
+# @return ::Array{Int32,1} : OPT
+function phases_init()
+    timeOPT = [0,0,0] ## le temps accordé pour chaque phase
+    OPT = [0,0,0]   ## l'opt utilisé pour chaque phase avec 1=A,2=B,3=C
+    if obj[1]==2
+        if obj[3]!=0
+            timeOPT= [60,25,15]
+            if(obj[2]==1)
+                OPT= [1,1,2]
+            else
+                OPT= [1,2,3]
+            end
+        else
+            timeOPT= [50,50,0]
+            OPT= [1,2,0]
+        end
+    else
+        if obj[3]!=0
+            timeOPT= [80,20,0]
+            OPT[3,3,0]
+        else
+            timeOPT= [100,0,0]
+            OPT = [3,0,0]
+        end
+    end
+    return timeOPT, OPT
 end

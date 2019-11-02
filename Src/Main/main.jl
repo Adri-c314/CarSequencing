@@ -1,5 +1,23 @@
+# Fichier contenant toutes les fonctions d'initialisation de données.
+# @author Oryan Rampon
+# @author Corentin Pelhatre
+# @author Mathis Ocquident
+# @author Thaddeus Leonard
+# @author Adrien Cassaigne
+# @author Xavier Pillet
+# @date 01/11/2019
+# @version 3
+
 include("../Util/includes.jl")
-function main()
+using Dates
+
+
+# Fonction main
+# @param ir : L'ensemble des noms d'instances avec la reference a etudié
+# @param verbose : Si l'on souhaite un affichage console de l'execution
+# @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
+# @param temps_max : temps max pour un tuple (milliseconde)
+function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"), ("A", "022_3_4_RAF_EP_ENP")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1000.0)
     #=
     ## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
     ##            les voitures avec [2]= leurs couleurs
@@ -12,24 +30,48 @@ function main()
     ## pbl      : Le paint batch limit
     ## obj      : Les obj des l'ordre
     ## Hprio    : le nombre de Hprio
-    instance, ratio ,pbl,obj,Hprio = lecture()
-    sz=size(instance)[1]
-
-    score_courrant , tab_violation = evaluation(instance,ratio,pbl,Hprio)
-
-    instance = GreedyRAF(instance,ratio,pbl,Hprio)
-    instance = GreedyEP(instance,ratio,pbl,Hprio)
-    score_courrant , tab_violation = evaluation(instance,ratio,pbl,Hprio)
-    for car in instance
-        println(car)
-    end
-    k,l = denominator(instance,ratio,sz)
     =#
-    instance = "A"
-    #reference = "022_3_4_RAF_EP_ENP"
-    reference = "039_38_4_RAF_EP_ch1"
-    b = 0.
-    VFLS(instance,reference)
-    println("fin")
 
+    for i in ir
+        # Gestion affichage :
+        if txtoutput
+            txt = string(
+                "===================================================\n",
+                "Etude de l'instance : ", i[1], "\n",
+                "Reference du dossier : ", i[2], "\n",
+                "A la date du : ", Dates.now(), "\n",
+                "===================================================\n\n"
+            )
+        end
+        if verbose
+            println(string(
+                "===================================================\n",
+                "Etude de l'instance : ", i[1], "\n",
+                "Reference du dossier : ", i[2], "\n",
+                "A la date du : ", Dates.now(), "\n",
+                "===================================================\n\n"
+            ))
+        end
+
+        # Lecture du fichier csv
+        datas = lectureCSV(i[1], i[2])
+
+        # WHY ????
+        b = 0.
+
+        # Lancement de la VFLS
+        VFLS(datas,temps_max)
+
+        # Gestion affichage :
+        if txtoutput
+            txt = string(
+                "fini mais faudrait mettre plus d'infos ici non ?\n"
+            )
+        end
+        if verbose
+            println(string(
+                "fini mais faudrait mettre plus d'infos ici non ?\n"
+            ))
+        end
+    end
 end

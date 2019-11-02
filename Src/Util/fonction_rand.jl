@@ -148,5 +148,5 @@ function violation_same_color(instance::Array{Array{Int32,1},1},prio::Array{Arra
 end
 
 
-generic(1000)
-generic(1000)
+#generic(1000)
+#generic(1000)
