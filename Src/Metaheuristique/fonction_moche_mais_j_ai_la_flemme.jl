@@ -1,3 +1,4 @@
+using Dates
 function init_sequence(instance::String,reference::String)
 
 
@@ -84,7 +85,7 @@ end
 #         prio l'array des violations des contraintes avec prio[i][j] le nombre
 #         de fois ou l'option j est rencontrée dans la fenetre commencant a i
 #         voir p937 proposition 1
-function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},Hprio::Int)
+function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},Hprio::Int32)
     col = instance[1][2]
     nbcol = 0
     Hpriofail=0
@@ -192,7 +193,7 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
 
     while sum(color)!=0 && tmpplace != size(instance)[1]+1
         if tmpcol==pbl && color[tmpi]!=0
-            tmpi = argmax2(color,tmpi)
+            tmpi = argmax2(convert(Array{Int32,2},color),convert(Int32,tmpi))
             tmpcol=0
             tmpdebcol=tmpplace
             if color[tmpi]>pbl
