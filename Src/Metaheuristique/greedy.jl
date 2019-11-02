@@ -27,7 +27,8 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
         append!(pi,[[0,0]])
     end
 
-    color=[0]
+    # Tentative de correction mais confronter à un bug entre le typage Array{Array{Int32,1},1} et Array{Int64,2}
+    color=[Int32[0]]
 
     for car in instance
         if car[2]>length(color)
