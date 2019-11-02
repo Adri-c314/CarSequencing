@@ -19,16 +19,11 @@
 function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int32,Hprio::Int32)
     sz =size(instance)[1]
     szcar = size(instance[1])[1]
-    pi = [Int32[0,0]]
-    PI = [Int32[0,sz]]
-
-    for i in 1:(Hprio-1)
-        append!(PI,[[0,sz]])
-        append!(pi,[[0,0]])
-    end
+    pi = [Int32[0,0] for i in 1:Hprio]
+    PI = [Int32[0,sz] for i in 1:Hprio]
 
     # Tentative de correction mais confronter à un bug entre le typage Array{Array{Int32,1},1} et Array{Int64,2}
-    color=[Int32[0]]
+    color=Int[0]
 
     for car in instance
         if car[2]>length(color)
@@ -132,20 +127,14 @@ end
 function GreedyEP(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int32,Hprio::Int32)
     szcar = size(instance[1])[1]
     sz =size(instance)[1]
-    pi = [Int32[0,0]]
-    PI = [Int32[0,sz]]
 
-    for i in 1:(Hprio-1)
-        append!(PI,[[0,sz]])
-        append!(pi,[[0,0]])
-    end
+    pi = [Int32[0,0] for i in 1:Hprio]
+    PI = [Int32[0,sz] for i in 1:Hprio]
 
     tmpdebcol=1
-
     for car in instance
         for i in 1:Hprio
             PI[i][1]+= car[2+i]
-
         end
     end
 

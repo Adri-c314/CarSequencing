@@ -55,13 +55,10 @@ function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"),
 
         # Lecture du fichier csv
         datas = lectureCSV(i[1], i[2])
-
-        # WHY ????
-        b = 0.
+        println(typeof(datas))
 
         # Lancement de la VFLS
-        VFLS(datas,temps_max)
-
+        VFLS(datas)
         # Gestion affichage :
         if txtoutput
             txt = string(

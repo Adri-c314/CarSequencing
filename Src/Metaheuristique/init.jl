@@ -15,13 +15,13 @@
 # @return ::Array{Array{Int32,1},1} : la sequence apres toute l'initialisation
 # @return ::Array{Int32,1} : Le score courant
 # @return ::Array{Array{Int32,1},1} : tab violation
-function compute_initial_sequence(datas)
+function compute_initial_sequence(datas::NTuple{4,DataFrame})
     sequence::Array{Array{Int32,1},1},prio::Array{Array{Int32,1},1},pbl::Int32,obj::Array{Int32,1},Hprio::Int32 = init_sequence(datas)
     obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,prio,pbl,Hprio)
     score_courrant::Array{Int32,1},tab_violation::Array{Array{Int32,1},1} = evaluation_init(sequence_courrante,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = deepcopy(sequence_courrante)
     score_meilleur = deepcopy(score_courrant)
-    return sequence_meilleure, score_meilleur, tab_violation
+    return sequence_meilleure, score_meilleur, tab_violation,prio,Hprio,obj
 end
 
 
@@ -33,7 +33,7 @@ end
 # @return pbl : paint_batch_limi
 # @return obj : Le tableau d'objectifs
 # @return Hprio : Le nombre de prioritaire h
-function init_sequence(datas)
+function init_sequence(datas::NTuple{4,DataFrame})
     # Initialisation des données :
     vehicles = datas[1]
     oo = datas[2] #optimization_objectives
@@ -109,29 +109,18 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
     nbcol = 0
     Hpriofail=0
     Lpriofail=0
-    ra = Int[]
-
-    for rat in ratio
-        append!(ra,[-rat[1]])
-    end
-
-    prio = [copy(ra)]
-
-    for i in 1:(size(instance)[1]-1)
-        append!(prio,[copy(ra)])
-    end
-
-    evalrat = [zeros(Int, ratio[1][2])]
-    nbrat = zeros(Int,size(ratio)[1])
-
-    for i in 2:size(ratio)[1]
-        append!(evalrat,[zeros(Int, ratio[i][2])])
-    end
-
+    maxprio =0
+    ra = [-ratio[i][1] for i in 1:size(ratio)[1]]
+    tab_violation = [copy(ra) for i in 1:size(instance)[1]]
+    evalrat = [zeros(ratio[i][2]) for i in 1:size(ratio)[1]]
     tmpi=1
 
     for n in instance
         tmprio = 1
+        if n[2]!= col
+            nbcol+=1
+            col=n[2]
+        end
         for eval in evalrat
             for i in 1:size(eval)[1]
                 #on ajoute 1 si la vouture n a bien la prio
@@ -139,8 +128,8 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
                     eval[i]+=1
                 end
                 #on reset quand on a regarde plus de x voitures avec x => y/x
-                if mod(tmpi-i,ratio[tmprio][2])==0
-                    prio[tmpi][tmprio]+=eval[i]
+                if tmpi>=ratio[tmprio][2] &&mod(tmpi-i,ratio[tmprio][2])==0
+                    tab_violation[tmpi][tmprio]+=eval[i]
                     if eval[i]>ratio[tmprio][1]
                         if tmprio>Hprio
                             Lpriofail+=eval[i]-ratio[tmprio][1]
@@ -148,19 +137,17 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
                             Hpriofail+=eval[i]-ratio[tmprio][1]
                         end
                     end
+                end
+                if mod(tmpi-i,ratio[tmprio][2])==0
                     eval[i]=0
                 end
             end
             tmprio+=1
         end
-        if n[2]!= col
-            nbcol+=1
-            col=n[2]
-        end
         tmpi+=1
     end
 
-    return [nbcol,Hpriofail,Lpriofail], prio
+    return [nbcol,Hpriofail,Lpriofail], tab_violation
 end
 
 
@@ -168,7 +155,7 @@ end
 # Fonction qui initialise les differentes phases et le temps accordé à chacune
 # @return ::Array{Int32,1} : timeOPT
 # @return ::Array{Int32,1} : OPT
-function phases_init()
+function phases_init(obj::Array{Int32,1})
     timeOPT = [0,0,0] ## le temps accordé pour chaque phase
     OPT = [0,0,0]   ## l'opt utilisé pour chaque phase avec 1=A,2=B,3=C
     if obj[1]==2
@@ -186,7 +173,7 @@ function phases_init()
     else
         if obj[3]!=0
             timeOPT= [80,20,0]
-            OPT[3,3,0]
+            OPT= [3,3,0]
         else
             timeOPT= [100,0,0]
             OPT = [3,0,0]
