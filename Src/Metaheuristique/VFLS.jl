@@ -33,7 +33,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
 
     for Phase in 1:3
         while temps_max*(timeOPT[Phase]/100)>time()-debut
-            choisir_klLS(sequence_meilleure, opt,obj,Phase)
+            choisir_klLS(sequence_meilleure, convert(Array{Int32,1},opt),obj,Phase)
             #=
             k, l, LSfoo! = choisir_klLS(sequence_meilleure, opt) # choose transformation and positions where applying it;
             if global_test_mouvement!(LSfoo!, sequence_meilleure, score_meilleur, k, l) # if transformation is good then

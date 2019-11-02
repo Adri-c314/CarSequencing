@@ -148,10 +148,10 @@ function violation_same_color(instance::Array{Array{Int32,1},1},prio::Array{Arra
 end
 
 
-<<<<<<< HEAD:Src/Metaheuristique/fonction_rand.jl
+#<<<<<<< HEAD:Src/Metaheuristique/fonction_rand.jl
 generic(Int32(1000))
 generic(Int32(1000))
-=======
+#=======#
 #generic(1000)
 #generic(1000)
->>>>>>> cd0c5387709701f01f4d74d5c590f33dcb6fdc95:Src/Util/fonction_rand.jl
+#>>>>>>> cd0c5387709701f01f4d74d5c590f33dcb6fdc95:Src/Util/fonction_rand.jl
