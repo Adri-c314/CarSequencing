@@ -1,4 +1,4 @@
-Fonction qui permet de verifier qu'un mouvement est bien améliorant
+# Fonction qui permet de verifier qu'un mouvement est bien améliorant
 # @param LSfoo!::Function : LSfoo! doit etre une des fonctions de recherche locale (swap!, fw_insertion!, bw_insertion!, reflection!, permutation!). Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
 # @param sequence_courrante : la sequence ou instance courante
 # @param score_courrant : la valeur du score sur les differents obj
