@@ -1,4 +1,4 @@
-<<<<<<< HEAD:Src/Metaheuristique/fonction_moche_mais_j_ai_la_flemme.jl
+#<<<<<<< HEAD:Src/Metaheuristique/fonction_moche_mais_j_ai_la_flemme.jl
 using Dates
 function init_sequence(instance::String,reference::String)
 
@@ -145,7 +145,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
     return [nbcol,Hpriofail,Lpriofail], prio
 end
 
-=======
+#=======#
 # Fichier tous les algorithms gloutons et leurs foncions associées
 # @author Oryan Rampon
 # @author Corentin Pelhatre
@@ -164,7 +164,7 @@ end
 # @param pbl : l'entier de paint_batch_limi
 # @param Hprio : l'entier de H
 # @return ::Array{Array{Int32,1},1} : La nouvelle instance (avec un petit tri en plus pas piqué des annetons mais là je m'enballe peut etre un peu dans les commentaires apres je ne sais pas)
->>>>>>> cd0c5387709701f01f4d74d5c590f33dcb6fdc95:Src/Metaheuristique/greedy.jl
+#>>>>>>> cd0c5387709701f01f4d74d5c590f33dcb6fdc95:Src/Metaheuristique/greedy.jl
 function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int32,Hprio::Int32)
     sz =size(instance)[1]
     szcar = size(instance[1])[1]

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Fonction qui permet de verifier qu'un mouvement est bien améliorant
+=======
+#Fonction qui permet de verifier qu'un mouvement est bien améliorant
+>>>>>>> b937fc47d6985d587a6a47bf0fbb95b1bd5a6a04
 # @param LSfoo!::Function : LSfoo! doit etre une des fonctions de recherche locale (swap!, fw_insertion!, bw_insertion!, reflection!, permutation!). Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
 # @param sequence_courrante : la sequence ou instance courante
 # @param score_courrant : la valeur du score sur les differents obj
@@ -130,7 +134,11 @@ end
 # @modify sequence_courante : ?????
 # @modify score_courrant : ?????
 function reflection!(sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
-   #TODO : Realise la reflection tranquille pepere sans te soucier de rien
+    for i in 1:floor(l-k/2)
+        tmp=sequence_courrante[k+i]
+        sequence_courrante[k+i]=sequence_courrante[l-i]
+        sequence_courrante[l-i]=tmp
+    end
    nothing # Pas de return pour eviter les copies de memoire.
 end
 
@@ -143,12 +151,71 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_reflection!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32)
-   #TODO : L'evaluer et si elle est meilleure (a 100*(R-1) % pres), garder les modifs, sinon les retirer de sequence_courrante.
+function test_reflection!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32,score_courrant::Array{Int32,1},prio::Array{Array{Int32,1}},Hprio::Int32,obj::Array{Int32,1},pbl::Int32)
+    core_init=[0,0,0]
+    tmp_violation=Int32(0)
+    #Evaluation initiale
+    for i in 1:length(prio)
+        tmp_val_courrante=sequence_courrante[max(k-prio[i][2],1)][i+2]
+        for j in max(k+1-prio[i][2],2):l
+            if sequence_courrante[j][i+2] != tmp_val_courrante
+                tmp_violation+=1
+            end
+        end
+        if i>Hprio
+            score_init[3]+=tmp_violation
+        else
+            score_init[2]+=tmp_violation
+        end
+        tmp_violation=0
+    end
+
+    tmp_val_courrante=sequence_courrante[max(k-pbl,1)][2]
+    for j in  max(k+1-pbl,2):l
+        if sequence_courrante[j][2] != tmp_val_courrante
+            tmp_violation+=1
+        end
+    end
+    score_init[1]+=tmp_violation
    return true
+
+    #On applique le mouvement
+    reflection!(sequence_courrante,k,l)
+
+    #Eval du mouvement
+    score_final=[0,0,0]
+    tmp_violation=0
+    for i in 1:length(prio)
+        tmp_val_courrante=sequence_courrante[max(k-prio[i][2],1)][i+2]
+        for j in  max(k+1-prio[i][2],2):l
+            if sequence_courrante[j][i+2] != tmp_val_courrante
+                tmp_violation+=1
+            end
+        end
+        if i>Hprio
+            score_final[3]+=tmp_violation
+        else
+            score_final[2]+=tmp_violation
+        end
+        tmp_violation=0
+    end
+
+    tmp_val_courrante=sequence_courrante[max(k-pbl,1)][2]
+    for j in max(k+1-pbl,2):l
+        if sequence_courrante[j][2] != tmp_val_courrante
+            tmp_violation+=1
+        end
+    end
+    score_final[1]+=tmp_violation
+
+    #On accepte ou non la reflection
+    if score_final[obj[1]]>1.05*score_init[obj[1]]
+        reflection!(sequence_courrante,k,l)
+        return false
+    else
+        return true
+    end
 end
-
-
 
 
 
@@ -164,7 +231,9 @@ end
 # @modify sequence_courante : ?????
 # @modify score_courrant : ?????
 function swap!(sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
-   #TODO : Realise le swap tranquille pepere sans te soucier de rien
+    tmp=sequence_courrante[k]
+    sequence_courrante[k]=sequence_courrante[l]
+    sequence_courrante[l]=tmp
    nothing # Pas de return pour eviter les copies de memoire.
 end
 
@@ -177,9 +246,67 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_swap!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32)
-   #TODO : L'evaluer et si elle est meilleure (a 100*(R-1) % pres), garder les modifs, sinon les retirer de sequence_courrante.
-   return true
+function test_swap!(sequence_courrante::Array{Array{Int32,1},1}, k::Int32, l::Int32, score_courrant::Array{Int32,1},prio::Array{Array{Int32,1}},Hprio::Int32,obj::Array{Int32,1},pbl::Int32)
+    score_init=[0,0,0]
+    tmp_violation=Int32(0)
+    #Evaluation initiale
+    for i in 1:length(prio)
+        tmp_val_courrante=sequence_courrante[max(k-prio[i][2],1)][i+2]
+        for j in max(k+1-prio[i][2],2):k
+            if sequence_courrante[j][i+2] != tmp_val_courrante
+                tmp_violation+=1
+            end
+        end
+        if i>Hprio
+            score_init[3]+=tmp_violation
+        else
+            score_init[2]+=tmp_violation
+        end
+        tmp_violation=0
+    end
+
+    tmp_val_courrante=sequence_courrante[max(k-pbl,1)][2]
+    for j in  max(k+1-pbl,2):k
+        if sequence_courrante[j][2] != tmp_val_courrante
+            tmp_violation+=1
+        end
+    end
+    score_init[1]+=tmp_violation
+    #On effectu le changement
+    swap!(sequence_courrante,k,l)
+
+    #Deuxième eval
+    score_final=[0,0,0]
+    tmp_violation=0
+    for i in 1:length(prio)
+        tmp_val_courrante=sequence_courrante[max(k-prio[i][2],1)][i+2]
+        for j in  max(k+1-prio[i][2],2):k
+            if sequence_courrante[j][i+2] != tmp_val_courrante
+                tmp_violation+=1
+            end
+        end
+        if i>Hprio
+            score_final[3]+=tmp_violation
+        else
+            score_final[2]+=tmp_violation
+        end
+        tmp_violation=0
+    end
+
+    tmp_val_courrante=sequence_courrante[max(k-pbl,1)][2]
+    for j in max(k+1-pbl,2):k
+        if sequence_courrante[j][2] != tmp_val_courrante
+            tmp_violation+=1
+        end
+    end
+    score_final[1]+=tmp_violation
+    #On accepte ou non le swap
+    if score_final[obj[1]]>1.05*score_init[obj[1]]
+        swap!(sequence_courrante,k,l)
+        return false
+    else
+        return true
+    end
 end
 
 
