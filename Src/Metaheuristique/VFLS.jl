@@ -39,7 +39,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
             tmpkl = generic(sz)
             k = minimum(tmpkl)
             l = maximum(tmpkl)
-            swap!(sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl)
+            swap!(sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl,:generic!)
             #=
             k, l, LSfoo! = choisir_klLS(sequence_meilleure, opt) # choose transformation and positions where applying it;
             if global_test_mouvement!(LSfoo!, sequence_meilleure, score_meilleur, k, l) # if transformation is good then
