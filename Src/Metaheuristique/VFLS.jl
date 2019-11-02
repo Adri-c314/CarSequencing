@@ -1,81 +1,57 @@
-# Fonction principale de l'heuristique, par Xavier.
+# Fichier contenant la fonction VFLS, fonction principale de l'heuristique
+# @author Oryan Rampon
+# @author Corentin Pelhatre
+# @author Mathis Ocquident
+# @author Thaddeus Leonard
+# @author Adrien Cassaigne
+# @author Xavier Pillet
+# @date 01/11/2019
+# @version 2
 
-include("choisir_klLS.jl")
-include("fonction_moche_mais_j_ai_la_flemme.jl")
 
+
+# Constantes utile pour fixer les types/opt :
 const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
 const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
 const ID_LS = (:swap!, :fw_insertion!, :bw_insertion!, :reflection!, :permutation!) #Macro pour identifier les fonctions de LS
-## temps en milliseconde...
-function VFLS(instance,reference, temps_max::Float64 = 1000.0)
-    sequence::Array{Array{Int32,1},1},prio::Array{Array{Int32,1},1},pbl::Int32,obj::Array{Int32,1},Hprio::Int32 = init_sequence(instance,reference) #Le glouton.
-    if obj[1]==1
-        sequence_courrante = GreedyRAF(sequence,prio,pbl,Hprio)
-    else
-        sequence_courrante = GreedyEP(sequence,prio,pbl,Hprio)
-    end
-    score_courrant::Array{Int32,1},tab_violation::Array{Array{Int32,1},1} = evaluation_init(sequence_courrante,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
-    sequence_meilleure = deepcopy(sequence_courrante)
-    score_meilleur = deepcopy(score_courrant)
+
+
+
+# Fonction principale de l'heuristique (VFLS)
+# @param datas : Le jeux de données lu
+# @param temps_max : Temps en milliseconde...
+# @return : La meilleure sequence
+function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
+    # compute initial sequence :
+    ## stop enlever des trucs important 2 fois que je fais ça............
+    ## on a besoin des ratio et de Hprio et obj sinon pour phases_init c'est plus compmiqué quoi......
+    sequence_meilleure, score_meilleur, tab_violation, ratio_prio, Hprio, obj = compute_initial_sequence(datas)
+    timeOPT, opt = phases_init(obj)
+
+    # while temps_max is not reached do
     debut = time()
-    timeOPT = [0,0,0] ## le temps accordé pour chaque phase
-    OPT = [0,0,0]   ## l'opt utilisé pour chaque phase avec 1=A,2=B,3=C
-    if obj[1]==2
-        if obj[3]!=0
-            timeOPT= [60,25,15]
-            if(obj[2]==1)
-                OPT= [1,1,2]
-            else
-                OPT= [1,2,3]
+
+    for Phase in 1:3
+        while temps_max*(timeOPT[Phase]/100)>time()-debut
+            choisir_klLS(sequence_meilleure, opt,obj,Phase)
+            #=
+            k, l, LSfoo! = choisir_klLS(sequence_meilleure, opt) # choose transformation and positions where applying it;
+            if global_test_mouvement!(LSfoo!, sequence_meilleure, score_meilleur, k, l) # if transformation is good then
+                global_mouvement!(LSfoo!, sequence_meilleure, k, l) # update current sequence by performing it;
             end
-        else
-            timeOPT= [50,50,0]
-            OPT= [1,2,0]
-        end
-    else
-        if obj[3]!=0
-            timeOPT= [80,20,0]
-            OPT[3,3,0]
-        else
-            timeOPT= [100,0,0]
-            OPT = [3,0,0]
+            =#
         end
     end
-    ##Phase 1
-    Phase = 1
-    while temps_max*(timeOPT[Phase]/100)>time()-debut
 
-    end
-    ##Phase 2
-    Phase = 2
-    while temps_max*(timeOPT[Phase]/100)>time()-debut
-
-    end
-
-    ##Phase 3
-    Phase = 3
-    while temps_max*(timeOPT[Phase]/100)>time()-debut
-
-    end
-
-    while temps_max > time() - debut
-
-
-
-        ##a faire car on passe pas le meme temps sur chaque opt en fonction des objectifs donc pas un for mais un while 3 fois
-        #=for opt in OPT
-            local k::UInt32, l::UInt32, LSfoo!::Function = choisir_klLS(sequence_courrante, opt) #Choix des param de la LS.
-            LSfoo!(sequence_courrante, k, l, score_courrant) #Appel de la fonction de recherche locale.
-            if estMieux(score_courrant, score_meilleur)
-                sequence_meilleure = deepcopy(sequence_courrante)
-                score_meilleur = deepcopy(sequence_courrante)
-            end
-        end
-        =#
-    end
     return sequence_meilleure
 end
 
+
+
+# Fonction qui realise une comparaison lexicographique
+# @param score_courrant : Le score courant comparer à
+# @pram score_meilleur : le meilleur score
+# @return ::Bool : true si le courrant est mieux
 function estMieux(score_courrant::Array{Int32,1}, score_meilleur::Array{Int32,1})
     return score_courrant >= score_meilleur # Comparaison lexicographique.
 end
