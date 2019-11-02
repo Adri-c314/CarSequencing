@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # Fonction qui permet de verifier qu'un mouvement est bien améliorant
-=======
-#Fonction qui permet de verifier qu'un mouvement est bien améliorant
->>>>>>> b937fc47d6985d587a6a47bf0fbb95b1bd5a6a04
 # @param LSfoo!::Function : LSfoo! doit etre une des fonctions de recherche locale (swap!, fw_insertion!, bw_insertion!, reflection!, permutation!). Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
 # @param sequence_courrante : la sequence ou instance courante
 # @param score_courrant : la valeur du score sur les differents obj
@@ -151,7 +147,7 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_reflection!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32,score_courrant::Array{Int32,1},prio::Array{Array{Int32,1}},Hprio::Int32,obj::Array{Int32,1},pbl::Int32)
+function test_reflection!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32,prio::Array{Array{Int32,1}},Hprio::Int32,obj::Array{Int32,1},pbl::Int32)
     core_init=[0,0,0]
     tmp_violation=Int32(0)
     #Evaluation initiale

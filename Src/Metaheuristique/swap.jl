@@ -195,7 +195,6 @@ function eval_Hprio(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
     for i in 1:Hprio
-        println(i)
         if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
             if sequence_courante[k][i+2]==1
                 for j in k:min(sz,k+ratio_option[i][2])
@@ -222,7 +221,6 @@ function eval_Hprio(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
             end
         end
     end
-    println(tmp_viol)
     return tmp_viol
 end
 ##
