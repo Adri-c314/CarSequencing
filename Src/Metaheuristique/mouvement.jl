@@ -6,7 +6,7 @@
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function global_test_mouvement!(LSfoo!::Function, sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32)
+function global_test_mouvement!(LSfoo!::Function, sequence_courrante::Array{Array{Int64,1},1}, score_courrant::Array{Int64,1}, k::UInt64, l::UInt64)
    if LSfoo! == swap!
        return test_swap!(sequence_courrante, score_courrant, k, l)
    elseif LSfoo! == fw_insertion!
@@ -29,7 +29,7 @@ end
 # @param l : l'indice de l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : ?????
-function global_mouvement!(LSfoo!::Function, sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
+function global_mouvement!(LSfoo!::Function, sequence_courrante::Array{Array{Int64,1},1}, k::UInt64, l::UInt64)
    #=
    if LSfoo! == :swap!
        swap!(sequence_courrante, k, l)
@@ -62,7 +62,7 @@ end
 # @param l : l'indice de l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : ?????
-function fw_insertion!(sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
+function fw_insertion!(sequence_courrante::Array{Array{Int64,1},1}, k::UInt64, l::UInt64)
    #TODO : Realise la fw_insertion tranquille pepere sans te soucier de rien
    nothing
 end
@@ -76,7 +76,7 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_fw_insertion!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32)
+function test_fw_insertion!(sequence_courrante::Array{Array{Int64,1},1}, score_courrant::Array{Int64,1}, k::UInt64, l::UInt64)
    #TODO : L'evaluer et si elle est meilleure (a 100*(R-1) % pres), garder les modifs, sinon les retirer de sequence_courrante.
    return true
 end
@@ -95,7 +95,7 @@ end
 # @param l : l'indice de l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : ?????
-function permutation!(sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
+function permutation!(sequence_courrante::Array{Array{Int64,1},1}, k::UInt64, l::UInt64)
    #TODO : Realise la permutation tranquille pepere sans te soucier de rien
    nothing # Pas de return pour eviter les copies de memoire.
 end
@@ -109,7 +109,7 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_permutation!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32)
+function test_permutation!(sequence_courrante::Array{Array{Int64,1},1}, score_courrant::Array{Int64,1}, k::UInt64, l::UInt64)
    #TODO : L'evaluer et si elle est meilleure (a 100*(R-1) % pres), garder les modifs, sinon les retirer de sequence_courrante.
    return true
 end
@@ -129,7 +129,7 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : ?????
 # @modify score_courrant : ?????
-function reflection!(sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
+function reflection!(sequence_courrante::Array{Array{Int64,1},1}, k::UInt64, l::UInt64)
     for i in 1:floor(l-k/2)
         tmp=sequence_courrante[k+i]
         sequence_courrante[k+i]=sequence_courrante[l-i]
@@ -147,9 +147,9 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_reflection!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32,prio::Array{Array{Int32,1}},Hprio::Int32,obj::Array{Int32,1},pbl::Int32)
+function test_reflection!(sequence_courrante::Array{Array{Int64,1},1}, score_courrant::Array{Int64,1}, k::UInt64, l::UInt64,prio::Array{Array{Int64,1}},Hprio::Int64,obj::Array{Int64,1},pbl::Int64)
     core_init=[0,0,0]
-    tmp_violation=Int32(0)
+    tmp_violation=Int64(0)
     #Evaluation initiale
     for i in 1:length(prio)
         tmp_val_courrante=sequence_courrante[max(k-prio[i][2],1)][i+2]
@@ -226,7 +226,7 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : ?????
 # @modify score_courrant : ?????
-function swap!(sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
+function swap!(sequence_courrante::Array{Array{Int64,1},1}, k::UInt64, l::UInt64)
     tmp=sequence_courrante[k]
     sequence_courrante[k]=sequence_courrante[l]
     sequence_courrante[l]=tmp
@@ -242,9 +242,9 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_swap!(sequence_courrante::Array{Array{Int32,1},1}, k::Int32, l::Int32, score_courrant::Array{Int32,1},prio::Array{Array{Int32,1}},Hprio::Int32,obj::Array{Int32,1},pbl::Int32)
+function test_swap!(sequence_courrante::Array{Array{Int64,1},1}, k::Int64, l::Int64, score_courrant::Array{Int64,1},prio::Array{Array{Int64,1}},Hprio::Int64,obj::Array{Int64,1},pbl::Int64)
     score_init=[0,0,0]
-    tmp_violation=Int32(0)
+    tmp_violation=Int64(0)
     #Evaluation initiale
     for i in 1:length(prio)
         tmp_val_courrante=sequence_courrante[max(k-prio[i][2],1)][i+2]
@@ -318,7 +318,7 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : ?????
 # @modify score_courrant : ?????
-function bw_insertion!(sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
+function bw_insertion!(sequence_courrante::Array{Array{Int64,1},1}, k::UInt64, l::UInt64)
    #TODO : Realise la bw_insertion tranquille pepere sans te soucier de rien
    nothing # Pas de return pour eviter les copies de memoire.
 end
@@ -332,7 +332,7 @@ end
 # @param l : l'indice de l
 # @return ::Bool : true si le mouvement est worth
 # @modify score_courrant : Modifie le score courant si accepter
-function test_bw_insertion!(sequence_courrante::Array{Array{Int32,1},1}, score_courrant::Array{Int32,1}, k::UInt32, l::UInt32)
+function test_bw_insertion!(sequence_courrante::Array{Array{Int64,1},1}, score_courrant::Array{Int64,1}, k::UInt64, l::UInt64)
    #TODO : L'evaluer et si elle est meilleure (a 100*(R-1) % pres), garder les modifs, sinon les retirer de sequence_courrante.
    return true
 end

@@ -56,9 +56,10 @@ function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"),
         # Lecture du fichier csv
         datas = lectureCSV(i[1], i[2])
         println(typeof(datas))
-
+        println("debut vfls : ")
         # Lancement de la VFLS
         VFLS(datas)
+        println("fin vfls : ")
         # Gestion affichage :
         if txtoutput
             txt = string(

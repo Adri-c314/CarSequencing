@@ -34,7 +34,6 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
     for Phase in 1:3
         #while temps_max*(timeOPT[Phase]/100)>time()-debut
         for i in 1:1000
-
             #choisir_klLS(sequence_meilleure, opt,obj,Phase)
             tmpkl = generic(sz)
             k = minimum(tmpkl)
@@ -60,6 +59,6 @@ end
 # @param score_courrant : Le score courant comparer à
 # @pram score_meilleur : le meilleur score
 # @return ::Bool : true si le courrant est mieux
-function estMieux(score_courrant::Array{Int32,1}, score_meilleur::Array{Int32,1})
+function estMieux(score_courrant::Array{Int64,1}, score_meilleur::Array{Int64,1})
     return score_courrant >= score_meilleur # Comparaison lexicographique.
 end

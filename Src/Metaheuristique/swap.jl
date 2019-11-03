@@ -4,7 +4,7 @@
 
 ## k et l avec k<l
 ## rand_mov le Symbol de la fonction utilisé pour trouvé k et l
-function swap!(sequence_courante::Array{Array{Int32,1},1}, k::Int32, l::Int32, score_courrant::Array{Int32,1},ratio_option::Array{Array{Int32,1}},tab_violation::Array{Array{Int32,1}},Hprio::Int32,obj::Array{Int32,1},pbl::Int32,rand_mov::Symbol)
+function swap!(sequence_courante::Array{Array{Int64,1},1}, k::Int64, l::Int64, score_courrant::Array{Int64,1},ratio_option::Array{Array{Int64,1}},tab_violation::Array{Array{Int64,1}},Hprio::Int64,obj::Array{Int64,1},pbl::Int64,rand_mov::Symbol)
 
     cond = true
     tmp_color=0
@@ -33,7 +33,7 @@ function swap!(sequence_courante::Array{Array{Int32,1},1}, k::Int32, l::Int32, s
         end
     end
     aa , bb =evaluation_init(sequence_courante,ratio_option,Hprio)
-    println(aa)
+    println("evaluation avant swap : ",aa)
 
     tmp=sequence_courante[k]
     sequence_courante[k]=sequence_courante[l]
@@ -41,7 +41,7 @@ function swap!(sequence_courante::Array{Array{Int32,1},1}, k::Int32, l::Int32, s
     update_tab_violation_and_pbl(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     a , b =evaluation_init(sequence_courante,ratio_option,Hprio)
 
-    println(a)
+    println("evaluation apres swap : ",a)
 
 
     nothing # Pas de return pour eviter les copies de memoire.
@@ -52,7 +52,7 @@ end
 # evalue la difference de RAF si on effectu le swap k,l
 #
 # @return Bool : si c'est autorisé comme changement
-function eval_couleur(sequence_courante::Array{Array{Int32,1},1},pbl::Int,k::Int,l::Int)
+function eval_couleur(sequence_courante::Array{Array{Int64,1},1},pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
@@ -126,7 +126,7 @@ end
 #On reevalue les color et le tab_violation de la new sol
 #
 #
-function update_tab_violation_and_pbl(sequence_courante::Array{Array{Int32,1},1},ratio_option::Array{Array{Int32,1},1},tab_violation,Hprio::Array{Array{Int32,1},1},pbl::Int,k::Int,l::Int)
+function update_tab_violation_and_pbl(sequence_courante::Array{Array{Int64,1},1},ratio_option::Array{Array{Int64,1},1},tab_violation,Hprio::Int64,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
 
@@ -203,7 +203,7 @@ end
 # evalue la difference de EP si on effectu le swap k,l
 #
 # @return Int : le nombre de EP de difference
-function eval_Hprio(sequence_courante::Array{Array{Int32,1},1},ratio_option::Array{Array{Int32,1},1},tab_violation::Array{Array{Int32,1},1},Hprio::Int,k::Int,l::Int)
+function eval_Hprio(sequence_courante::Array{Array{Int64,1},1},ratio_option::Array{Array{Int64,1},1},tab_violation::Array{Array{Int64,1},1},Hprio::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
     for i in 1:Hprio
@@ -241,7 +241,7 @@ end
 #
 #
 # @return Int : le nombre de ENP de difference
-function eval_Lprio(sequence_courante::Array{Array{Int32,1},1},ratio_option::Array{Array{Int32,1},1},tab_violation::Array{Array{Int32,1},1},Hprio::Int,k::Int,l::Int)
+function eval_Lprio(sequence_courante::Array{Array{Int64,1},1},ratio_option::Array{Array{Int64,1},1},tab_violation::Array{Array{Int64,1},1},Hprio::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
     for i in Hprio+1:size(ratio_option)[1]
