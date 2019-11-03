@@ -26,6 +26,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
     ## stop enlever des trucs important 2 fois que je fais ça............
     ## on a besoin des ratio et de Hprio et obj sinon pour phases_init c'est plus compmiqué quoi......
     sequence_meilleure, score_meilleur, tab_violation, ratio_option, Hprio, obj,pbl = compute_initial_sequence(datas)
+    println("P'tites infos sur l'instance, toujours utile quand on veut tester des trucs : ")
+    println("nombre d'options prioritaires : ", Hprio)
+    println("PAINT_BATCH_LIMIT : ", pbl)
+    println("--------------------------------------------------------------")
     timeOPT, opt = phases_init(obj)
     println(score_meilleur)
     # while temps_max is not reached do
@@ -33,6 +37,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
     sz = size(sequence_meilleure)[1]
     for Phase in 1:3
         #while temps_max*(timeOPT[Phase]/100)>time()-debut
+        #là c'est pour tester chaque mouvement en attendant de tous les avoir
         for i in 1:1000
             #choisir_klLS(sequence_meilleure, opt,obj,Phase)
             tmpkl = generic(sz)
@@ -47,7 +52,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
             =#
         end
     end
-
+    #println("1 voiture : ",sequence_meilleure[1])    #juste pour tester des trucs 
     a , b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
     println("_____________________")
     println(a)
