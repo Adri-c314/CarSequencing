@@ -24,15 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-<<<<<<< HEAD
-<<<<<<< HEAD
     if LSfoo! == :insertion!
-=======
-    if LSfoo! == :shuffle! || LSfoo! == :swap!
->>>>>>> bbfb7e85729a0d3e905e4db9d3fdb229a9f01dcc
-=======
-    if LSfoo! == :shuffle! || LSfoo! == :swap!
->>>>>>> bbfb7e85729a0d3e905e4db9d3fdb229a9f01dcc
         @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     end
     nothing
