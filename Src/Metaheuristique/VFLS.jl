@@ -10,6 +10,22 @@
 
 
 
+#=
+## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
+##            les voitures avec [2]= leurs couleurs
+##            les voitures avec [3:3+Hprio]= leurs Hprio (ca serait pas plutot [3:3+Hprio-1] ?)
+##            les voitures avec [3+Hprio:]= leurs Lprio
+##                              [size()[1]-2] = le debut de leur sequence de couleur
+##                              [size()[1]-1] = la fin de leur sequence de couleur
+## Ratio x/y: Les ratio avec [1] = x
+##            Les ratio avec [2] = y
+## pbl      : Le paint batch limit
+## obj      : Les obj des l'ordre
+## Hprio    : le nombre de Hprio
+=#
+
+
+
 # Constantes utile pour fixer les types/opt :
 const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
 const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
@@ -21,42 +37,73 @@ const ID_LS = (:swap!, :fw_insertion!, :bw_insertion!, :reflection!, :permutatio
 # @param datas : Le jeux de données lu
 # @param temps_max : Temps en milliseconde...
 # @return : La meilleure sequence
-function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
+function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
     # compute initial sequence :
-    ## stop enlever des trucs important 2 fois que je fais ça............
-    ## on a besoin des ratio et de Hprio et obj sinon pour phases_init c'est plus compmiqué quoi......
-    sequence_meilleure, score_meilleur, tab_violation, ratio_option, Hprio, obj,pbl = compute_initial_sequence(datas)
-    println("P'tites infos sur l'instance, toujours utile quand on veut tester des trucs : ")
-    println("nombre d'options prioritaires : ", Hprio)
-    println("PAINT_BATCH_LIMIT : ", pbl)
-    println("--------------------------------------------------------------")
-    timeOPT, opt = phases_init(obj)
-    println(score_meilleur)
-    # while temps_max is not reached do
-    debut = time()
+    sequence_meilleure, score_init, tab_violation, ratio_option, Hprio, obj,pbl = compute_initial_sequence(datas)
     sz = size(sequence_meilleure)[1]
+    timeOPT, opt = phases_init(obj)
+
+
+
+    # affichage initial :
+    if verbose
+        println("1) Information sur les données :")
+        println("   ---------------------------")
+        println("Nombre d'options prioritaires : ", Hprio)
+        println("PAINT_BATCH_LIMIT : ", pbl)
+        println("Nombre de vehicules : ", sz)
+        println("\n\n\n")
+    end
+    txt = ""
+    if txtoutput
+        txt = string(txt, "1) Information sur l'instance :\n",
+                "   ----------------------------\n",
+                "Nombre d'options prioritaires : ", Hprio, "\n",
+                "PAINT_BATCH_LIMIT : ", pbl, "\n",
+                "Nombre de vehicules : ", sz, "\n",
+                "\n\n\n")
+    end
+
+
+
+    # affichage initial sequence :
+    if verbose
+        println("2) Information sur la sequence initiale :")
+        println("   ------------------------------------")
+        for j in 1:length(score_init)
+            println(string("Valeur sur l'objectif ", j, " : ", score_init[j]))
+        end
+        println("\n\n\n")
+    end
+    if txtoutput
+        txt = string(txt, "2) Information sur la sequence initiale :\n","   ------------------------------------")
+        for j in 1:length(score_init)
+            txt = string(txt, "Valeur sur l'objectif ", j, " : ", score_init[j], "\n")
+        end
+        txt = string("\n\n\n")
+    end
+
+
+
+    debut = time()
     for Phase in 1:3
-        #while temps_max*(timeOPT[Phase]/100)>time()-debut
-        #là c'est pour tester chaque mouvement en attendant de tous les avoir
         for i in 1:1000
             #choisir_klLS(sequence_meilleure, opt,obj,Phase)
             tmpkl = generic(sz)
             k = minimum(tmpkl)
             l = maximum(tmpkl)
-            swap!(sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl,:generic!)
-            #=
-            k, l, LSfoo! = choisir_klLS(sequence_meilleure, opt) # choose transformation and positions where applying it;
-            if global_test_mouvement!(LSfoo!, sequence_meilleure, score_meilleur, k, l) # if transformation is good then
-                global_mouvement!(LSfoo!, sequence_meilleure, k, l) # update current sequence by performing it;
-            end
-            =#
+            swap!(sequence_meilleure,k,l,ratio_option,tab_violation,Hprio,obj,pbl,:generic!)
         end
     end
-    #println("1 voiture : ",sequence_meilleure[1])    #juste pour tester des trucs 
-    a , b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
-    println("_____________________")
-    println(a)
-    return sequence_meilleure
+
+
+
+    # Re evaluation en fin d'exection :
+    a, b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
+
+
+
+    return a, b, txt
 end
 
 
