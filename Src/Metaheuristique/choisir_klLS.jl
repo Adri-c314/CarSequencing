@@ -18,7 +18,7 @@ using Random
 ## du coup oui mais pas vraiment # @return LSfoo!::Function : LSfoo! doit etre une des fonctions de recherche locale (swap!, fw_insertion!, bw_insertion!, reflection!, permutation!). Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
 # @return ID_rand[mv][i]::Function : une fonction pour obtenir k et l random
 # @return ID_LS[mv]::Function : une fonction de recherche locale
-function choisir_klLS(sequence_courrante::Array{Array{Int32,1},1}, opt::Array{Int32,1},obj::Array{Int32,1},phase::Int)
+function choisir_klLS(sequence_courrante::Array{Array{Int,1},1}, opt::Array{Int,1},obj::Array{Int,1},phase::Int)
     ID_LS = (:swap!, :insertion!, :reflection!, :shuffle!)
     ID_rand1 = (:generic!, :similar!, :consecutive!, :same_color!,:border_block_two!,:violation!,:violation_same_color!)
     ID_rand2 = (:generic!, :denominator!, :same_color!, :border_block_one!)

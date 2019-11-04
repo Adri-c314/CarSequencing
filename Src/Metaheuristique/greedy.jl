@@ -15,14 +15,14 @@
 # @param ratio : le tableau de ratio
 # @param pbl : l'entier de paint_batch_limi
 # @param Hprio : l'entier de H
-# @return ::Array{Array{Int32,1},1} : La nouvelle instance (avec un petit tri en plus pas piqué des annetons mais là je m'enballe peut etre un peu dans les commentaires apres je ne sais pas)
-function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int32,Hprio::Int32)
+# @return ::Array{Array{Int,1},1} : La nouvelle instance (avec un petit tri en plus pas piqué des annetons mais là je m'enballe peut etre un peu dans les commentaires apres je ne sais pas)
+function GreedyRAF(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},pbl::Int,Hprio::Int)
     sz =size(instance)[1]
     szcar = size(instance[1])[1]
-    pi = [Int32[0,0] for i in 1:Hprio]
-    PI = [Int32[0,sz] for i in 1:Hprio]
+    pi = [Int[0,0] for i in 1:Hprio]
+    PI = [Int[0,sz] for i in 1:Hprio]
 
-    # Tentative de correction mais confronter à un bug entre le typage Array{Array{Int32,1},1} et Array{Int32,2}
+    # Tentative de correction mais confronter à un bug entre le typage Array{Array{Int,1},1} et Array{Int,2}
     color=Int[0]
 
     for car in instance
@@ -44,7 +44,7 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
     tmp=0
 
     for n in color
-        tmp+=ceil(Int32,n/pbl)
+        tmp+=ceil(Int,n/pbl)
     end
 
     if color[tmpi]>pbl
@@ -57,7 +57,7 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
 
     while sum(color)!=0 && tmpplace != size(instance)[1]+1
         if tmpcol==pbl && color[tmpi]!=0
-            tmpi = argmax2(convert(Array{Int32,2},color),convert(Int32,tmpi))
+            tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
             tmpcol=0
             tmpdebcol=tmpplace
             if color[tmpi]>pbl
@@ -123,13 +123,13 @@ end
 # @param ratio : le tableau de ratio
 # @param pbl : l'entier de paint_batch_limi
 # @param Hprio : l'entier de H
-# @return ::Array{Array{Int32,1},1} : la nouvelle instance
-function GreedyEP(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},pbl::Int32,Hprio::Int32)
+# @return ::Array{Array{Int,1},1} : la nouvelle instance
+function GreedyEP(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},pbl::Int,Hprio::Int)
     szcar = size(instance[1])[1]
     sz =size(instance)[1]
 
-    pi = [Int32[0,0] for i in 1:Hprio]
-    PI = [Int32[0,sz] for i in 1:Hprio]
+    pi = [Int[0,0] for i in 1:Hprio]
+    PI = [Int[0,sz] for i in 1:Hprio]
 
     tmpdebcol=1
     for car in instance
@@ -200,8 +200,8 @@ end
 
 # Fonction qui tri l'instance
 # @param instance : l'instance avant tri
-# @return ::Array{Array{Int32,1},1} : l'instance apres tri
-function tri_car(instance::Array{Array{Int32,1},1})
+# @return ::Array{Array{Int,1},1} : l'instance apres tri
+function tri_car(instance::Array{Array{Int,1},1})
     instance = sort(instance, lt=(x,y)->isless(x[1], y[1]))
     return instance
 end
@@ -211,8 +211,8 @@ end
 # Fonction qui fait un truc bien utile
 # @param tmp : Bah comme son nom l'indique elle doit pas duré tres longtemps donc bon..
 # @param nope : nope !
-# @return ::Int32 : Une vaste fumisterie
-function argmax2(tmp::Array{Int32,2},nope::Int32)
+# @return ::Int : Une vaste fumisterie
+function argmax2(tmp::Array{Int,2},nope::Int)
     tmpii=1
     tmpmax=tmp[1]
 
@@ -233,8 +233,8 @@ end
 # @param PI : Je sais pas d'ou il sort lui
 # @param pi : et son fils c'est ramener avec
 # @param Hprio : l'entier de h
-# @return ::{Int32} : un nombre mega dur à calculer même pas tu essaye.
-function dur(ratio::Array{Array{Int32,1},1},PI::Array{Array{Int32,1},1},pi::Array{Array{Int32,1},1},Hprio::Int32)
+# @return ::{Int} : un nombre mega dur à calculer même pas tu essaye.
+function dur(ratio::Array{Array{Int,1},1},PI::Array{Array{Int,1},1},pi::Array{Array{Int,1},1},Hprio::Int)
     tmp=0
 
     if (PI[1][2]==pi[1][2])
