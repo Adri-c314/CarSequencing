@@ -21,7 +21,7 @@ function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"),
     #=
     ## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
     ##            les voitures avec [2]= leurs couleurs
-    ##            les voitures avec [3:3+Hprio]= leurs Hprio
+    ##            les voitures avec [3:3+Hprio]= leurs Hprio (ca serait pas plutot [3:3+Hprio-1] ?)
     ##            les voitures avec [3+Hprio:]= leurs Lprio
     ##                              [size()[1]-2] = le debut de leur sequence de couleur
     ##                              [size()[1]-1] = la fin de leur sequence de couleur
@@ -56,7 +56,6 @@ function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"),
         # Lecture du fichier csv
         datas = lectureCSV(i[1], i[2])
         println(typeof(datas))
-
         # Lancement de la VFLS
         VFLS(datas)
         # Gestion affichage :

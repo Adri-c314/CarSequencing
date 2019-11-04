@@ -14,7 +14,7 @@ Random.seed!(0)
 # Fonction avec un nom generic
 # @param size : la taille max
 # @return Array{Int64,1} : une position aleatoire
-function generic(size::Int32)
+function generic(size::Int64)
     a = rand(1:size,2)
     return a
 end
@@ -25,7 +25,7 @@ end
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
 # @return Array{Int64,1} : une position aleatoire t'as tout compris
-function similar(instance::Array{Array{Int32,1},1},size::Int32)
+function similar(instance::Array{Array{Int64,1},1},size::Int64)
     ## faire suivant les options ??
     while true
         a = rand(1:size,2)
@@ -43,7 +43,7 @@ end
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
 # @return Array{Int64,1} : une position aleatoire toujours
-function consecutive(instance::Array{Array{Int32,1},1},size::Int32)
+function consecutive(instance::Array{Array{Int64,1},1},size::Int64)
     k=rand(1:size,1)
     return [k,k+1]
 end
@@ -51,7 +51,7 @@ end
 
 
 ## faudra faire un array des violation ??? un truc comme ça ou alors mettre dans instnace si l est en violation bref caca
-function denominator(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},sz::Int32)
+function denominator(instance::Array{Array{Int64,1},1},ratio::Array{Array{Int64,1},1},sz::Int64)
     k= rand(1:sz,1)
     q = rand(1:size(ratio)[1],1)
 
@@ -61,7 +61,7 @@ end
 
 
 # Fonction
-function same_color(instance::Array{Array{Int32,1},1},size::Int32)
+function same_color(instance::Array{Array{Int64,1},1},size::Int64)
     ## faire suivant les options ??
     while true
         a = rand(1:size,2)
@@ -74,7 +74,7 @@ end
 
 
 ## on met dans instance le block de meme couleur.
-function border_block_one(instance::Array{Array{Int32,1},1},size::Int32)
+function border_block_one(instance::Array{Array{Int64,1},1},size::Int64)
     a = rand(1:size,1)
     r = rand(1)
     if r >0.5
@@ -89,7 +89,7 @@ end
 
 
 ## la meme
-function border_block_two(instance::Array{Array{Int32,1},1},sz::Int32)
+function border_block_two(instance::Array{Array{Int64,1},1},sz::Int64)
     sz = size(instance[1])[1]
     a = same_color(instance,sz)
     r = rand(1)
@@ -118,7 +118,7 @@ end
 
 
 ## faudra faire un array des violation ??? un truc comme ça ou alors mettre dans instnace si l est en violation bref caca
-function violation(instance::Array{Array{Int32,1},1},prio::Array{Array{Int32,1},1},size::Int32)
+function violation(instance::Array{Array{Int64,1},1},prio::Array{Array{Int64,1},1},size::Int64)
     l = rand(1:size,1)
 
     while true
@@ -132,7 +132,7 @@ end
 
 
 ## nique ta mere
-function violation_same_color(instance::Array{Array{Int32,1},1},prio::Array{Array{Int32,1},1},size::Int32)
+function violation_same_color(instance::Array{Array{Int64,1},1},prio::Array{Array{Int64,1},1},size::Int64)
     k = rand(1:size,1)
 
     while prio[k][1]==0
@@ -148,10 +148,10 @@ function violation_same_color(instance::Array{Array{Int32,1},1},prio::Array{Arra
 end
 
 
-<<<<<<< HEAD:Src/Metaheuristique/fonction_rand.jl
-generic(Int32(1000))
-generic(Int32(1000))
-=======
+#<<<<<<< HEAD:Src/Metaheuristique/fonction_rand.jl
+generic(Int64(1000))
+generic(Int64(1000))
+#=======#
 #generic(1000)
 #generic(1000)
->>>>>>> cd0c5387709701f01f4d74d5c590f33dcb6fdc95:Src/Util/fonction_rand.jl
+#>>>>>>> cd0c5387709701f01f4d74d5c590f33dcb6fdc95:Src/Util/fonction_rand.jl
