@@ -17,7 +17,7 @@ using Dates
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"), ("A", "022_3_4_RAF_EP_ENP")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1000.0)
+function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1000.0)
     #=
     ## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
     ##            les voitures avec [2]= leurs couleurs
@@ -59,6 +59,7 @@ function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"),
 
         # Lancement de la VFLS
         VFLS(datas)
+        ui
         # Gestion affichage :
         if txtoutput
             txt = string(

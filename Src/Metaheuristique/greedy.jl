@@ -92,7 +92,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
     Hpriofail=0
     Lpriofail=0
 
-
+    println(ratio)
     prio = [zeros(size(ratio)[1])]
 
     for i in 1:(size(instance)[1]-1)
@@ -256,7 +256,7 @@ function GreedyRAF(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1}
             tmpplace+=1
             tmpcol+=1
             color[tmpi]-=1
-            for i in 1:3
+            for i in 1:Hprio
                 pi[i][1]+=tmpduri[2+i]
                 pi[i][2]+=1
             end

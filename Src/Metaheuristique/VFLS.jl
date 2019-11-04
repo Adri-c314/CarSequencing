@@ -9,7 +9,6 @@
 # @version 2
 
 
-
 # Constantes utile pour fixer les types/opt :
 const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
 const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
@@ -21,7 +20,7 @@ const ID_LS = (:swap!, :fw_insertion!, :bw_insertion!, :reflection!, :permutatio
 # @param datas : Le jeux de données lu
 # @param temps_max : Temps en milliseconde...
 # @return : La meilleure sequence
-function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
+function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 10.0)
     # compute initial sequence :
     ## stop enlever des trucs important 2 fois que je fais ça............
     ## on a besoin des ratio et de Hprio et obj sinon pour phases_init c'est plus compmiqué quoi......
@@ -31,15 +30,35 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
     # while temps_max is not reached do
     debut = time()
     sz = size(sequence_meilleure)[1]
-    for Phase in 1:3
-        #while temps_max*(timeOPT[Phase]/100)>time()-debut
-        for i in 1:1000
+    szcar = size(sequence_meilleure[1])[1]
+    nb = [0,0,0,0]
+    @time for Phase in 1:3
+        while temps_max*(timeOPT[Phase]/100)>time()-debut
+        #for i in 1:100
+            ID_LS = (:swap!, :insertion!, :reflection!, :shuffle!)
 
-            #choisir_klLS(sequence_meilleure, opt,obj,Phase)
-            tmpkl = generic(sz)
-            k = minimum(tmpkl)
-            l = maximum(tmpkl)
-            swap!(sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl,:generic!)
+
+            f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt,obj,Phase)
+
+            k,l = choose_f_rand(sequence_meilleure,ratio_option,tab_violation,f_rand,Phase,obj,Hprio)
+
+            if f_mouv==:swap!
+                swap!(sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl,f_rand)
+                nb[1]+=1
+            elseif f_mouv==:insertion!
+                nb[2]+=1
+            elseif f_mouv==:reflection!
+                nb[3]+=1
+                ##fonctionne pas
+                #reflection(sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl,f_rand)
+            else
+                nb[4]+=1
+                ## fonctionne mal sur pbl je corrige ça
+                #shuffle_(sequence_meilleure,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl)
+            end
+            #println(nb)
+            #swap!(sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl,:generic!)
+            #shuffle_(sequence_meilleure,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl)
             #=
             k, l, LSfoo! = choisir_klLS(sequence_meilleure, opt) # choose transformation and positions where applying it;
             if global_test_mouvement!(LSfoo!, sequence_meilleure, score_meilleur, k, l) # if transformation is good then
@@ -50,7 +69,12 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0)
     end
 
     a , b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
+    szcar = size(sequence_meilleure[1])[1]
+    for car in sequence_meilleure
+        println(car)
+    end
     println("_____________________")
+    println(nb)
     println(a)
     return sequence_meilleure
 end

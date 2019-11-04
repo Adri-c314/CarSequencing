@@ -106,15 +106,16 @@ end
 #         voir p937 proposition 1
 function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},Hprio::Int)
     col = instance[1][2]
+    sz =size(instance)[1]
     nbcol = 0
     Hpriofail=0
     Lpriofail=0
     maxprio =0
+
     ra = [-ratio[i][1] for i in 1:size(ratio)[1]]
     tab_violation = [copy(ra) for i in 1:size(instance)[1]]
     evalrat = [zeros(ratio[i][2]) for i in 1:size(ratio)[1]]
     tmpi=1
-
     for n in instance
         tmprio = 1
         if n[2]!= col
@@ -128,7 +129,7 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
                     eval[i]+=1
                 end
                 #on reset quand on a regarde plus de x voitures avec x => y/x
-                if tmpi>=ratio[tmprio][2] &&mod(tmpi-i,ratio[tmprio][2])==0
+                if tmpi>=ratio[tmprio][2] && mod(tmpi-i,ratio[tmprio][2])==0
                     tab_violation[tmpi][tmprio]+=eval[i]
                     if eval[i]>ratio[tmprio][1]
                         if tmprio>Hprio
@@ -146,7 +147,6 @@ function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{In
         end
         tmpi+=1
     end
-
     return [nbcol,Hpriofail,Lpriofail], tab_violation
 end
 
