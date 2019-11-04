@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :swap!
+    if LSfoo! == :shuffle! || LSfoo! == :swap!
         @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     end
     nothing
@@ -1192,14 +1192,35 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, rati
 
     end
 
+    update_col_seq(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
     update_col_and_pbl_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
+
     return
 end
 
+function update_col_seq(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    if sequence_courante[k][szcar-1]==k
+        tmpk=k-1
+        col = sequence_courante[k][2]
+        while tmpk>=1 && sequence_courante[tmpk][2]==col
+            sequence_courante[tmpk][szcar-1]=k-1
+            tmpk-=1
+        end
+    end
+    if sequence_courante[k+l-1][szcar-2]==k+l-1
+        tmpk=k+l
+        col = sequence_courante[k+l-1][2]
+        while tmpk>=1 && sequence_courante[tmpk][2]==col
+            sequence_courante[tmpk][szcar-2]=k+l
+            tmpk+=1
+        end
+    end
 
-
+end
 # Sincerement j'ai la flemme de commenter ça
 function update_col_and_pbl_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
@@ -1383,7 +1404,7 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
     deb = 1
     deb = max(1,k-1)
     fin = sz
-    fin = min(k+l+1,sz)
+    fin = min(k+l-1,sz)
     col = sequence_courante[deb][2]
     nbcol=0
     tmpi = sequence_courante[deb][szcar-1]
@@ -1391,7 +1412,7 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
         tmpi = sequence_courante[tmpi+1][szcar-1]
         nbcol+=1
     end
-
+    #println("nbcol : ",nbcol)
 
     col = sequence_courante[max(1,k-1)][2]
 
@@ -1411,11 +1432,12 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
     if sequence_courante[k+l][2]!= col
         tmpnbcol+=1
     end
-    if(tmpnbcol>nbcol)||tmp_pbl>pbl
+
+    if (tmpnbcol>nbcol)||tmp_pbl>pbl
         return false
-    else
-        tmp_pbl+=1
+
     end
 
+    #println("tmpnbcol : ",tmpnbcol)
     return true
 end
