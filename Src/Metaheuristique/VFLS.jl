@@ -100,7 +100,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
 
         # affichage a chaque fin de phase :
         if txtoutput
-            txt = string(txt, "\nPhase ", Phase, " :", "\n",
+            txt = string(txt, "\n\nPhase ", Phase, " :", "\n",
                 "Nombre de swap : ",nb[1], "\n",
                 "Nombre d'insertion : ",nb[2], "\n",
                 "Nombre de reflection : ",nb[3], "\n",
@@ -108,11 +108,11 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             )
         end
         if verbose
-            println("Phase ", Phase, " :")
+            println("\nPhase ", Phase, " :")
             println("Nombre de swap : ",nb[1])
             println("Nombre d'insertion : ",nb[2])
             println("Nombre de reflection : ",nb[3])
-            println("Nombre de shuffle : ",nb[4])
+            println("Nombre de shuffle : ",nb[4],"\n\n")
         end
 
 
