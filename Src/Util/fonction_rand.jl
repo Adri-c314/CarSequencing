@@ -55,8 +55,8 @@ end
 
 # Fonction avec un nom generic
 # @param size : la taille max
-# @return Array{Int64,1} : une position aleatoire
-function generic(size::Int64)
+# @return Array{Int32,1} : une position aleatoire
+function generic(size::Int32)
     a = rand(1:size,2)
     return a
 end
@@ -66,7 +66,7 @@ end
 # Une autre fonction similaire
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
-# @return Array{Int64,1} : une position aleatoire t'as tout compris
+# @return Array{Int32,1} : une position aleatoire t'as tout compris
 function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},size::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
     if Phase ==1 ||(Phase==2 && obj[2]==2)
         while true
@@ -95,7 +95,7 @@ end
 # Fonction qui permet pas mal de chose mais si tu as scroller jusque là va donc mettre ta fonction et ça passe :)
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
-# @return Array{Int64,1} : une position aleatoire toujours
+# @return Array{Int32,1} : une position aleatoire toujours
 function consecutive(instance::Array{Array{Int,1},1},sz::Int)
     k=rand(1:sz-1,1)[1]
     return [k,k+1]
@@ -201,15 +201,28 @@ end
 
 
 function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
-    tmp = violation(instance,ratio_option,tab_violation,sz,Hprio,obj,Phase)
-    k = tmp[1]
+
     while true
-        l = rand(1:sz,1)[1]
-        if l!=k
+        tmp = rand(1:sz,2)
+        k =tmp[1]
+        l = tmp[2]
+        cond = false
+        if l!=k && instance[l][2]==instance[k][2]
             for i in 1:size(ratio_option)[1]
                 if tab_violation[l][i]>0
-                    return [k,l]
+                    cond = true
                 end
+            end
+            if cond
+                cond = false
+                for i in 1:size(ratio_option)[1]
+                    if tab_violation[k][i]>0
+                        cond = true
+                    end
+                end
+            end
+            if cond
+                return k,l
             end
         end
     end

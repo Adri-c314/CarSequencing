@@ -13,7 +13,7 @@
 
 # Fonction qui fait appelle à la bonne fonction de mouvement
 # @param LSfoo!::Function : LSfoo! doit etre une des fonctions de recherche locale (swap!, fw_insertion!, bw_insertion!, reflection!, permutation!). Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -24,7 +24,9 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
+    if LSfoo! == :swap!
+        @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
+    end
     nothing
 end
 
@@ -37,7 +39,7 @@ end
 # =====================================================================
 
 # Fonction principale du mouvement d'insertion de maniere random entre bw et fw
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -60,7 +62,7 @@ end
 
 
 # Fonction principale du mouvement de backward insertion
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -79,7 +81,7 @@ end
 
 
 # Fonction principale du mouvement de forward insertion
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -97,7 +99,7 @@ end
 
 
 # Fonction qui evalue le nombre de Hprio violer pour la forward insertion
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -167,7 +169,7 @@ end
 
 
 # Fonction qui evalue le nombre de Hprio violer pour la forward insertion
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -186,7 +188,7 @@ end
 
 
 # Fontion qui evalue la difference de RAF si on effectu la bi de k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
@@ -208,7 +210,7 @@ end
 
 
 # Fontion qui evalue la difference de RAF si on effectu le fi de k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
@@ -230,7 +232,7 @@ end
 
 
 # Fonction qui evalue la difference de EP si on effectu la fi k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -248,7 +250,7 @@ end
 
 
 # Fonction qui evalue la difference de EP si on effectu la bi k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -266,7 +268,7 @@ end
 
 
 # Fonction qui maj le tab violation de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -287,7 +289,7 @@ end
 
 
 # Fonction qui maj le tab violation de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -308,14 +310,14 @@ end
 
 
 # Fonction qui maj les color de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
-# @modify sequence_courrante : modifie les fenetre dans la sequence
+# @modify sequence_courante : modifie les fenetre dans la sequence
 function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
@@ -324,14 +326,14 @@ end
 
 
 # Fonction qui maj les color de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
-# @modify sequence_courrante : modifie les fenetre dans la sequence
+# @modify sequence_courante : modifie les fenetre dans la sequence
 function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
@@ -346,7 +348,7 @@ end
 # =====================================================================
 
 # Fonction principale du mouvement de reflection
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -358,6 +360,7 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+    return
     sz = size(sequence_courante)[1]
     cond = true
     tmp_color=0
@@ -429,7 +432,7 @@ end
 
 
 # Fonction qui maj le tab violation de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -463,7 +466,7 @@ end
 
 
 # Fonction qui reevalue les color de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
@@ -541,14 +544,14 @@ end
 
 
 # Fonction qui maj les color de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
-# @modify sequence_courrante : modifie les fenetre dans la sequence
+# @modify sequence_courante : modifie les fenetre dans la sequence
 function update_col_and_pbl_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
@@ -598,7 +601,7 @@ end
 
 
 # Fonction qui permet l'evaluation des Hprio
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -634,7 +637,7 @@ end
 
 
 # Fonction qui evalue la difference de EP si on effectu le swap k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le nombre de Hprio
@@ -677,7 +680,7 @@ end
 
 
 # Fonction qui realise une evaluation de la reflection
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio : liste de ratio (premiere colonne p et seconde q)
 # @param Hprio : le nombre de Hprio
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
@@ -738,7 +741,7 @@ end
 # =====================================================================
 
 # Fonction principale du mouvement de swap
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -751,10 +754,13 @@ end
 # @modify sequence_courante : la sequence courante est mise à jour
 function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
+    szcar =size(sequence_courante[1])[1]
     cond = true
     tmp_color=0
+    tmp_Hprio=0
+    tmp_Lprio=0
     for o in obj
-        if o==1 && (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
+        if o==1 #&& (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
             tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
             cond = tmp_color<=0
             if tmp_color<0
@@ -778,14 +784,16 @@ function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_o
             return
         end
     end
-
     # Sinon on realise le mouvement de swap :
-    tmp=sequence_courante[k]
+
+
+    tmp=copy(sequence_courante[k])
     sequence_courante[k]=sequence_courante[l]
     sequence_courante[l]=tmp
 
     # Mise à jour du tableau de violation et pbl :
     update_tab_violation_and_pbl_swap!(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+
 
     nothing # Pas de return pour eviter les copies de memoire.
 end
@@ -793,7 +801,7 @@ end
 
 
 # Fontion qui evalue la difference de RAF si on effectu le swap k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
@@ -806,71 +814,104 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
     if sequence_courante[k][2]==sequence_courante[l][2]
         return tmp_color
     end
-
-    if sequence_courante[k][2]==sequence_courante[l-1][2]
-        if sequence_courante[l-1][szcar-1]-sequence_courante[l-1][szcar-2]==pbl
-            return 1
+    if l-k>1
+        if sequence_courante[k][2]==sequence_courante[l][2]
+            return tmp_color
         end
-        tmp_color-=1
-    end
 
-    if l<sz
-        if sequence_courante[k][2]==sequence_courante[l+1][2]
-            if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]==pbl
+        if sequence_courante[k][2]==sequence_courante[l-1][2]
+            if sequence_courante[l-1][szcar-1]-sequence_courante[l-1][szcar-2]+1==pbl
                 return 1
             end
             tmp_color-=1
         end
 
-        if sequence_courante[k][2]==sequence_courante[l+1][2]&& sequence_courante[k][2]==sequence_courante[l-1][2]
-            if sequence_courante[l+1][szcar-1]-sequence_courante[l-1][szcar-2]>pbl
-                return 1
+        if l<sz
+            if sequence_courante[k][2]==sequence_courante[l+1][2]
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1==pbl
+                    return 1
+                end
+                tmp_color-=1
+            end
+
+            if sequence_courante[k][2]==sequence_courante[l+1][2]&& sequence_courante[k][2]==sequence_courante[l-1][2]
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l-1][szcar-2]+1>pbl
+                    return 1
+                end
             end
         end
-    end
 
-    if sequence_courante[l][2]==sequence_courante[k+1][2]
-        if sequence_courante[k+1][szcar-1]-sequence_courante[k+1][szcar-2]==pbl
-            return 1
-        end
-        tmp_color-=1
-    end
-
-    if k>1
-        if sequence_courante[l][2]==sequence_courante[k-1][2]
-            if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]==pbl
+        if sequence_courante[l][2]==sequence_courante[k+1][2]
+            if sequence_courante[k+1][szcar-1]-sequence_courante[k+1][szcar-2]+1==pbl
                 return 1
             end
             tmp_color-=1
         end
 
-        if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==sequence_courante[k-1][2]
-            if sequence_courante[k+1][szcar-1]-sequence_courante[k-1][szcar-2]>pbl
-                return 1
+        if k>1
+            if sequence_courante[l][2]==sequence_courante[k-1][2]
+                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1==pbl
+                    return 1
+                end
+                tmp_color-=1
+            end
+
+            if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==sequence_courante[k-1][2]
+                if sequence_courante[k+1][szcar-1]-sequence_courante[k-1][szcar-2]+1>pbl
+                    return 1
+                end
             end
         end
-    end
 
-    if sequence_courante[l][2]==sequence_courante[l-1][2]
-        tmp_color+=1
-    end
-    if l<sz && sequence_courante[l][2]==sequence_courante[l+1][2]
-        tmp_color+=1
-    end
-    if sequence_courante[k][2]==sequence_courante[k+1][2]
-        tmp_color+=1
-    end
-    if k>1 && sequence_courante[k][2]==sequence_courante[k-1][2]
-        tmp_color+=1
+        if sequence_courante[l][2]==sequence_courante[l-1][2]
+            tmp_color+=1
+        end
+        if l<sz && sequence_courante[l][2]==sequence_courante[l+1][2]
+            tmp_color+=1
+        end
+        if sequence_courante[k][2]==sequence_courante[k+1][2]
+            tmp_color+=1
+        end
+        if k>1 && sequence_courante[k][2]==sequence_courante[k-1][2]
+            tmp_color+=1
+        end
+
+    else
+        if l<sz
+            if sequence_courante[k][2]==sequence_courante[l+1][2]
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1==pbl
+                    return 1
+                end
+                tmp_color-=1
+            end
+        end
+
+        if k>1
+            if sequence_courante[l][2]==sequence_courante[k-1][2]
+                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1==pbl
+                    return 1
+                end
+                tmp_color-=1
+            end
+        end
+
+        if l<sz && sequence_courante[l][2]==sequence_courante[l+1][2]
+            tmp_color+=1
+        end
+        if k>1 && sequence_courante[k][2]==sequence_courante[k-1][2]
+            tmp_color+=1
+        end
+
+
+
     end
 
     return tmp_color
 end
 
 
-
 # Fonction qui evalue la difference de EP si on effectu le swap k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # ration_option : liste de ratio (premiere colonne p et seconde q)
 # tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le tableau des H
@@ -915,59 +956,106 @@ end
 
 
 # Fonction qui reevalue les color et le tab_violation de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @modify tab_violation : les tableau sont maj
-# @modify sequence_courrante : modifie les fenetre dans la sequence
+# @modify sequence_courante : modifie les fenetre dans la sequence
 function update_tab_violation_and_pbl_swap!(sequence_courante::Array{Array{Int,1},1}, ratio_option::Array{Array{Int,1},1}, tab_violation,Hprio::Int, pbl::Int, k::Int, l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
 
+
     ## update des color k
-    tmpkdeb=k
-    tmpkfin=k
-    while tmpkdeb>1 &&(sequence_courante[k][2]==sequence_courante[tmpkdeb][2])
-        tmpkdeb-=1
-    end
-    tmpkdeb+=1
-    debk = tmpkdeb
+    if sequence_courante[k]!=sequence_courante[l]
+
+        if sequence_courante[l][szcar-1]==k
+            tmpk=k-1
+            col = sequence_courante[l][2]
+            while tmpk>=1 && sequence_courante[tmpk][2]==col
+                sequence_courante[tmpk][szcar-1]=k-1
+                tmpk-=1
+            end
+        end
+        if sequence_courante[l][szcar-2]==k
+            tmpk=k+1
+            col = sequence_courante[l][2]
+            while tmpk<= sz &&  sequence_courante[tmpk][2]==col
+                sequence_courante[tmpk][szcar-2]=k+1
+                tmpk+=1
+            end
+        end
+        if sequence_courante[k][szcar-2]==l
+            tmpl=l+1
+            col = sequence_courante[k][2]
+            while tmpl<= sz &&sequence_courante[tmpl][2]==col
+                sequence_courante[tmpl][szcar-2]=l+1
+                tmpl+=1
+            end
+        end
+        if sequence_courante[k][szcar-1]==l
+            tmpl=l-1
+            col = sequence_courante[k][2]
+            while tmpl>=1 && sequence_courante[tmpl][2]==col
+                sequence_courante[tmpl][szcar-1]=l-1
+                tmpl-=1
+            end
+        end
+
+        ## update des color k
+        tmpkdeb=k
+        tmpkfin=k
+        while tmpkdeb>=1 &&(sequence_courante[k][2]==sequence_courante[tmpkdeb][2])
+            tmpkdeb-=1
+        end
+        tmpkdeb+=1
+        debk = tmpkdeb
 
 
-    while tmpkfin<sz &&(sequence_courante[k][2]==sequence_courante[tmpkfin][2])
-        tmpkfin+=1
-    end
-    tmpkfin-=1
-    fink = tmpkfin
-    while tmpkfin>debk
-        sequence_courante[tmpkfin][szcar-2]= tmpkdeb
-        sequence_courante[tmpkfin][szcar-1]= fink
+        while tmpkfin<=sz &&(sequence_courante[k][2]==sequence_courante[tmpkfin][2])
+            tmpkfin+=1
+        end
         tmpkfin-=1
-    end
+        fink = tmpkfin
+
+        while tmpkfin>=debk
+            sequence_courante[tmpkfin][szcar-2]= tmpkdeb
+            sequence_courante[tmpkfin][szcar-1]= fink
+            tmpkfin-=1
+
+        end
 
 
-    ## update des color l
-    tmpldeb=l
-    tmplfin=l
+        ## update des color l
+        tmpldeb=l
+        tmplfin=l
 
-    while tmpldeb>1 &&(sequence_courante[l][2]==sequence_courante[tmpldeb][2])
-        tmpldeb-=1
-    end
-    tmpldeb+=1
-    debl = tmpldeb
+        while tmpldeb>=1 &&(sequence_courante[l][2]==sequence_courante[tmpldeb][2])
+            tmpldeb-=1
+        end
+        tmpldeb+=1
+        debl = tmpldeb
 
-    while tmplfin<sz &&(sequence_courante[l][2]==sequence_courante[tmplfin][2])
-        tmplfin+=1
-    end
-    tmplfin-=1
-    finl = tmplfin
-    while tmplfin>debl
-        sequence_courante[tmplfin][szcar-2]= tmpldeb
-        sequence_courante[tmplfin][szcar-1]= finl
+        while tmplfin<=sz &&(sequence_courante[l][2]==sequence_courante[tmplfin][2])
+            tmplfin+=1
+        end
         tmplfin-=1
+        finl = tmplfin
+        while tmplfin>=debl
+            sequence_courante[tmplfin][szcar-2]= tmpldeb
+            sequence_courante[tmplfin][szcar-1]= finl
+            tmplfin-=1
+        end
+    else
+        tmp_fin_l = sequence_courante[l][szcar-1]
+        tmp_deb_l = sequence_courante[l][szcar-2]
+        sequence_courante[l][szcar-2]= sequence_courante[k][szcar-2]
+        sequence_courante[l][szcar-1]= sequence_courante[k][szcar-1]
+        sequence_courante[k][szcar-2]= tmp_deb_l
+        sequence_courante[k][szcar-1]= tmp_fin_l
     end
 
     ## update du tab_violation
@@ -997,7 +1085,7 @@ end
 
 
 # Fonction qui evalue la difference de EP si on effectu le swap k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # ration_option : liste de ratio (premiere colonne p et seconde q)
 # tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le tableau des H
@@ -1048,7 +1136,7 @@ end
 
 
 # Fonction principale du mouvement de shuffle
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -1160,7 +1248,7 @@ end
 
 
 # Fonction qui reevalue les color et le tab_violation de la new sol
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param sequence : ???? quesaco
@@ -1196,7 +1284,7 @@ end
 
 
 # Fonction qui evalue la difference des hprio si on effectu le shuffle k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # ration_option : liste de ratio (premiere colonne p et seconde q)
 # tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le tableau des H
@@ -1240,7 +1328,7 @@ end
 
 
 # Fonction qui evalue la difference des lprio si on effectu le shuffle k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # ration_option : liste de ratio (premiere colonne p et seconde q)
 # tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @param Hprio : le tableau des H
@@ -1281,39 +1369,38 @@ function eval_Lprio_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_optio
     return tmp_viol
 end
 
-
 # Fonction qui evalue la difference des lprio si on effectu le shuffle k,l
-# @param sequence_courrante : la sequence ou instance courante
+# @param sequence_courante : la sequence ou instance courante
 # @param sequence : ???? quesaco
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @return Int : le nombre de EP de difference
-function eval_couleur_shuffle(sequence_courrante::Array{Array{Int,1},1},sequence::Array{Int,1},pbl::Int,k::Int,l::Int)
+function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence::Array{Int,1},pbl::Int,k::Int,l::Int)
 
-    szcar = size(sequence_courrante[1])[1]
-    sz = size(sequence_courrante)[1]
+    szcar = size(sequence_courante[1])[1]
+    sz = size(sequence_courante)[1]
 
     deb = 1
     deb = max(1,k-1)
     fin = sz
     fin = min(k+l+1,sz)
-    col = sequence_courrante[deb][2]
+    col = sequence_courante[deb][2]
     nbcol=0
-    tmpi = sequence_courrante[deb][szcar-1]
+    tmpi = sequence_courante[deb][szcar-1]
     while tmpi<=fin && tmpi<sz
-        tmpi = sequence_courrante[tmpi+1][szcar-1]
+        tmpi = sequence_courante[tmpi+1][szcar-1]
         nbcol+=1
     end
 
 
-    col = sequence_courrante[max(1,k-1)][2]
+    col = sequence_courante[max(1,k-1)][2]
 
     tmpnbcol = 0
     tmp_pbl=1
     for i in k:k+l-1
-        if sequence_courrante[sequence[i-k+1]][2]!= col
+        if sequence_courante[sequence[i-k+1]][2]!= col
             tmpnbcol+=1
-            col=sequence_courrante[sequence[i-k+1]][2]
+            col=sequence_courante[sequence[i-k+1]][2]
             tmp_pbl=1
         end
         tmp_pbl+=1
@@ -1321,7 +1408,7 @@ function eval_couleur_shuffle(sequence_courrante::Array{Array{Int,1},1},sequence
             return false
         end
     end
-    if sequence_courrante[k+l][2]!= col
+    if sequence_courante[k+l][2]!= col
         tmpnbcol+=1
     end
     if(tmpnbcol>nbcol)||tmp_pbl>pbl

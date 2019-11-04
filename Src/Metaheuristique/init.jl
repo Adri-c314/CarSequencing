@@ -12,13 +12,13 @@
 
 # Fonction de réalisation de l'operation initial de l'algorithm VFLS
 # @param Datas : Tableau de DataFrame bien degueu qu'on s'empresse de nettoyer
-# @return ::Array{Array{Int64,1},1} : la sequence apres toute l'initialisation
-# @return ::Array{Int64,1} : Le score courant
-# @return ::Array{Array{Int64,1},1} : tab violation
+# @return ::Array{Array{Int32,1},1} : la sequence apres toute l'initialisation
+# @return ::Array{Int32,1} : Le score courant
+# @return ::Array{Array{Int32,1},1} : tab violation
 function compute_initial_sequence(datas::NTuple{4,DataFrame})
-    sequence::Array{Array{Int64,1},1},prio::Array{Array{Int64,1},1},pbl::Int64,obj::Array{Int64,1},Hprio::Int64 = init_sequence(datas)
+    sequence::Array{Array{Int32,1},1},prio::Array{Array{Int32,1},1},pbl::Int32,obj::Array{Int32,1},Hprio::Int32 = init_sequence(datas)
     obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,prio,pbl,Hprio)
-    score_courrant::Array{Int64,1},tab_violation::Array{Array{Int64,1},1} = evaluation_init(sequence_courrante,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
+    score_courrant::Array{Int32,1},tab_violation::Array{Array{Int32,1},1} = evaluation_init(sequence_courrante,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = deepcopy(sequence_courrante)
     score_meilleur = deepcopy(score_courrant)
     return sequence_meilleure, score_meilleur, tab_violation,prio,Hprio,obj,pbl
@@ -41,11 +41,11 @@ function init_sequence(datas::NTuple{4,DataFrame})
     ratio = datas[4]
 
     # Creation d'une sequence de base
-    sequence = [Int64[]]
+    sequence = [Int32[]]
 
     # Ajout de tous les vehicules dans la sequence :
     for i in 1:size(vehicles)[1]
-        tmp = Int64[0]
+        tmp = Int32[0]
         for ii in 1:(size(vehicles)[2]-3)
             append!(tmp,vehicles[i,ii+3])
         end
@@ -55,16 +55,16 @@ function init_sequence(datas::NTuple{4,DataFrame})
     popfirst!(sequence)
 
     # Mise en forme des ratios :
-    rat = [Int64[]]
+    rat = [Int32[]]
     for i in 1:size(ratio)[1]
-        append!(rat,[Int64[0,0]])
+        append!(rat,[Int32[0,0]])
         if i ==1
             popfirst!(rat)
         end
         tmp = ratio.Ratio[i]
         tmp = split(tmp,"/")
-        rat[i][1]= parse(Int64,tmp[1])
-        rat[i][2]= parse(Int64,tmp[2])
+        rat[i][1]= parse(Int32,tmp[1])
+        rat[i][2]= parse(Int32,tmp[2])
     end
 
     # Gestion des Hprio
@@ -104,7 +104,7 @@ end
 # @return prio : l'array des violations des contraintes avec prio[i][j] le nombre
 #         de fois ou l'option j est rencontrée dans la fenetre finissant a i
 #         voir p937 proposition 1
-function evaluation_init(instance::Array{Array{Int64,1},1},ratio::Array{Array{Int64,1},1},Hprio::Int)
+function evaluation_init(instance::Array{Array{Int32,1},1},ratio::Array{Array{Int32,1},1},Hprio::Int)
     col = instance[1][2]
     sz =size(instance)[1]
     nbcol = 0
@@ -153,9 +153,9 @@ end
 
 
 # Fonction qui initialise les differentes phases et le temps accordé à chacune
-# @return ::Array{Int64,1} : timeOPT
-# @return ::Array{Int64,1} : OPT
-function phases_init(obj::Array{Int64,1})
+# @return ::Array{Int32,1} : timeOPT
+# @return ::Array{Int32,1} : OPT
+function phases_init(obj::Array{Int32,1})
     timeOPT = [0,0,0] ## le temps accordé pour chaque phase
     OPT = [0,0,0]   ## l'opt utilisé pour chaque phase avec 1=A,2=B,3=C
     if obj[1]==2

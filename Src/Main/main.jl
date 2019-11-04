@@ -60,7 +60,7 @@ function main(ir::Array{Tuple{String,String},1} = [("A", "039_38_4_RAF_EP_ch1"),
                 println(string("Valeur sur l'objectif ", j, " : ", score[j]))
             end
             println(string("===================================================\n\n"))
-            println(sol)
+            #println(sol)
         end
     end
 end
