@@ -23,9 +23,8 @@
 # @param sz : le nombre de vehicules
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-#sequence_meilleure,k,l,score_meilleur,ratio_option,tab_violation,Hprio,obj,pbl,f_rand
-function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, score_courrant::Array{Int,1}, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    @eval LSfoo!(sequence_courante, k, l, score_courrant, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+    @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     nothing
 end
 
@@ -49,8 +48,13 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, score_courrant::Array{Int,1}, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-   nothing
+function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+    if rand(1:2) == 1
+        bw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+    else
+        fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+    end
+    nothing
 end
 
 
@@ -67,7 +71,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function bw_insertion!(sequence_courrante::Array{Array{Int,1},1}, k::UInt, l::UInt)
+function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
 
    nothing
 end
@@ -86,8 +90,251 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, score_courrant::Array{Int,1}, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
    nothing
+end
+
+
+
+# Fonction qui evalue le nombre de Hprio violer pour la forward insertion
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @return ::Int : la dif de Hprio violé
+function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    tmp_viol=0 ##sorry pour ce nom xD
+    for i in 1:Hprio
+
+        #fenetres de k-ratio à k
+        for j in max(1,k-ratio_option[i][2]+1):k
+            if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
+                if tab_violation[j][i]>0
+                    tmp_viol+=1
+                end
+            elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[j][2]-1][i+2]==1
+                if tab-violation[j][i]>0
+                    tmp_viol-=1
+                end
+            end
+        end
+
+        #fenetres de k à k+ratio-1
+        for j in k+1:min(sz,k+ratio_option[i][2]-1)
+            if sequence_courante[j-1][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
+                if tab_violation[j][i]>0
+                    tmp_viol+=1
+                end
+            elseif sequence_courante[j][i+2]==0 && sequence_courante[k+ratio_option[j][2]-1][i+2]==1
+                if tab-violation[j][i]>0
+                    tmp_viol-=1
+                end
+            end
+        end
+
+        #fenetres de l-ratio+1
+        for j in max(1,l-ratio_option[i][2]+1):l
+            if sequence_courante[l][i+2]==1 && sequence_courante[l+ratio_option[i][2]-1][i+2]==0
+                if tab_violation[j][i]>0
+                    tmp_viol+=1
+                end
+            elseif sequence_courante[l][i+2]==0 && sequence_courante[l+ratio_option[j][2]-1][i+2]==1
+                if tab-violation[j][i]>0
+                    tmp_viol-=1
+                end
+            end
+        end
+
+        #fenetres de l+1 à l+ratio-1
+        for j in l+1:min(sz,l+ratio_option[i][2]-1)
+            if sequence_courante[j-1][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
+                if tab_violation[j][i]>0
+                    tmp_viol+=1
+                end
+            elseif sequence_courante[j][i+2]==0 && sequence_courante[j+ratio_option[j][2]-1][i+2]==1
+                if tab-violation[j][i]>0
+                    tmp_viol-=1
+                end
+            end
+        end
+    end
+    return tmp_viol
+end
+
+
+
+# Fonction qui evalue le nombre de Hprio violer pour la forward insertion
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @return ::Int : la dif de Hprio violé
+function eval_Hprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    tmp_viol=0 ##sorry pour ce nom xD
+    for i in 1:Hprio
+        # TODO : a dev
+    end
+    return tmp_viol
+end
+
+
+
+# Fontion qui evalue la difference de RAF si on effectu la bi de k,l
+# @param sequence_courrante : la sequence ou instance courante
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @return Bool : si c'est autorisé comme changement
+function eval_couleur_bi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::Int, l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    tmp_color=0
+    ## on test le new pbl c'est important
+    if sequence_courante[k][2]==sequence_courante[l][2]
+        return tmp_color
+    end
+
+    # TODO : a dev
+
+    return tmp_color
+end
+
+
+
+# Fontion qui evalue la difference de RAF si on effectu le fi de k,l
+# @param sequence_courrante : la sequence ou instance courante
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @return Bool : si c'est autorisé comme changement
+function eval_couleur_fi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::Int, l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    tmp_color=0
+    ## on test le new pbl c'est important
+    if sequence_courante[k][2]==sequence_courante[l][2]
+        return tmp_color
+    end
+
+    # TODO : a dev
+
+    return tmp_color
+end
+
+
+
+# Fonction qui evalue la difference de EP si on effectu la fi k,l
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @return Int : le nombre de ENP de difference
+function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    tmp_viol=0
+
+
+    return tmp_viol
+end
+
+
+
+# Fonction qui evalue la difference de EP si on effectu la bi k,l
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @return Int : le nombre de ENP de difference
+function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    tmp_viol=0
+
+
+    return tmp_viol
+end
+
+
+
+# Fonction qui maj le tab violation de la new sol
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @modify tab_violation : modifie tab_violation
+function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    tmp_viol=0
+    for i in 1:Hprio
+        # TODO : a dev
+    end
+
+    return tmp_viol
+end
+
+
+
+# Fonction qui maj le tab violation de la new sol
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @modify tab_violation : modifie tab_violation
+function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    tmp_viol=0
+    for i in 1:Hprio
+        # TODO : a dev
+    end
+
+    return tmp_viol
+end
+
+
+
+# Fonction qui maj les color de la new sol
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @modify sequence_courrante : modifie les fenetre dans la sequence
+function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+end
+
+
+
+# Fonction qui maj les color de la new sol
+# @param sequence_courrante : la sequence ou instance courante
+# @param ratio_option : liste de ratio (premiere colonne p et seconde q)
+# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
+# @param Hprio : le nombre de Hprio
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @modify sequence_courrante : modifie les fenetre dans la sequence
+function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
 end
 
 
@@ -110,7 +357,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, score_courrant::Array{Int,1}, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     sz = size(sequence_courante)[1]
     cond = true
     tmp_color=0
@@ -140,24 +387,30 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, s
     end
     tmp = [i for i in (k):(l)]
     tmp =reverse(tmp)
+
+    #=
     for i in 1:sz
         println(tab_violation[i])
     end
     for i in 1:sz
         println(sequence_courante[i])
     end
+    =#
 
     aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
     update_tab_violation_reflection(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l),sequence_courante[tmp])
     a  ,b=evaluation_init(sequence_courante,ratio_option,Hprio)
     update_col_and_pbl_reflection(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+    #=
     for i in 1:sz
         println(tab_violation[i])
     end
     for i in 1:sz
         println(sequence_courante[i])
     end
+    =#
+    #=
     println(tmp_Hprio)
     println(aa)
     println(a)
@@ -168,6 +421,8 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, s
         println(tadarone)
         return tadarone
     end
+    =#
+
     nothing # Pas de return pour eviter les copies de memoire.
 end
 
@@ -191,11 +446,11 @@ function update_tab_violation_reflection(sequence_courante::Array{Array{Int,1},1
                 if sequence_courante[k+j][i+2]==1
                     tab_violation[l-j+ratio_option[i][2]-1][i]+=1
                     tab_violation[k+j][i]-=1
-                    println("j  ",j ," -1")
+                    #println("j  ",j ," -1")
                 elseif sequence_courante[max(1,l-j)][i+2]==1
                     tab_violation[l-j+ratio_option[i][2]-1][i]-=1
                     tab_violation[k+j][i]+=1
-                    println("j  ",j ,"+1"," pos : ",k+j)
+                    #println("j  ",j ,"+1"," pos : ",k+j)
 
                 end
             end
@@ -216,8 +471,8 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},pbl::I
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
-    println(k)
-    println(l)
+    #println(k)
+    #println(l)
     ## on test le new pbl c'est important
     if sequence_courante[k][2]==sequence_courante[l][2]
         return tmp_color
@@ -804,7 +1059,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function shuffle!(sequence_courante::Array{Array{Int,1},1}, score_courrant::Array{Int,1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,obj::Array{Int,1},pbl::Int)
+function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     sz = size(sequence_courante)[1]
     if pbl >10
         l = rand(2:5,1)[1]
@@ -851,10 +1106,57 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, score_courrant::Arra
 
     update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
-    update_col_and_pbl(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
+    update_col_and_pbl_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     return
 end
 
+
+
+# Sincerement j'ai la flemme de commenter ça
+function update_col_and_pbl_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+
+    ## update des color
+    tmpkdeb=k
+    while tmpkdeb>=1 &&(sequence_courante[k][2]==sequence_courante[tmpkdeb][2])
+        tmpkdeb-=1
+    end
+    tmpkdeb+=1
+    debk = tmpkdeb
+
+
+    tmplfin=k+l-1
+    while tmplfin<=sz && sequence_courante[k+l-1][2]==sequence_courante[tmplfin][2]
+        tmplfin+=1
+
+    end
+    tmplfin-=1
+    finl = tmplfin
+
+    deb = debk
+    col = sequence_courante[deb][2]
+    for i in debk:finl
+        if sequence_courante[i][2]!= col
+            col=sequence_courante[i][2]
+            deb = i
+        end
+        sequence_courante[i][szcar-2]=deb
+    end
+
+    fin = finl
+    tmpi = fin
+    col=sequence_courante[fin][2]
+    for i in debk:finl
+
+        if sequence_courante[tmpi][2]!= col
+            col=sequence_courante[tmpi][2]
+            fin = tmpi
+        end
+        sequence_courante[tmpi][szcar-1]=fin
+        tmpi-=1
+    end
+end
 
 
 # Fonction qui reevalue les color et le tab_violation de la new sol
@@ -867,7 +1169,7 @@ end
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @modify tab_violation : les tableau sont maj
-function update_tab_violation(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
+function update_tab_violation_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
     ## update du tab_violation
     sz = size(sequence_courante)[1]
     tmp_viol=0

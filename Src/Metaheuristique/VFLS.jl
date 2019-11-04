@@ -94,8 +94,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             typeof(f_mouv)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
             compteurMvt!(f_mouv, nb)
-            # global_mouvement!()
-            swap!(sequence_meilleure,k,l,ratio_option,tab_violation,Hprio,obj,pbl,:generic!)
+            global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
         end
 
         # affichage a chaque fin de phase :
