@@ -89,8 +89,9 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     nb = [0, 0, 0, 0]
     debut = time()
     @time for Phase in 1:3
+        debut = time()
         while temps_max*(timeOPT[Phase]/100)>time()-debut
-        #for i in 1:1
+
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             typeof(f_mouv)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
