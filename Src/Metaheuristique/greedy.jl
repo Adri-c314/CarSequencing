@@ -1,151 +1,3 @@
-#<<<<<<< HEAD:Src/Metaheuristique/fonction_moche_mais_j_ai_la_flemme.jl
-using Dates
-function init_sequence(instance::String,reference::String)
-
-
-    # Gestion de l'instance :
-    #instance = "A"
-    #reference = "022_3_4_RAF_EP_ENP"
-    #reference = "039_38_4_RAF_EP_ch1"
-    println(instance)
-    println(reference)
-    datas = lectureCSV(instance, reference)
-
-    # Initialisation de la variable txt du fichier output :
-    txt = string(
-        "===================================================\n",
-        "Etude de l'instance : ", instance, "\n",
-        "Reference du dossier : ", reference, "\n",
-        "A la date du : ", Dates.now(), "\n",
-        "===================================================\n\n"
-    )
-
-    # Initialisation des données :
-    vehicles = datas[1]
-    oo = datas[2] #optimization_objectives
-    pbl = datas[3] #paint_batch_limi
-    ratio = datas[4]
-
-
-    instance = [Int64[]]
-
-    for i in 1:size(vehicles)[1]
-
-        tmp = Int64[0]
-
-        for ii in 1:(size(vehicles)[2]-3)
-
-            append!(tmp,vehicles[i,ii+3])
-        end
-        append!(tmp,[0,0,i])
-
-        append!(instance,[tmp])
-
-    end
-    a=0
-    popfirst!(instance)
-
-    rat = [Int64[]]
-    for i in 1:size(ratio)[1]
-        append!(rat,[Int64[0,0]])
-        if i ==1
-            popfirst!(rat)
-        end
-        tmp = ratio.Ratio[i]
-        tmp = split(tmp,"/")
-        rat[i][1]= parse(Int64,tmp[1])
-        rat[i][2]= parse(Int64,tmp[2])
-    end
-    Hprio = 0
-
-    for name in names(vehicles)[5:end]
-        tmp =split(string(name),"")
-        if tmp[1]=="H"
-            Hprio+=1
-        end
-    end
-    pbl = pbl.limitation[1]
-
-    obj= zeros(3)
-    for i in 1:size(oo)[1]
-        if oo[i,2] == "high_priority_level_and_easy_to_satisfy_ratio_constraints"
-            obj[i]=2
-        elseif oo[i,2] == "paint_color_batches"
-            obj[i]=1
-        elseif oo[i,2] == "low_priority_level_ratio_constraints"
-            obj[i]=3
-        end
-    end
-
-
-    return instance, rat,pbl,obj,Hprio
-end
-
-##
-#return : [nbcol,Hpriofail,Lpriofail] : l'array des 3 fonctions objectifs
-#         prio l'array des violations des contraintes avec prio[i][j] le nombre
-#         de fois ou l'option j est rencontrée dans la fenetre commencant a i
-#         voir p937 proposition 1
-function evaluation_init(instance::Array{Array{Int64,1},1},ratio::Array{Array{Int64,1},1},Hprio::Int64)
-    col = instance[1][2]
-    nbcol = 0
-    Hpriofail=0
-    Lpriofail=0
-
-
-    prio = [zeros(size(ratio)[1])]
-
-    for i in 1:(size(instance)[1]-1)
-        append!(prio,[zeros(size(ratio)[1])])
-    end
-
-    evalrat = [Int[]]
-    nbrat = zeros(Int,size(ratio)[1])
-    for i in 1:size(ratio)[1]
-        append!(evalrat,[zeros(Int, ratio[i][2])])
-    end
-    println("------------------------------------")
-    #println(evalrat)
-    popfirst!(evalrat)
-    tmpi=1
-    for n in instance
-        tmprio = 1
-        for eval in evalrat
-            for i in 1:length(eval)
-                #on ajoute 1 si la vouture n a bien la prio
-                if i<=tmpi
-                    if n[tmprio+2]==1
-                        eval[i]+=1
-                    end
-                end
-                #on reset quand on a regarde plus de x voitures avec x => y/x
-                if mod(tmpi+i,ratio[tmprio][2])==0
-                    if eval[i]>ratio[tmprio][1]
-
-                        prio[tmpi][tmprio]+=eval[i]
-
-                        if tmprio>Hprio
-                            Lpriofail+=eval[i]-ratio[tmprio][1]
-                        else
-                            Hpriofail+=eval[i]-ratio[tmprio][1]
-                        end
-                    end
-                    eval[i]=0
-                end
-            end
-            tmprio+=1
-        end
-        if n[2]!= col
-            nbcol+=1
-            col=n[2]
-        end
-        tmpi+=1
-    end
-    #println(prio)
-    return [nbcol,Hpriofail,Lpriofail], prio
-end
-
-#=======#
 # Fichier tous les algorithms gloutons et leurs foncions associées
 # @author Oryan Rampon
 # @author Corentin Pelhatre
@@ -164,7 +16,6 @@ end
 # @param pbl : l'entier de paint_batch_limi
 # @param Hprio : l'entier de H
 # @return ::Array{Array{Int64,1},1} : La nouvelle instance (avec un petit tri en plus pas piqué des annetons mais là je m'enballe peut etre un peu dans les commentaires apres je ne sais pas)
-#>>>>>>> cd0c5387709701f01f4d74d5c590f33dcb6fdc95:Src/Metaheuristique/greedy.jl
 function GreedyRAF(instance::Array{Array{Int64,1},1},ratio::Array{Array{Int64,1},1},pbl::Int64,Hprio::Int64)
     sz =size(instance)[1]
     szcar = size(instance[1])[1]
@@ -256,7 +107,7 @@ function GreedyRAF(instance::Array{Array{Int64,1},1},ratio::Array{Array{Int64,1}
             tmpplace+=1
             tmpcol+=1
             color[tmpi]-=1
-            for i in 1:3
+            for i in 1:Hprio
                 pi[i][1]+=tmpduri[2+i]
                 pi[i][2]+=1
             end
