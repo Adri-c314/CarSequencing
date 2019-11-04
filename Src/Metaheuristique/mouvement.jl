@@ -1,4 +1,16 @@
-Fonction qui permet de verifier qu'un mouvement est bien améliorant
+# Fichier tous les algorithms gloutons et leurs foncions associées
+# @author Oryan Rampon
+# @author Corentin Pelhatre
+# @author Mathis Ocquident
+# @author Thaddeus Leonard
+# @author Adrien Cassaigne
+# @author Xavier Pillet
+# @date 01/11/2019
+# @version 1
+
+
+
+# Fonction qui permet de verifier qu'un mouvement est bien améliorant
 # @param LSfoo!::Function : LSfoo! doit etre une des fonctions de recherche locale (swap!, fw_insertion!, bw_insertion!, reflection!, permutation!). Retourne les bonnes valeurs de k et de l en fonction de si on applique OptA, OptB ou OptC.
 # @param sequence_courrante : la sequence ou instance courante
 # @param score_courrant : la valeur du score sur les differents obj
@@ -30,19 +42,6 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : ?????
 function global_mouvement!(LSfoo!::Function, sequence_courrante::Array{Array{Int32,1},1}, k::UInt32, l::UInt32)
-   #=
-   if LSfoo! == :swap!
-       swap!(sequence_courrante, k, l)
-   elseif LSfoo! == :fw_insertion!
-       fw_insertion!(sequence_courrante, k, l)
-   elseif LSfoo! == :bw_insertion!
-       bw_insertion!(sequence_courrante, k, l)
-   elseif LSfoo! == :reflection!
-       reflection!(sequence_courrante, k, l)
-   elseif LSfoo! == :permutation!
-       permutation!(sequence_courrante, k, l)
-   end
-   =#
    LSfoo!(sequence_courrante, k, l)
    nothing
 end
