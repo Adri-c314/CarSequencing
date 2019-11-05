@@ -88,19 +88,23 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
 
     nb = [0, 0, 0, 0]
     debut = time()
+    println(obj)
+    println(timeOPT)
     @time for Phase in 1:3
         debut = time()
+        n=1
+        print("Phase : ",Phase ,", Execution :")
         while temps_max*(timeOPT[Phase]/100)>time()-debut
+        #for i in 1:100
 
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
-            typeof(f_mouv)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
             compteurMvt!(f_mouv, nb)
-            f_mouv = :insertion!
-            k = 10
-            l = 24
             global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
-            println("mvt fait au", time())
+            if (time()-debut)>(n/10)*temps_max*(timeOPT[Phase]/100)
+                print("###")
+                n+=1
+            end
         end
 
         # affichage a chaque fin de phase :

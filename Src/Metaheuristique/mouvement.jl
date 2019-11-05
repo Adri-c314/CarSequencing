@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion!
+    if LSfoo! == :shuffle! || LSfoo! == :swap! ||LSfoo! == :reflection!
         @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     end
     nothing
@@ -826,30 +826,14 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, r
     tmp = [i for i in (k):(l)]
     tmp =reverse(tmp)
 
-    #=
-    for i in 1:sz
-        println(tab_violation[i])
-    end
-    for i in 1:sz
-        println(sequence_courante[i])
-    end
-    =#
 
-    aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
-    update_tab_violation_reflection(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+    #aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
+    update_col_seq_reflection(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l),sequence_courante[tmp])
-    a  ,b=evaluation_init(sequence_courante,ratio_option,Hprio)
+    update_tab_violation_reflection(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+    #a  ,b=evaluation_init(sequence_courante,ratio_option,Hprio)
     update_col_and_pbl_reflection(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     #=
-    for i in 1:sz
-        println(tab_violation[i])
-    end
-    for i in 1:sz
-        println(sequence_courante[i])
-    end
-    =#
-    #=
-    println(tmp_Hprio)
     println(aa)
     println(a)
     if a[1]>aa[1]||a[2]>aa[2]+10
@@ -858,12 +842,34 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, r
         println(a)
         println(tadarone)
         return tadarone
-    end
-    =#
+    end=#
+
 
     nothing # Pas de return pour eviter les copies de memoire.
 end
 
+
+function update_col_seq_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    if k>1&&sequence_courante[k][szcar-1]==k
+        tmpk=k-1
+        col = sequence_courante[k][2]
+        while tmpk>=1 && sequence_courante[tmpk][2]==col
+            sequence_courante[tmpk][szcar-1]=k-1
+            tmpk-=1
+        end
+    end
+    if l<sz&&sequence_courante[k+l-1][szcar-2]==k+l-1
+        tmpk=k+l
+        col = sequence_courante[k+l-1][2]
+        while tmpk>=1 && sequence_courante[tmpk][2]==col
+            sequence_courante[tmpk][szcar-2]=k+l
+            tmpk+=1
+        end
+    end
+
+end
 
 
 # Fonction qui maj le tab violation de la new sol
@@ -878,24 +884,32 @@ end
 function update_tab_violation_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0
-    for i in 1:Hprio
-        for j in 0:l-k-1
-            if sequence_courante[k+j][i+2]!=sequence_courante[max(1,l-j)][i+2]
-                if sequence_courante[k+j][i+2]==1
-                    tab_violation[l-j+ratio_option[i][2]-1][i]+=1
-                    tab_violation[k+j][i]-=1
-                    #println("j  ",j ," -1")
-                elseif sequence_courante[max(1,l-j)][i+2]==1
-                    tab_violation[l-j+ratio_option[i][2]-1][i]-=1
-                    tab_violation[k+j][i]+=1
-                    #println("j  ",j ,"+1"," pos : ",k+j)
-
-                end
+    evalrat = [zeros(ratio[i][2]) for i in 1:size(ratio)[1]]
+    for j in 1:size(ratio_option)[1]
+        for i in max(1,k-ratio[i][1]):min(sz,l+ratio[i][1])
+            tmprio = 1
+            if n[2]!= col
+                nbcol+=1
+                col=n[2]
             end
+            eval = evalrat[j]
+                for ii in 1:size(eval)[1]
+                    #on ajoute 1 si la vouture n a bien la prio
+                    if n[tmprio+2]==1
+                        eval[i]+=1
+                    end
+                    #on reset quand on a regarde plus de x voitures avec x => y/x
+                    tab_violation-=ratio_option[i][1]
+                    if i>=ratio[j][2] && i>=k && mod(i-ii,ratio[j][2])==0
+                        tab_violation[i][j]+=eval[ii]
+                    end
+                    if mod(i-ii,ratio[tmprio][2])==0
+                        eval[ii]=0
+                    end
+                end
+
         end
     end
-
-    return tmp_viol
 end
 
 
@@ -978,6 +992,7 @@ end
 
 
 
+
 # Fonction qui maj les color de la new sol
 # @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -1043,26 +1058,29 @@ end
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @return ::Int : la difference de Hprio violer
-function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
+function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0
-    tab_violation = deepcopy(tab_violation1)
     for i in 1:Hprio
+        tab_deb=[0 for i in ratio_option[i][2]-1]
+        tab_fin=[0 for i in ratio_option[i][2]-1]
         for j in 0:ratio_option[i][2]-1
-            if k+j<=sz && l-j>= 1 && sequence_courante[max(sz,k+j)][i+2]!=sequence_courante[max(1,l-j)][i+2]
+            if sequence_courante[k+j][i+2]!=sequence_courante[max(1,l-j)][i+2]
                 if sequence_courante[k+j][i+2]==1
-                    tab_violation[k+j][i]-=1
-                    if(tab_violation[k+j][i]>=0)
-                        tmp_viol-=1
-                    end
-                elseif sequence_courante[max(1,l-j)][i+2]==1 &&  l-j+ratio_option[i][2]-1 <= sz
-                    tab_violation[l-j+ratio_option[i][2]-1][i]+=1
-                    if(tab_violation[l-j+ratio_option[i][2]-1][i]>0)
-                        tmp_viol+=1
-                    end
+                    tab_fin[j+1]+=1
+                    tab_deb[j+1]-=1
+                elseif sequence_courante[max(1,l-j)][i+2]==1
+                    tab_fin[j+1]-=1
+                    tab_deb[j+1]+=1
                 end
             end
-
+            if j>0
+                tab_fin[j+1]+=tab_fin[j]
+                tab_deb[j+1]+=tab_deb[j]
+            end
+            tab_violation[k+j] += tab_deb[j+1]
+            tab_violation[k+l-1+ratio_option[i][2]-1] += tab_deb[j+1]
+            tmp_viol+=max(0,tab_violation[k+l-1+ratio_option[i][2]-1])+max(0,tab_violation[k+j])
         end
     end
 
@@ -1081,33 +1099,29 @@ end
 # @return Int : le nombre de ENP de difference
 function eval_Lprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
-    kk=k
     tmp_viol=0
-    tab_violation = deepcopy(tab_violation1)
     for i in Hprio+1:size(ratio_option)[1]
-        k = l
-        for l in kk:l
-            if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
-                if sequence_courante[k][i+2]==1
-                    for j in k:min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]-=1
-                        if(tab_violation[j][i]>=0)
-                            tmp_viol-=1
-                        end
-                    end
-                elseif sequence_courante[l][i+2]==1
-                    for j in k:min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]+=1
-                        if(tab_violation[j][i]>0)
-                            tmp_viol+=1
-                        end
-                    end
+        tab_deb=[0 for i in ratio_option[i][2]-1]
+        tab_fin=[0 for i in ratio_option[i][2]-1]
+        for j in 0:ratio_option[i][2]-1
+            if sequence_courante[k+j][i+2]!=sequence_courante[max(1,l-j)][i+2]
+                if sequence_courante[k+j][i+2]==1
+                    tab_fin[j+1]+=1
+                    tab_deb[j+1]-=1
+                elseif sequence_courante[max(1,l-j)][i+2]==1
+                    tab_fin[j+1]-=1
+                    tab_deb[j+1]+=1
                 end
             end
-            k-=1
+            if j>0
+                tab_fin[j+1]+=tab_fin[j]
+                tab_deb[j+1]+=tab_deb[j]
+            end
+            tab_violation[k+j] += tab_deb[j+1]
+            tab_violation[k+l-1+ratio_option[i][2]-1] += tab_deb[j+1]
+            tmp_viol+=max(0,tab_violation[k+l-1+ratio_option[i][2]-1])+max(0,tab_violation[k+j])
         end
     end
-    k=kk
 
     return tmp_viol
 end
@@ -1121,50 +1135,7 @@ end
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
 # @return ::Array{Int, 1} : [nbcol,Hpriofail,Lpriofail]
 function evaluation_reflection(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int,tab_violation::Array{Array{Int,1},1})
-    col = instance[1][2]
-    sz =size(instance)[1]
-    nbcol = 0
-    Hpriofail=0
-    Lpriofail=0
-    maxprio =0
-    ra = [-ratio[i][1] for i in 1:size(ratio)[1]]
-    tab_violation = [copy(ra) for i in 1:size(instance)[1]]
-    evalrat = [zeros(ratio[i][2]) for i in 1:size(ratio)[1]]
-    tmpi=1
-
-    for n in instance
-        tmprio = 1
-        if n[2]!= col
-            nbcol+=1
-            col=n[2]
-        end
-        for eval in evalrat
-            for i in 1:size(eval)[1]
-                #on ajoute 1 si la vouture n a bien la prio
-                if n[tmprio+2]==1
-                    eval[i]+=1
-                end
-                #on reset quand on a regarde plus de x voitures avec x => y/x
-                if tmpi>=ratio[tmprio][2] &&mod(tmpi-i,ratio[tmprio][2])==0
-                    tab_violation[tmpi][tmprio]+=eval[i]
-                    if eval[i]>ratio[tmprio][1]
-                        if tmprio>Hprio
-                            Lpriofail+=eval[i]-ratio[tmprio][1]
-                        else
-                            Hpriofail+=eval[i]-ratio[tmprio][1]
-                        end
-                    end
-                end
-                if mod(tmpi-i,ratio[tmprio][2])==0
-                    eval[i]=0
-                end
-            end
-            tmprio+=1
-        end
-        tmpi+=1
-    end
-
-    return [nbcol,Hpriofail,Lpriofail]
+        ## non en fait je sais mais pas c'est quoi
 end
 
 
@@ -1627,7 +1598,7 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, rati
 
     end
 
-    update_col_seq(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
+    update_col_seq_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
     update_col_and_pbl_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
@@ -1635,7 +1606,7 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, rati
     return
 end
 
-function update_col_seq(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
+function update_col_seq_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     if sequence_courante[k][szcar-1]==k
@@ -1656,7 +1627,7 @@ function update_col_seq(sequence_courante::Array{Array{Int,1},1},ratio_option::A
     end
 
 end
-# Sincerement j'ai la flemme de commenter ça
+# Sincerement j'ai la flemme de commenter ça # tqt je comprend xDD d
 function update_col_and_pbl_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
@@ -1718,7 +1689,7 @@ function update_tab_violation_shuffle(sequence_courante::Array{Array{Int,1},1},r
     sz = size(sequence_courante)[1]
     tmp_viol=0
     l = size(sequence)[1]
-    for i in 1:Hprio
+    for i in 1:size(ratio_option)[1]
         kk = k
         for l in sequence
             if sequence_courante[kk][i+2]!=sequence_courante[l][i+2]
