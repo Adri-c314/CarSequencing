@@ -89,6 +89,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     nb = [0, 0, 0, 0]
     debut = time()
     println(obj)
+    println(timeOPT)
     @time for Phase in 1:3
         debut = time()
         n=1
@@ -104,7 +105,6 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
                 print("###")
                 n+=1
             end
-
         end
 
         # affichage a chaque fin de phase :

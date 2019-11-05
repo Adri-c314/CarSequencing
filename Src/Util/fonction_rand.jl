@@ -80,7 +80,7 @@ function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1
     else
         while true
             a = rand(1:size,2)
-            for i in Hprio+1:size(ratio_option)[1]+1
+            for i in 3:size(ratio_option)[1]+2
                 if instance[a[1]][i]==instance[a[2]][i]
                     return a
                 end
@@ -173,9 +173,14 @@ end
 ## faudra faire un array des violation ??? un truc comme ça ou alors mettre dans instnace si l est en violation bref caca
 function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
     if Phase ==1 ||(Phase==2 && obj[2]==2)
+        a, b =evaluation_init(instance,ratio_option,Hprio)
+        if(a[2]==0)
+            return rand(1:sz,2)
+        end
         l = rand(1:sz,1)[1]
 
         while true
+
             k = rand(1:sz,1)[1]
             for i in 1:Hprio
                 if tab_violation[k][i]>0 && l!=k
@@ -185,7 +190,10 @@ function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int
         end
     else
         l = rand(1:sz,1)[1]
-
+        a, b =evaluation_init(instance,ratio_option,Hprio)
+        if(a[2]==0 &&a[3]==0)
+            return rand(1:sz,2)
+        end
         while true
             k = rand(1:sz,1)[1]
             for i in 1:size(ratio_option)[1]
@@ -200,8 +208,12 @@ end
 
 
 function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
-
+    a, b =evaluation_init(instance,ratio_option,Hprio)
+    if(a[2]==0)
+        return rand(1:sz,2)
+    end
     while true
+
         tmp = rand(1:sz,2)
         k =tmp[1]
         l = tmp[2]

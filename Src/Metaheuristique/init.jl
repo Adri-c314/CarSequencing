@@ -82,7 +82,7 @@ function init_sequence(datas::NTuple{4,DataFrame})
     # Nettoyage obj
     obj= zeros(3)
     for i in 1:size(oo)[1]
-        if oo[i,2] == "high_priority_level_and_difficult_to_satisfy_ratio_constraints"
+        if oo[i,2] == "high_priority_level_and_difficult_to_satisfy_ratio_constraints" || oo[i,2] =="high_priority_level_and_easy_to_satisfy_ratio_constraints"
             obj[i]=2
         elseif oo[i,2] == "paint_color_batches"
             obj[i]=1
