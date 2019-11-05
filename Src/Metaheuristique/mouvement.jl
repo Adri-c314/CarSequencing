@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :swap!
+    if LSfoo! == :insertion!
         @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     end
     nothing
@@ -74,8 +74,56 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+    # Realisation du benefice ou non du mvt
+    szcar =size(sequence_courante[1])[1]
+    cond = true
+    tmp_color=0
+    tmp_Hprio=0
+    tmp_Lprio=0
+    for o in obj
+        if o==1 #&& (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
+            tmp_color = eval_couleur_bi(sequence_courante, pbl, k, l)
+            cond = tmp_color<=0
+            if tmp_color<0
+                break
+            end
+        elseif o==2
+            tmp_Hprio = eval_Hprio_bi(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
+            cond = tmp_Hprio <=0
+            if tmp_Hprio<0
+                break
+            end
+        elseif o==3
+            tmp_Lprio = eval_Lprio_bi(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+            cond = tmp_Lprio <=0
+            if tmp_Lprio<0
+                break
+            end
+        end
+        # Si ça n'ameliore pas alors on fait rien
+        if !cond
+            return
+        end
+    end
 
-   nothing
+    # Sinon on realise le mouvement de bw :
+    if k > l # Gestion du cas ou s'est inversé. Cette solution n'est surement pas top
+        tmp = l
+        l = k
+        k = tmp
+    end
+    tmp = copy(sequence_courante[k])
+    for i in k:l-1
+        sequence_courante[i] = sequence_courante[i+1]
+    end
+    sequence_courante[l] = tmp
+
+
+    # Mise à jour du tableau de violation et pbl :
+    update_tab_violation_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+    update_col_and_pbl_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+
+    nothing
 end
 
 
@@ -93,7 +141,55 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-   nothing
+    # Realisation du benefice ou non du mvt
+    szcar =size(sequence_courante[1])[1]
+    cond = true
+    tmp_color=0
+    tmp_Hprio=0
+    tmp_Lprio=0
+    for o in obj
+        if o==1 #&& (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
+            tmp_color = eval_couleur_fi(sequence_courante, pbl, k, l)
+            cond = tmp_color<=0
+            if tmp_color<0
+                break
+            end
+        elseif o==2
+            tmp_Hprio = eval_Hprio_fi(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
+            cond = tmp_Hprio <=0
+            if tmp_Hprio<0
+                break
+            end
+        elseif o==3
+            tmp_Lprio = eval_Lprio_fi(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+            cond = tmp_Lprio <=0
+            if tmp_Lprio<0
+                break
+            end
+        end
+        # Si ça n'ameliore pas alors on fait rien
+        if !cond
+            return
+        end
+    end
+
+    # Sinon on realise le mouvement de bw :
+    if k > l # Gestion du cas ou s'est inversé. Cette solution n'est surement pas top
+        tmp = l
+        l = k
+        k = tmp
+    end
+    tmp = copy(sequence_courante[l])
+    for i in 0:l-k-1
+        sequence_courante[l-i] = sequence_courante[l-i-1]
+    end
+    sequence_courante[k] = tmp
+
+    # Mise à jour du tableau de violation et pbl :
+    update_tab_violation_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+    update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+
+    nothing
 end
 
 
@@ -441,14 +537,43 @@ end
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @modify tab_violation : modifie tab_violation
-function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
+function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0
     for i in 1:Hprio
-        # TODO : a dev
-    end
+        fenetre = ratio_option[i][2]
+        depart = -ratio_option[i][1]
+        tmp2 = tab_violation[l-1][i]
 
-    return tmp_viol
+        # Boucle sur toutes les fenetres contenant k ou l
+        for j in l:l+fenetre
+            tmp = depart
+            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
+                if sequence_courante[max(1, j-jj)][2+i] == 1
+                    tmp +=1
+                end
+            end
+            tab_violation[j][i] = tmp
+        end
+
+        # decalage dans x y z
+        for j in k+1+fenetre:l-2
+            tab_violation[j][i] = tab_violation[j+1][i]
+        end
+
+        # Calucule du bous de la partie decalé
+        for j in k:k+fenetre
+            tmp = depart
+            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
+                if j-jj > 0
+                    if sequence_courante[j-jj][2+i] == 1
+                        tmp +=1
+                    end
+                end
+            end
+            tab_violation[j][i] = tmp
+        end
+    end
 end
 
 
@@ -462,14 +587,43 @@ end
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @modify tab_violation : modifie tab_violation
-function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
+function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0
     for i in 1:Hprio
-        # TODO : a dev
-    end
+        fenetre = ratio_option[i][2]
+        depart = -ratio_option[i][1]
+        tmp2 = tab_violation[k+1+fenetre][i]
 
-    return tmp_viol
+        # Boucle sur toutes les fenetres contenant k ou l
+        for j in k:k+1+fenetre
+            tmp = depart
+            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
+                if sequence_courante[max(1, j-jj)][2+i] == 1
+                    tmp +=1
+                end
+            end
+            tab_violation[j][i] = tmp
+        end
+
+        # decalage dans x y z
+        for j in k+2+fenetre:l
+            tmp3 = tab_violation[j][i]
+            tab_violation[j][i] = tmp2
+            tmp2 = tmp3
+        end
+
+        # Calucule du bous de la partie decalé
+        for j in l+1:min(l+fenetre-1, sz)
+            tmp = depart
+            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
+                if sequence_courante[j-jj][2+i] == 1
+                    tmp +=1
+                end
+            end
+            tab_violation[j][i] = tmp
+        end
+    end
 end
 
 
@@ -1357,14 +1511,35 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, rati
 
     end
 
+    update_col_seq(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
     update_col_and_pbl_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
+
     return
 end
 
+function update_col_seq(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    if sequence_courante[k][szcar-1]==k
+        tmpk=k-1
+        col = sequence_courante[k][2]
+        while tmpk>=1 && sequence_courante[tmpk][2]==col
+            sequence_courante[tmpk][szcar-1]=k-1
+            tmpk-=1
+        end
+    end
+    if sequence_courante[k+l-1][szcar-2]==k+l-1
+        tmpk=k+l
+        col = sequence_courante[k+l-1][2]
+        while tmpk>=1 && sequence_courante[tmpk][2]==col
+            sequence_courante[tmpk][szcar-2]=k+l
+            tmpk+=1
+        end
+    end
 
-
+end
 # Sincerement j'ai la flemme de commenter ça
 function update_col_and_pbl_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
@@ -1548,7 +1723,7 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
     deb = 1
     deb = max(1,k-1)
     fin = sz
-    fin = min(k+l+1,sz)
+    fin = min(k+l-1,sz)
     col = sequence_courante[deb][2]
     nbcol=0
     tmpi = sequence_courante[deb][szcar-1]
@@ -1556,7 +1731,7 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
         tmpi = sequence_courante[tmpi+1][szcar-1]
         nbcol+=1
     end
-
+    #println("nbcol : ",nbcol)
 
     col = sequence_courante[max(1,k-1)][2]
 
@@ -1576,11 +1751,12 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
     if sequence_courante[k+l][2]!= col
         tmpnbcol+=1
     end
-    if(tmpnbcol>nbcol)||tmp_pbl>pbl
+
+    if (tmpnbcol>nbcol)||tmp_pbl>pbl
         return false
-    else
-        tmp_pbl+=1
+
     end
 
+    #println("tmpnbcol : ",tmpnbcol)
     return true
 end

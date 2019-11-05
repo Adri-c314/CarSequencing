@@ -89,13 +89,18 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     nb = [0, 0, 0, 0]
     debut = time()
     @time for Phase in 1:3
+        debut = time()
         while temps_max*(timeOPT[Phase]/100)>time()-debut
-        #for i in 1:1
+
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             typeof(f_mouv)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
             compteurMvt!(f_mouv, nb)
+            f_mouv = :insertion!
+            k = 10
+            l = 24
             global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
+            println("mvt fait au", time())
         end
 
         # affichage a chaque fin de phase :
@@ -132,7 +137,7 @@ end
 # @param score_courrant : Le score courant comparer à
 # @pram score_meilleur : le meilleur score
 # @return ::Bool : true si le courrant est mieux
-function estMieux(score_courrant::Array{Int32,1}, score_meilleur::Array{Int32,1})
+function estMieux(score_courrant::Array{Int,1}, score_meilleur::Array{Int,1})
     return score_courrant >= score_meilleur # Comparaison lexicographique.
 end
 
