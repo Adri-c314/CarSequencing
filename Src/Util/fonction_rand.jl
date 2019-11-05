@@ -105,17 +105,16 @@ end
 
 ## faudra faire un array des violation ??? un truc comme ça ou alors mettre dans instnace si l est en violation bref caca
 function denominator(instance::Array{Array{Int,1},1}, ratio::Array{Array{Int,1},1}, sz::Int)
-    k= rand(1:sz,1)
-    q = rand(1:size(ratio)[1],1)
+    k= rand(1:sz,1)[1]
+    q = rand(1:size(ratio)[1],1)[1]
 
-    return [k,k[1]+ratio[q][1][2]]
+    return [k,k[1]+ratio[q][2]]
 end
 
 
 
 # Fonction
 function same_color(instance::Array{Array{Int,1},1},size::Int)
-    ## faire suivant les options ??
     while true
         a = rand(1:size,2)
         if instance[a[1]][2]==instance[a[2]][2]&& a[1]!=a[2]
