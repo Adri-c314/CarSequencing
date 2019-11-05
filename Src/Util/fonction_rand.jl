@@ -67,10 +67,10 @@ end
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
 # @return Array{Int32,1} : une position aleatoire t'as tout compris
-function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},size::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
+function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
     if Phase ==1 ||(Phase==2 && obj[2]==2)
         while true
-            a = rand(1:size,2)
+            a = rand(1:sz,2)
             for i in 3:Hprio
                 if instance[a[1]][i]==instance[a[2]][i]
                     return a
@@ -79,7 +79,7 @@ function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1
         end
     else
         while true
-            a = rand(1:size,2)
+            a = rand(1:sz,2)
             for i in 3:size(ratio_option)[1]+2
                 if instance[a[1]][i]==instance[a[2]][i]
                     return a
