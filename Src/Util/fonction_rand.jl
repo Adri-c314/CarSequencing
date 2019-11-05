@@ -46,8 +46,8 @@ function  choose_f_rand(sequence_meilleure::Array{Array{Int,1},1}, ratio_option:
     elseif S==  :violation_same_color!
           tmp = violation_same_color(sequence_meilleure,ratio_option,tab_violation,sz,Hprio,obj,Phase)
     end
-      k = minimum(tmp)
-      l = maximum(tmp)
+      k = max(1,minimum(tmp))
+      l = min(sz,maximum(tmp))
       return k,l
 end
 
