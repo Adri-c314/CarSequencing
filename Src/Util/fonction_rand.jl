@@ -171,12 +171,12 @@ end
 
 
 ## faudra faire un array des violation ??? un truc comme ça ou alors mettre dans instnace si l est en violation bref caca
-function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},size::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
+function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
     if Phase ==1 ||(Phase==2 && obj[2]==2)
-        l = rand(1:size,1)[1]
+        l = rand(1:sz,1)[1]
 
         while true
-            k = rand(1:size,1)[1]
+            k = rand(1:sz,1)[1]
             for i in 1:Hprio
                 if tab_violation[k][i]>0 && l!=k
                     return [k,l]
@@ -184,10 +184,10 @@ function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int
             end
         end
     else
-        l = rand(1:size,1)[1]
+        l = rand(1:sz,1)[1]
 
         while true
-            k = rand(1:size,1)[1]
+            k = rand(1:sz,1)[1]
             for i in 1:size(ratio_option)[1]
                 if tab_violation[k][i]>0 && l!=k
                     return [k,l]

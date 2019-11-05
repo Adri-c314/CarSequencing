@@ -983,33 +983,29 @@ end
 # @return Int : le nombre de ENP de difference
 function eval_Lprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
-    kk=k
     tmp_viol=0
-    tab_violation = deepcopy(tab_violation1)
     for i in Hprio+1:size(ratio_option)[1]
-        k = l
-        for l in kk:l
-            if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
-                if sequence_courante[k][i+2]==1
-                    for j in k:min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]-=1
-                        if(tab_violation[j][i]>=0)
-                            tmp_viol-=1
-                        end
-                    end
-                elseif sequence_courante[l][i+2]==1
-                    for j in k:min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]+=1
-                        if(tab_violation[j][i]>0)
-                            tmp_viol+=1
-                        end
-                    end
+        tab_deb=[0 for i in ratio_option[i][2]-1]
+        tab_fin=[0 for i in ratio_option[i][2]-1]
+        for j in 0:ratio_option[i][2]-1
+            if sequence_courante[k+j][i+2]!=sequence_courante[max(1,l-j)][i+2]
+                if sequence_courante[k+j][i+2]==1
+                    tab_fin[j+1]+=1
+                    tab_deb[j+1]-=1
+                elseif sequence_courante[max(1,l-j)][i+2]==1
+                    tab_fin[j+1]-=1
+                    tab_deb[j+1]+=1
                 end
             end
-            k-=1
+            if j>0
+                tab_fin[j+1]+=tab_fin[j]
+                tab_deb[j+1]+=tab_deb[j]
+            end
+            tab_violation[k+j] += tab_deb[j+1]
+            tab_violation[k+l-1+ratio_option[i][2]-1] += tab_deb[j+1]
+            tmp_viol+=max(0,tab_violation[k+l-1+ratio_option[i][2]-1])+max(0,tab_violation[k+j])
         end
     end
-    k=kk
 
     return tmp_viol
 end
@@ -1577,7 +1573,7 @@ function update_tab_violation_shuffle(sequence_courante::Array{Array{Int,1},1},r
     sz = size(sequence_courante)[1]
     tmp_viol=0
     l = size(sequence)[1]
-    for i in 1:Hprio
+    for i in 1:size(ratio_option)[1]
         kk = k
         for l in sequence
             if sequence_courante[kk][i+2]!=sequence_courante[l][i+2]
