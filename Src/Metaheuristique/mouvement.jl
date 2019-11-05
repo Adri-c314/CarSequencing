@@ -114,24 +114,11 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio à k
         for j in max(1,k-ratio_option[i][2]+1):k
             if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j][i]>0
+                if tab_violation[j+ratio_option[i][2]-1][i]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[j][2]-1][i+2]==1
-                if tab-violation[j][i]>0
-                    tmp_viol-=1
-                end
-            end
-        end
-
-        #fenetres de k à k+ratio-1
-        for j in k+1:min(sz,k+ratio_option[i][2]-1)
-            if sequence_courante[j-1][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j][i]>0
-                    tmp_viol+=1
-                end
-            elseif sequence_courante[j][i+2]==0 && sequence_courante[k+ratio_option[j][2]-1][i+2]==1
-                if tab-violation[j][i]>0
+                if tab-violation[j+ratio_option[i][2]-1][i]>0
                     tmp_viol-=1
                 end
             end
@@ -140,28 +127,16 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de l-ratio+1
         for j in max(1,l-ratio_option[i][2]+1):l
             if sequence_courante[l][i+2]==1 && sequence_courante[l+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j][i]>0
+                if tab_violation[j+ratio_option[i][2]-1][i]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[l+ratio_option[j][2]-1][i+2]==1
-                if tab-violation[j][i]>0
+                if tab-violation[j+ratio_option[i][2]-1][i]>0
                     tmp_viol-=1
                 end
             end
         end
 
-        #fenetres de l+1 à l+ratio-1
-        for j in l+1:min(sz,l+ratio_option[i][2]-1)
-            if sequence_courante[j-1][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j][i]>0
-                    tmp_viol+=1
-                end
-            elseif sequence_courante[j][i+2]==0 && sequence_courante[j+ratio_option[j][2]-1][i+2]==1
-                if tab-violation[j][i]>0
-                    tmp_viol-=1
-                end
-            end
-        end
     end
     return tmp_viol
 end
@@ -180,7 +155,33 @@ function eval_Hprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
     for i in 1:Hprio
-        # TODO : a dev
+
+        #fenetres de k-ratio+1 à k
+        for j in max(1,k-ratio_option[i][2]+1):k
+            if sequence_courante[k][i+2]==1 && sequence_courante[j+ratio_option[i][2]][i+2]==0
+                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    tmp_viol-=1
+                end
+            elseif sequence_courante[k][i+2]==0 && sequence_courante[j+ratio_option[j][2]][i+2]==1
+                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    tmp_viol+=1
+                end
+            end
+        end
+
+        #fenetre de l-ratio +1 à l
+        for j in max(1,l-ratio_option[i][2]+1):l
+            if sequence_courante[l-ratio_option[i][2]+1][i+2]==1 && sequence_courante[k][i+2]==0
+                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    tmp_viol-=1
+                end
+            elseif sequence_courante[l-ratio_option[i][2]+1][i+2]==0 && sequence_courante[k][i+2]==1
+                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    tmp_viol+=1
+                end
+            end
+        end
+
     end
     return tmp_viol
 end
@@ -197,12 +198,65 @@ function eval_couleur_bi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
-    ## on test le new pbl c'est important
-    if sequence_courante[k][2]==sequence_courante[l][2]
-        return tmp_color
-    end
 
-    # TODO : a dev
+        if sequence_courante[l][szcar-1]>l
+            #k=l
+            if sequence_courante[k][2]==sequence_courante[l][2]
+                if sequence_courante[k][szcar-2]<k && sequence_courante[k][szcar-1]>k
+                    return 0
+                elseif  sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k && sequence_courante[k-1][2]==sequence_courante[k+1][2]
+                    return -2
+                elseif sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k
+                    return -1
+                else
+                    return 0
+                end
+            #k!=l
+            else
+                if sequence_courante[k][szcar-2]<k && sequence_courante[k][szcar-1]>k
+                    return 2
+                elseif sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k && sequence_courante[k-1][2]==sequence_courante[k+1][2]
+                    return 0
+                elseif sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k
+                    return 1
+                else
+                    return 2
+                end
+            end
+        else
+            if sequence_courante[l][2]==sequence_courante[k][2]
+                if sequence_courante[k][szcar-2]<k && sequence_courante[k][szcar-1]>k
+                    return 0
+                elseif  sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==l && sequence_courante[k-1][2]==sequence_courante[k+1][2]
+                    return -2
+                elseif sequence_courante[k][szcar-2]==l && sequence_courante[k][szcar-1]==l
+                    return -1
+                else
+                    return 0
+                end
+            else
+                if sequence_courante[k][2]==sequence_courante[l+1][2]
+                    if sequence_courante[k][szcar-2]<k && sequence_courante[k][szcar-1]>k
+                        return 0
+                    elseif  sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k && sequence_courante[k-1][2]==sequence_courante[k+1][2]
+                        return -2
+                    elseif sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k
+                        return -1
+                    else
+                        return 0
+                    end
+                end
+                if sequence_courante[k][szcar-2]<l && sequence_courante[k][szcar-1]>l
+                    return 1
+                elseif  sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k && sequence_courante[k-1][2]==sequence_courante[k+1][2]
+                    return -1
+                elseif sequence_courante[k][szcar-2]==k && sequence_courante[k][szcar-1]==k
+                    return 0
+                else
+                    return 1
+                end
+            end
+        end
 
     return tmp_color
 end
@@ -220,12 +274,68 @@ function eval_couleur_fi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
     ## on test le new pbl c'est important
-    if sequence_courante[k][2]==sequence_courante[l][2]
-        return tmp_color
+    #if sequence_courante[k][2]==sequence_courante[l][2]
+    #    return tmp_color
+    #end
+
+    if sequence_courante[k][szcar-2]<k
+        #k=l
+        if sequence_courante[k][2]==sequence_courante[l][2]
+            if sequence_courante[l][szcar-2]<l && sequence_courante[l][szcar-1]>l
+                return tmp_color
+            elseif  sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l && sequence_courante[l-1][2]==sequence_courante[l+1][2]
+                return tmp_color-2
+            elseif sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l
+                return -1
+            else
+                return 0
+            end
+        #k!=l
+        else
+            if sequence_courante[l][szcar-2]<l && sequence_courante[l][szcar-1]>l
+                return 2
+            elseif sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l && sequence_courante[l-1][2]==sequence_courante[l+1][2]
+                return 0
+            elseif sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l
+                return 1
+            else
+                return 2
+            end
+        end
+    else
+        if sequence_courante[l][2]==sequence_courante[k][2]
+            if sequence_courante[l][szcar-2]<l && sequence_courante[l][szcar-1]>l
+                return 0
+            elseif  sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l && sequence_courante[l-1][2]==sequence_courante[l+1][2]
+                return -2
+            elseif sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l
+                return -1
+            else
+                return 0
+            end
+        else
+            if sequence_courante[l][2]==sequence_courante[k-1][2]
+                if sequence_courante[l][szcar-2]<l && sequence_courante[l][szcar-1]>l
+                    return 0
+                elseif  sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l && sequence_courante[l-1][2]==sequence_courante[l+1][2]
+                    return -2
+                elseif sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l
+                    return -1
+                else
+                    return 0
+                end
+            end
+            if sequence_courante[l][szcar-2]<l && sequence_courante[l][szcar-1]>l
+                return 1
+            elseif  sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l && sequence_courante[l-1][2]==sequence_courante[l+1][2]
+                return -1
+            elseif sequence_courante[l][szcar-2]==l && sequence_courante[l][szcar-1]==l
+                return 0
+            else
+                return 1
+            end
+        end
     end
-
-    # TODO : a dev
-
     return tmp_color
 end
 
@@ -242,8 +352,35 @@ end
 function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0
+    for i in Hprio+1:size(ratio_option)[1]
 
+        #fenetres de k-ratio à k
+        for j in max(1,k-ratio_option[i][2]+1):k
+            if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
+                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    tmp_viol+=1
+                end
+            elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[j][2]-1][i+2]==1
+                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    tmp_viol-=1
+                end
+            end
+        end
 
+        #fenetres de l-ratio+1
+        for j in max(1,l-ratio_option[i][2]+1):l
+            if sequence_courante[l][i+2]==1 && sequence_courante[l+ratio_option[i][2]-1][i+2]==0
+                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    tmp_viol+=1
+                end
+            elseif sequence_courante[l][i+2]==0 && sequence_courante[l+ratio_option[j][2]-1][i+2]==1
+                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    tmp_viol-=1
+                end
+            end
+        end
+
+    end
     return tmp_viol
 end
 
@@ -260,7 +397,35 @@ end
 function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     tmp_viol=0
+    for i in Hprio+1:size(ratio_option)[1]
 
+        #fenetres de k-ratio+1 à k
+        for j in max(1,k-ratio_option[i][2]+1):k
+            if sequence_courante[k][i+2]==1 && sequence_courante[j+ratio_option[i][2]][i+2]==0
+                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    tmp_viol-=1
+                end
+            elseif sequence_courante[k][i+2]==0 && sequence_courante[j+ratio_option[j][2]][i+2]==1
+                if tab-violation[j+ratio_option[i][2]-1][i]>=0
+                    tmp_viol+=1
+                end
+            end
+        end
+
+        #fenetre de l-ratio +1 à l
+        for j in max(1,l-ratio_option[i][2]+1):l
+            if sequence_courante[l-ratio_option[i][2]+1][i+2]==1 && sequence_courante[k][i+2]==0
+                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    tmp_viol-=1
+                end
+            elseif sequence_courante[l-ratio_option[i][2]+1][i+2]==0 && sequence_courante[k][i+2]==1
+                if tab-violation[j+ratio_option[i][2]-1][i]>=0
+                    tmp_viol+=1
+                end
+            end
+        end
+
+    end
 
     return tmp_viol
 end
