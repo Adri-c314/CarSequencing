@@ -640,6 +640,70 @@ end
 function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
+
+    fink=k+1
+    while sequence_courante[fink][2]==sequence_courante[k-1][2]
+        debl+=1
+    end
+    fink+=1
+
+    if sequence_courante[k][2]==sequence_courante[l][2]
+        for i in sequence_courante[k][szcar-2]:fink
+            sequence_courante[i][szcar-1]=sequence_courante[i][szcar-1]-1
+        end
+        for i in fink+1:sequence_courante[l][szcar-2]-1
+            sequence_courante[i][size-2]=sequence_courante[i][size-2]-1
+            sequence_courante[i][size-1]=sequence_courante[i][size-1]-1
+        end
+
+        for i in sequence_courante[l][size-2]:sequence_courante[l][szcar-1]
+            sequence_courante[i][size-2]=sequence_courante[l][size-2]-1
+        end
+        sequence_courante[k][size-2]=sequence_courante[l][size-2]
+        sequence_courante[k][size-1]=sequence_courante[l][size-1]+1
+
+    elseif sequence_courante[k][2]!=sequence_courante[l][2]
+            finl=sequence_courante[l][szcar-1]
+            for i in sequence_courante[k][szcar-2]:fink
+                sequence_courante[i][szcar-1]=sequence_courante[i][szcar-1]-1
+            end
+            for i in fink+1:sequence_courante[l][szcar-2]-1
+                sequence_courante[i][size-2]=sequence_courante[i][size-2]-1
+                sequence_courante[i][size-1]=sequence_courante[i][size-1]-1
+            end
+            for i in sequence_courante[l][size-2]:l
+                sequence_courante[i][size-1]=l-1
+            end
+            sequence_courante[k][size-2]=l
+            sequence_courante[k][size-1]=l
+            for i in l+2:finl
+                sequence_courante[i][size-2]=l+1
+            end
+
+            else
+                for i in sequence_courante[k][szcar-2]:fink
+                    sequence_courante[i][szcar-1]=sequence_courante[i][szcar-1]-1
+                end
+                for i in fink+1:sequence_courante[l][szcar-2]-1
+                    sequence_courante[i][size-2]=sequence_courante[i][size-2]-1
+                    sequence_courante[i][size-1]=sequence_courante[i][size-1]-1
+                end
+                for i in sequence_courante[l][size-2]:l
+                    sequence_courante[i][size-1]=l-1
+                end
+                sequence_courante[k][size-2]=l
+                if sequence_courante[k][2]==sequence_courante[l+1][2]
+                    for i in l:sequence_courante[l+1][szcar-1]
+                        sequence_courante[i][szcar-2]=sequence_courante[l+1][szcar-2]-1
+                    end
+                    sequence_courante[k][size-1]=sequence_courante[l+1][szcar-1]
+                else
+                    sequence_courante[k][size-1]=l
+            
+            end
+
+        end
+
 end
 
 
@@ -656,6 +720,58 @@ end
 function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
+
+    debl=l-1
+    while sequence_courante[debl][2]==sequence_courante[l+1][2]
+        debl-=1
+    end
+    debl+=1
+
+    if sequence_courante[k][2]==sequence_courante[l][2]
+        for i in sequence_courante[k][size-2]:sequence_courante[k][szcar-1]
+            sequence_courante[i][size-1]=sequence_courante[i][size-1]+1
+        end
+        sequence_courante[l][size-2]=sequence_courante[k][size-2]
+        sequence_courante[l][size-1]=sequence_courante[k][size-1]+1
+        for i in sequence_courante[k][szcar-1]+1:debl
+            sequence_courante[l][size-2]=sequence_courante[k][size-2]+1
+            sequence_courante[l][size-1]=sequence_courante[i][size-1]+1
+        end
+        for i in debl:sequence_courante[l+1][szcar-1]
+            sequence_courante[i][szcar-2]=sequence_courante[i][szcar-2]+1
+        end
+
+    elseif sequence_courante[k][2]!=sequence_courante[l][2]
+            if sequence_courante[k][szcar-2]<k
+                for i in sequence_courante[k][szcar-2]:k-1
+                    sequence_courante[i][szcar-1]=k-1
+                end
+                sequence_courante[l][size-2]=k
+                sequence_courante[l][size-1]=k
+                sequence_courante[k][size-2]=k+1
+                sequence_courante[k][size-1]=sequence_courante[k][size-1]+1
+                for i in k+2:debl
+                    sequence_courante[l][size-2]=sequence_courante[k][size-2]+1
+                    sequence_courante[l][size-1]=sequence_courante[i][size-1]+1
+                end
+                for i in debl:sequence_courante[l+1][szcar-1]
+                    sequence_courante[i][szcar-2]=sequence_courante[i][szcar-2]+1
+                end
+            else
+                sequence_courante[l][size-2]=k
+                sequence_courante[l][size-1]=k
+                sequence_courante[k][size-2]=k+1
+                sequence_courante[k][size-1]+=1
+                for i in k+2:debl
+                    sequence_courante[l][size-2]=sequence_courante[k][size-2]+1
+                    sequence_courante[l][size-1]=sequence_courante[i][size-1]+1
+                end
+                for i in debl:sequence_courante[l+1][szcar-1]
+                    sequence_courante[i][szcar-2]=sequence_courante[i][szcar-2]+1
+                end
+            end
+
+        end
 end
 
 
