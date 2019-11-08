@@ -211,11 +211,11 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio à k
         for j in max(1,k-ratio_option[i][2]+1):k
             if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[j][2]-1][i+2]==1
-                if tab-violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             end
@@ -224,11 +224,11 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de l-ratio+1
         for j in max(1,l-ratio_option[i][2]+1):l
             if sequence_courante[l][i+2]==1 && sequence_courante[l+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[l+ratio_option[j][2]-1][i+2]==1
-                if tab-violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             end
@@ -256,11 +256,11 @@ function eval_Hprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio+1 à k
         for j in max(1,k-ratio_option[i][2]+1):k
             if sequence_courante[k][i+2]==1 && sequence_courante[j+ratio_option[i][2]][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             elseif sequence_courante[k][i+2]==0 && sequence_courante[j+ratio_option[j][2]][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             end
@@ -269,11 +269,11 @@ function eval_Hprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetre de l-ratio +1 à l
         for j in max(1,l-ratio_option[i][2]+1):l
             if sequence_courante[l-ratio_option[i][2]+1][i+2]==1 && sequence_courante[k][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             elseif sequence_courante[l-ratio_option[i][2]+1][i+2]==0 && sequence_courante[k][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             end
@@ -454,11 +454,11 @@ function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio à k
         for j in max(1,k-ratio_option[i][2]+1):k
             if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[j][2]-1][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             end
@@ -467,11 +467,11 @@ function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de l-ratio+1
         for j in max(1,l-ratio_option[i][2]+1):l
             if sequence_courante[l][i+2]==1 && sequence_courante[l+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[l+ratio_option[j][2]-1][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             end
@@ -499,11 +499,11 @@ function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio+1 à k
         for j in max(1,k-ratio_option[i][2]+1):k
             if sequence_courante[k][i+2]==1 && sequence_courante[j+ratio_option[i][2]][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             elseif sequence_courante[k][i+2]==0 && sequence_courante[j+ratio_option[j][2]][i+2]==1
-                if tab-violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             end
@@ -512,11 +512,11 @@ function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetre de l-ratio +1 à l
         for j in max(1,l-ratio_option[i][2]+1):l
             if sequence_courante[l-ratio_option[i][2]+1][i+2]==1 && sequence_courante[k][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             elseif sequence_courante[l-ratio_option[i][2]+1][i+2]==0 && sequence_courante[k][i+2]==1
-                if tab-violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             end
@@ -554,12 +554,12 @@ function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
 
         # decalage dans x y z
         for j in k+1+fenetre:l-2
-            tab_violation[j][i] = tab_violation[j+1][i]
+            tab_violation[i][j] = tab_violation[j+1][i]
         end
 
         # Calucule du bous de la partie decalé
@@ -572,7 +572,7 @@ function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_
                     end
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
     end
 end
@@ -594,7 +594,7 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
     for i in 1:Hprio
         fenetre = ratio_option[i][2]
         depart = -ratio_option[i][1]
-        tmp2 = tab_violation[k+1+fenetre][i]
+        tmp2 = tab_violation[i][k+1+fenetre]
 
         # Boucle sur toutes les fenetres contenant k ou l
         for j in k:k+1+fenetre
@@ -604,13 +604,13 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
 
         # decalage dans x y z
         for j in k+2+fenetre:l
-            tmp3 = tab_violation[j][i]
-            tab_violation[j][i] = tmp2
+            tmp3 = tab_violation[i][j]
+            tab_violation[i][j] = tmp2
             tmp2 = tmp3
         end
 
@@ -622,7 +622,7 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
     end
 end
@@ -875,25 +875,37 @@ end
 # @param l : l'indice de l (avec k<l)
 # @modify tab_violation : modifie tab_violation
 function update_tab_violation_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
-    ## update du tab_violation
     sz = size(sequence_courante)[1]
+    tmp_viol=0
     for i in 1:size(ratio_option)[1]
-        tmpfin = l
-        for tmpi in k:l
-            if sequence_courante[tmpi][i+2]!=sequence_courante[tmpfin][i+2]
-                if sequence_courante[tmpi][i+2]==1
-                    for j in max(tmpi,ratio_option[i][2]-1):min(sz,tmpi+ratio_option[i][2]-1)
-                        tab_violation[j][i]-=1
+        tab_deb=[0 for i in 1:ratio_option[i][2]-1]
+        tab_fin=[0 for i in 1:ratio_option[i][2]-1]
+        for j in 0:min(l-k-1,ratio_option[i][2]-2,sz-k)
 
-                    end
-                elseif sequence_courante[tmpfin][i+2]==1
-                    for j in max(tmpi,ratio_option[i][2]-1):min(sz,tmpi+ratio_option[i][2]-1)
-                        tab_violation[j][i]+=1
-
-                    end
+            if sequence_courante[min(sz,k+j)][i+2]!=sequence_courante[max(1,l-j)][i+2]
+                if sequence_courante[k+j][i+2]==1
+                    tab_fin[j+1]+=1
+                    tab_deb[j+1]-=1
+                elseif sequence_courante[max(1,l-j)][i+2]==1
+                    tab_fin[j+1]-=1
+                    tab_deb[j+1]+=1
                 end
             end
-            tmpfin-=1
+            if j>0
+                tab_fin[j+1]+=tab_fin[j]
+                tab_deb[j+1]+=tab_deb[j]
+            end
+            tab_violation[i][k+j] += tab_deb[j+1]
+            if (l-j+ratio_option[i][2]-1<=sz)
+                tab_violation[i][l-j+ratio_option[i][2]-1] += tab_fin[j+1]
+                tmp_viol+=max(0,tab_violation[i][l-j+ratio_option[i][2]-1])
+            end
+            tmp_viol+=max(0,tab_violation[i][k+j])
+        end
+    end
+    for i in 1:size(ratio_option)[1]
+            if l-k >ratio_option[i][2]-1
+            reverse!(tab_violation[i],k+ratio_option[i][2]-1,l)
         end
     end
     return
@@ -1062,12 +1074,12 @@ function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
                 tab_fin[j+1]+=tab_fin[j]
                 tab_deb[j+1]+=tab_deb[j]
             end
-            tab_violation[k+j][i] += tab_deb[j+1]
+            tab_violation[i][k+j] += tab_deb[j+1]
             if (l-j+ratio_option[i][2]-1<=sz)
-                tab_violation[l-j+ratio_option[i][2]-1][i] += tab_fin[j+1]
-                tmp_viol+=max(0,tab_violation[l-j+ratio_option[i][2]-1][i])
+                tab_violation[i][l-j+ratio_option[i][2]-1] += tab_fin[j+1]
+                tmp_viol+=max(0,tab_violation[i][l-j+ratio_option[i][2]-1])
             end
-            tmp_viol+=max(0,tab_violation[k+j][i])
+            tmp_viol+=max(0,tab_violation[i][k+j])
         end
     end
 
@@ -1105,12 +1117,12 @@ function eval_Lprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
                 tab_fin[j+1]+=tab_fin[j]
                 tab_deb[j+1]+=tab_deb[j]
             end
-            tab_violation[k+j][i] += tab_deb[j+1]
+            tab_violation[i][k+j] += tab_deb[j+1]
             if (l-j+ratio_option[i][2]-1<=sz)
-                tab_violation[l-j+ratio_option[i][2]-1][i] += tab_fin[j+1]
-                tmp_viol+=max(0,tab_violation[l-j+ratio_option[i][2]-1][i])
+                tab_violation[i][l-j+ratio_option[i][2]-1] += tab_fin[j+1]
+                tmp_viol+=max(0,tab_violation[i][l-j+ratio_option[i][2]-1])
             end
-            tmp_viol+=max(0,tab_violation[k+j][i])
+            tmp_viol+=max(0,tab_violation[i][k+j])
         end
     end
     return tmp_viol
@@ -1322,23 +1334,23 @@ function eval_Hprio_swap(sequence_courante::Array{Array{Int,1},1}, ratio_option:
         if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
             if sequence_courante[k][i+2]==1
                 for j in k:min(l-1,k+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>0)
+                    if(tab_violation[i][j]>0)
                         tmp_viol-=1
                     end
                 end
                 for j in max(l,k+ratio_option[i][2]):min(sz,l+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>=0)
+                    if(tab_violation[i][j]>=0)
                         tmp_viol+=1
                     end
                 end
             elseif sequence_courante[l][i+2]==1
                 for j in max(l,k+ratio_option[i][2]):min(sz,l+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>0)
+                    if(tab_violation[i][j]>0)
                         tmp_viol-=1
                     end
                 end
                 for j in k:min(l-1,k+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>=0)
+                    if(tab_violation[i][j]>=0)
                         tmp_viol+=1
                     end
                 end
@@ -1461,17 +1473,17 @@ function update_tab_violation_and_pbl_swap!(sequence_courante::Array{Array{Int,1
         if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
             if sequence_courante[k][i+2]==1
                 for j in k:min(l-1,k+ratio_option[i][2]-1)
-                    tab_violation[j][i]+=1
+                    tab_violation[i][j]+=1
                 end
                 for j in max(l,k+ratio_option[i][2]):min(sz,l+ratio_option[i][2]-1)
-                    tab_violation[j][i]-=1
+                    tab_violation[i][j]-=1
                 end
             elseif sequence_courante[l][i+2]==1
                 for j in max(l,k+ratio_option[i][2]):min(sz,l+ratio_option[i][2]-1)
-                    tab_violation[j][i]+=1
+                    tab_violation[i][j]+=1
                 end
                 for j in k:min(l-1,k+ratio_option[i][2]-1)
-                    tab_violation[j][i]-=1
+                    tab_violation[i][j]-=1
                 end
             end
         end
@@ -1495,23 +1507,23 @@ function eval_Lprio_swap(sequence_courante::Array{Array{Int,1},1}, ratio_option:
         if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
             if sequence_courante[k][i+2]==1
                 for j in k:min(l-1,k+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>0)
+                    if(tab_violation[i][j]>0)
                         tmp_viol-=1
                     end
                 end
                 for j in max(l,k+ratio_option[i][2]):min(sz,l+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>=0)
+                    if(tab_violation[i][j]>=0)
                         tmp_viol+=1
                     end
                 end
             elseif sequence_courante[l][i+2]==1
                 for j in max(l,k+ratio_option[i][2]):min(sz,l+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>0)
+                    if(tab_violation[i][j]>0)
                         tmp_viol-=1
                     end
                 end
                 for j in k:min(l-1,k+ratio_option[i][2]-1)
-                    if(tab_violation[j][i]>=0)
+                    if(tab_violation[i][j]>=0)
                         tmp_viol+=1
                     end
                 end
@@ -1697,11 +1709,11 @@ function update_tab_violation_shuffle(sequence_courante::Array{Array{Int,1},1},r
             if sequence_courante[kk][i+2]!=sequence_courante[l][i+2]
                 if sequence_courante[kk][i+2]==1
                     for j in max(kk,ratio_option[i][2]-1):min(sz,kk+ratio_option[i][2]-1)
-                        tab_violation[j][i]-=1
+                        tab_violation[i][j]-=1
                     end
                 elseif sequence_courante[l][i+2]==1
                     for j in max(kk,ratio_option[i][2]-1):min(sz,kk+ratio_option[i][2]-1)
-                        tab_violation[j][i]+=1
+                        tab_violation[i][j]+=1
                     end
                 end
             end
@@ -1730,15 +1742,15 @@ function eval_Hprio_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_optio
             if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
                 if sequence_courante[k][i+2]==1
                     for j in max(k,ratio_option[i][2]-1):min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]-=1
-                        if(tab_violation[j][i]>=0)
+                        tab_violation[i][j]-=1
+                        if(tab_violation[i][j]>=0)
                             tmp_viol-=1
                         end
                     end
                 elseif sequence_courante[l][i+2]==1
                     for j in max(k,ratio_option[i][2]-1):min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]+=1
-                        if(tab_violation[j][i]>0)
+                        tab_violation[i][j]+=1
+                        if(tab_violation[i][j]>0)
                             tmp_viol+=1
                         end
                     end
@@ -1771,15 +1783,15 @@ function eval_Lprio_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_optio
             if sequence_courante[k][i+2]!=sequence_courante[l][i+2]
                 if sequence_courante[k][i+2]==1
                     for j in max(k,ratio_option[i][2]):min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]-=1
-                        if(tab_violation[j][i]>=0)
+                        tab_violation[i][j]-=1
+                        if(tab_violation[i][j]>=0)
                             tmp_viol-=1
                         end
                     end
                 elseif sequence_courante[l][i+2]==1
                     for j in max(k,ratio_option[i][2]):min(sz,k+ratio_option[i][2]-1)
-                        tab_violation[j][i]+=1
-                        if(tab_violation[j][i]>0)
+                        tab_violation[i][j]+=1
+                        if(tab_violation[i][j]>0)
                             tmp_viol+=1
                         end
                     end

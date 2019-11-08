@@ -184,7 +184,7 @@ function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int
             tmpi+=1
             k = rand(1:sz,1)[1]
             for i in 1:Hprio
-                if tab_violation[k][i]>0 && l!=k
+                if tab_violation[i][k]>0 && l!=k
                     return [k,l]
                 end
             end
@@ -199,7 +199,7 @@ function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int
             tmpi+=1
             k = rand(1:sz,1)[1]
             for i in 1:size(ratio_option)[1]
-                if tab_violation[k][i]>0 && l!=k
+                if tab_violation[i][k]>0 && l!=k
                     return [k,l]
                 end
             end
@@ -225,14 +225,14 @@ function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Arra
         tmpi+=1
         if l!=k && instance[l][2]==instance[k][2]
             for i in 1:size(ratio_option)[1]
-                if tab_violation[l][i]>0
+                if tab_violation[i][l]>0
                     cond = true
                 end
             end
             if cond
                 cond = false
                 for i in 1:size(ratio_option)[1]
-                    if tab_violation[k][i]>0
+                    if tab_violation[i][k]>0
                         cond = true
                     end
                 end
