@@ -172,15 +172,16 @@ end
 
 ## faudra faire un array des violation ??? un truc comme ça ou alors mettre dans instnace si l est en violation bref caca
 function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
+    tmpi = 1000
     if Phase ==1 ||(Phase==2 && obj[2]==2)
-        a, b =evaluation_init(instance,ratio_option,Hprio)
+        #=a, b =evaluation_init(instance,ratio_option,Hprio)
         if(a[2]==0)
             return rand(1:sz,2)
-        end
+        end=#
         l = rand(1:sz,1)[1]
-
-        while true
-
+        tmpi+=1
+        while true && tmpi<size(instance)[1]
+            tmpi+=1
             k = rand(1:sz,1)[1]
             for i in 1:Hprio
                 if tab_violation[k][i]>0 && l!=k
@@ -190,11 +191,12 @@ function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int
         end
     else
         l = rand(1:sz,1)[1]
-        a, b =evaluation_init(instance,ratio_option,Hprio)
+        #=a, b =evaluation_init(instance,ratio_option,Hprio)
         if(a[2]==0 &&a[3]==0)
             return rand(1:sz,2)
-        end
-        while true
+        end=#
+        while true && tmpi<size(instance)[1]
+            tmpi+=1
             k = rand(1:sz,1)[1]
             for i in 1:size(ratio_option)[1]
                 if tab_violation[k][i]>0 && l!=k
@@ -203,21 +205,24 @@ function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int
             end
         end
     end
+    return generic(sz)
 
 end
 
 
 function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
-    a, b =evaluation_init(instance,ratio_option,Hprio)
+    #=a, b =evaluation_init(instance,ratio_option,Hprio)
     if(a[2]==0)
         return rand(1:sz,2)
-    end
-    while true
+    end=#
+    tmpi = 1000
+    while true && tmpi<size(instance)[1]
 
         tmp = rand(1:sz,2)
         k =tmp[1]
         l = tmp[2]
         cond = false
+        tmpi+=1
         if l!=k && instance[l][2]==instance[k][2]
             for i in 1:size(ratio_option)[1]
                 if tab_violation[l][i]>0
@@ -237,4 +242,5 @@ function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Arra
             end
         end
     end
+    return same_color(instance,sz)
 end

@@ -93,8 +93,13 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     println(timeOPT)
     @time for Phase in 1:3
         debut = time()
-        n=1
-        print("Phase : ",Phase ,", Execution :")
+        n=0
+        st_output = string("Phase : ",Phase ,", Execution : [")
+        tmp_st = ""
+        for i in 1:50-n-1
+            tmp_st=string(tmp_st," ")
+        end
+        tmp_st=string(tmp_st,"   ] ")
         while temps_max*(timeOPT[Phase]/100)>time()-debut
         #for i in 1:100
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
@@ -102,9 +107,14 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
 
             effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
-
-            if (time()-debut)>(n/10)*temps_max*(timeOPT[Phase]/100)
-                print("###")
+            if (time()-debut)>(n/50)*temps_max*(timeOPT[Phase]/100)
+                st_output=string(st_output, "#")
+                tmp_st = ""
+                for i in 1:50-n-1
+                    tmp_st=string(tmp_st," ")
+                end
+                tmp_st=string(tmp_st," ] ")
+                print(st_output,tmp_st,n*2,"% \r")
                 n+=1
             end
 
@@ -120,13 +130,15 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             )
         end
         if verbose
-            println("\nPhase ", Phase, " :")
+            st_output=string(st_output, "#] ")
+            println(st_output,100,"%")
+            #println("\nPhase ", Phase, " :")
             println("Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1])
             println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
             println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
-            println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4],"\n\n")
+            println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
             a, b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
-            println(a)
+            println("score : ", a,"\n\n")
         end
 
 
