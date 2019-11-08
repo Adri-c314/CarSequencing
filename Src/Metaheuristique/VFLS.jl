@@ -87,6 +87,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
 
 
     nb = [0, 0, 0, 0]
+    nb_effectiv = [0,0,0,0]
     debut = time()
     println(obj)
     println(timeOPT)
@@ -98,9 +99,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         #for i in 1:100
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
-            compteurMvt!(f_mouv, nb)
 
-            global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
+            effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
+            compteurMvt!(f_mouv, nb,nb_effectiv,effect)
+
             if (time()-debut)>(n/10)*temps_max*(timeOPT[Phase]/100)
                 print("###")
                 n+=1
@@ -119,10 +121,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         end
         if verbose
             println("\nPhase ", Phase, " :")
-            println("Nombre de swap : ",nb[1])
-            println("Nombre d'insertion : ",nb[2])
-            println("Nombre de reflection : ",nb[3])
-            println("Nombre de shuffle : ",nb[4],"\n\n")
+            println("Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1])
+            println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
+            println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
+            println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4],"\n\n")
             a, b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
             println(a)
         end
@@ -130,11 +132,15 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
 
         # Reset de nb
         nb = [0, 0, 0, 0]
+        nb_effectiv = [0,0,0,0]
     end
 
     # Re evaluation en fin d'exection :
     a, b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
     println(a)
+    for t in tab_violation
+        #println(t)
+    end
     return a, b, txt
 end
 
@@ -154,7 +160,7 @@ end
 # @param f_mouv : le type de mouvement
 # @param nb : le compteur
 # @modify nb : mets à jour nb
-function compteurMvt!(f_mouv::Symbol, nb::Array{Int, 1})
+function compteurMvt!(f_mouv::Symbol, nb::Array{Int, 1},nb_effectiv::Array{Int, 1},effectiv::Bool)
     if f_mouv==:swap!
         nb[1]+=1
     elseif f_mouv==:insertion!
@@ -163,6 +169,17 @@ function compteurMvt!(f_mouv::Symbol, nb::Array{Int, 1})
         nb[3]+=1
     else
         nb[4]+=1
+    end
+    if effectiv
+        if f_mouv==:swap!
+            nb_effectiv[1]+=1
+        elseif f_mouv==:insertion!
+            nb_effectiv[2]+=1
+        elseif f_mouv==:reflection!
+            nb_effectiv[3]+=1
+        else
+            nb_effectiv[4]+=1
+        end
     end
     nothing
 end

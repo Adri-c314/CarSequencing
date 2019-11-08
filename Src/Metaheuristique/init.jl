@@ -47,8 +47,9 @@ function init_sequence(datas::NTuple{4,DataFrame})
     for i in 1:size(vehicles)[1]
         tmp = Int[0]
         for ii in 1:(size(vehicles)[2]-3)
-            append!(tmp,vehicles[i,ii+3])
+                append!(tmp,vehicles[i,ii+3])
         end
+        println(tmp)
         append!(tmp,[0,0,i])
         append!(sequence,[tmp])
     end
