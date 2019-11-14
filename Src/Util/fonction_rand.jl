@@ -56,7 +56,7 @@ end
 # Fonction avec un nom generic
 # @param size : la taille max
 # @return Array{Int32,1} : une position aleatoire
-function generic(size::Int32)
+function generic(size::Int)
     a = rand(1:size,2)
     return a
 end

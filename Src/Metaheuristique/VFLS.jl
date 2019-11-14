@@ -90,6 +90,8 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     debut = time()
     println(obj)
     println(timeOPT)
+    #global_mouvement!(:insertion!, sequence_meilleure, 2, 72, ratio_option, tab_violation, Hprio, obj, pbl, :generic!)
+    ###########################""
     @time for Phase in 1:3
         debut = time()
         n=1
@@ -99,7 +101,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
             compteurMvt!(f_mouv, nb)
-
+            println(f_rand, f_mouv)
             global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
             if (time()-debut)>(n/10)*temps_max*(timeOPT[Phase]/100)
                 print("###")
