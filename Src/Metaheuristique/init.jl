@@ -47,7 +47,7 @@ function init_sequence(datas::NTuple{4,DataFrame})
     for i in 1:size(vehicles)[1]
         tmp = Int[0]
         for ii in 1:(size(vehicles)[2]-3)
-            append!(tmp,vehicles[i,ii+3])
+                append!(tmp,vehicles[i,ii+3])
         end
         append!(tmp,[0,0,i])
         append!(sequence,[tmp])
@@ -112,8 +112,8 @@ function evaluation_init(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,
     Lpriofail=0
     maxprio =0
 
-    ra = [-ratio[i][1] for i in 1:size(ratio)[1]]
-    tab_violation = [copy(ra) for i in 1:size(instance)[1]]
+    ra = [[-ratio[i][1] for j in 1:size(instance)[1]] for i in 1:size(ratio)[1]]
+    tab_violation = ra
     evalrat = [zeros(ratio[i][2]) for i in 1:size(ratio)[1]]
     tmpi=1
     for n in instance
@@ -130,7 +130,7 @@ function evaluation_init(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,
                 end
                 #on reset quand on a regarde plus de x voitures avec x => y/x
                 if tmpi>=ratio[tmprio][2] && mod(tmpi-i,ratio[tmprio][2])==0
-                    tab_violation[tmpi][tmprio]+=eval[i]
+                    tab_violation[tmprio][tmpi]+=eval[i]
                     if eval[i]>ratio[tmprio][1]
                         if tmprio>Hprio
                             Lpriofail+=eval[i]-ratio[tmprio][1]
