@@ -426,11 +426,11 @@ function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio à k
         for j in max(1,k-ratio_option[i][2]+1):min(k,sz-ratio_option[i][2])
             if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[i][j+ratio_option[i][2]-1]>=0
+                if tab_violation[j+ratio_option[i][2]-1][i]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[i][2]-1][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             end
@@ -440,11 +440,11 @@ function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         for j in max(1,l-ratio_option[i][2]+1):l
             if j+ratio_option[i][2]-1 <= sz
                 if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                    if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>=0
                         tmp_viol+=1
                     end
                 elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[i][2]-1][i+2]==1
-                    if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>0
                         tmp_viol-=1
                     end
                 end
@@ -480,11 +480,11 @@ function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio+1 à k
         for j in max(1,k-ratio_option[i][2]+1):min(k,sz-ratio_option[i][2])
             if sequence_courante[k][i+2]==1 && sequence_courante[j+ratio_option[i][2]][i+2]==0
-                if tab_violation[i][j+ratio_option[i][2]-1]>0
+                if tab_violation[j+ratio_option[i][2]-1][i]>0
                     tmp_viol-=1
                 end
             elseif sequence_courante[k][i+2]==0 && sequence_courante[j+ratio_option[i][2]][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             end
@@ -494,11 +494,11 @@ function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         for j in max(1,l-ratio_option[i][2]+1):l
             if j+ratio_option[i][2]-1 <= sz && j-ratio_option[i][2]+1>=1
                 if sequence_courante[j-ratio_option[i][2]+1][i+2]==1 && sequence_courante[k][i+2]==0
-                    if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>0
                         tmp_viol-=1
                     end
                 elseif sequence_courante[j-ratio_option[i][2]+1][i+2]==0 && sequence_courante[k][i+2]==1
-                    if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>=0
                         tmp_viol+=1
                     end
                 end
@@ -527,7 +527,7 @@ function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_
     for i in 1:Hprio
         fenetre = ratio_option[i][2]
         depart = -ratio_option[i][1]
-        tmp2 = tab_violation[l-1][i]
+        tmp2 = tab_violation[i][l-1]
 
         # Boucle sur toutes les fenetres contenant k ou l
         for j in l:min(sz, l+fenetre)
@@ -537,12 +537,12 @@ function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[i][j] = tmp
+            tab_violation[j][i] = tmp
         end
 
         # decalage dans x y z
         for j in k+1+fenetre:l-2
-            tab_violation[i][j] = tab_violation[j+1][i]
+            tab_violation[j][i] = tab_violation[i][j+1]
         end
 
         # Calucule du bous de la partie decalé
@@ -555,7 +555,7 @@ function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_
                     end
                 end
             end
-            tab_violation[i][j] = tmp
+            tab_violation[j][i] = tmp
         end
     end
 end
@@ -577,7 +577,7 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
     for i in 1:Hprio
         fenetre = ratio_option[i][2]
         depart = -ratio_option[i][1]
-        tmp2 = tab_violation[min(k+1+fenetre,sz)][i]
+        tmp2 = tab_violation[i][min(k+1+fenetre,sz)]
 
         # Boucle sur toutes les fenetres contenant k ou l
         for j in k:min(k+1+fenetre,sz)
@@ -587,13 +587,13 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[i][j] = tmp
+            tab_violation[j][i] = tmp
         end
 
         # decalage dans x y z
         for j in k+2+fenetre:l
-            tmp3 = tab_violation[i][j]
-            tab_violation[i][j] = tmp2
+            tmp3 = tab_violation[j][i]
+            tab_violation[j][i] = tmp2
             tmp2 = tmp3
         end
 
@@ -605,7 +605,7 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[i][j] = tmp
+            tab_violation[j][i] = tmp
         end
     end
 end
