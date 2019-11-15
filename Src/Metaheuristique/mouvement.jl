@@ -637,7 +637,7 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
         if k!=1
             fink=sequence_courante[k-1][szcar-1]
         else
-            fink=sequence_courante[l][szcar-1]
+            fink=0
         end
 
         for i in sequence_courante[l][szcar-2]:fink
