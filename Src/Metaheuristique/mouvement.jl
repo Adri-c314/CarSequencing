@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :shuffle! || LSfoo! == :swap! || LSfoo! == :reflection!
+    if LSfoo! == :insertion! || LSfoo! == :shuffle! || LSfoo! == :swap! || LSfoo! == :reflection!
         return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
@@ -51,10 +51,12 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if rand(1:2) == 1
-        return bw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
-    else
-        return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+    if k!=l
+        if rand(1:1) == 1
+            return bw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+        else
+            return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+        end
     end
     return false
     nothing
@@ -81,6 +83,7 @@ function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
+
     for o in obj
         if o==1 #&& (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
             tmp_color = eval_couleur_bi(sequence_courante, pbl, k, l)
@@ -106,7 +109,7 @@ function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
             return false
         end
     end
-    #println(sequence_courante)
+
     # Sinon on realise le mouvement de bw :
     if k > l # Gestion du cas ou s'est inversé. Cette solution n'est surement pas top
         tmp = l
@@ -119,9 +122,11 @@ function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     end
     sequence_courante[l] = tmp
 
+    #println("bw" ,k, "+",l)
     # Mise à jour du tableau de violation et pbl :
     update_tab_violation_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     update_col_and_pbl_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+
     return true
     nothing
 end
@@ -186,9 +191,12 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     end
     sequence_courante[k] = tmp
 
+    println("fw" ,k, "+",l)
+
     # Mise à jour du tableau de violation et pbl :
     update_tab_violation_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+    #println("seqfin",sequence_courante)
     return true
     nothing
 end
@@ -221,7 +229,7 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[i][2]-1][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             end
@@ -231,11 +239,11 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         for j in max(1,l-ratio_option[i][2]+1):l
             if j+ratio_option[i][2]-1 <= sz
                 if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                    if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>=0
                         tmp_viol+=1
                     end
                 elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[i][2]-1][i+2]==1
-                    if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>0
                         tmp_viol-=1
                     end
                 end
@@ -274,7 +282,7 @@ function eval_Hprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
                     tmp_viol-=1
                 end
             elseif sequence_courante[k][i+2]==0 && sequence_courante[j+ratio_option[i][2]][i+2]==1
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             end
@@ -284,11 +292,11 @@ function eval_Hprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         for j in max(1,l-ratio_option[i][2]+1):l
             if j+ratio_option[i][2]-1<=sz && j-ratio_option[i][2]+1>0
                 if sequence_courante[j-ratio_option[i][2]+1][i+2]==1 && sequence_courante[k][i+2]==0
-                    if tab_violation[j+ratio_option[i][2]-1][i]>0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>0
                         tmp_viol-=1
                     end
                 elseif sequence_courante[j-ratio_option[i][2]+1][i+2]==0 && sequence_courante[k][i+2]==1
-                    if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                    if tab_violation[i][j+ratio_option[i][2]-1]>=0
                         tmp_viol+=1
                     end
                 end
@@ -426,7 +434,7 @@ function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio à k
         for j in max(1,k-ratio_option[i][2]+1):min(k,sz-ratio_option[i][2])
             if sequence_courante[l][i+2]==1 && sequence_courante[j+ratio_option[i][2]-1][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>=0
+                if tab_violation[i][j+ratio_option[i][2]-1]>=0
                     tmp_viol+=1
                 end
             elseif sequence_courante[l][i+2]==0 && sequence_courante[j+ratio_option[i][2]-1][i+2]==1
@@ -480,7 +488,7 @@ function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         #fenetres de k-ratio+1 à k
         for j in max(1,k-ratio_option[i][2]+1):min(k,sz-ratio_option[i][2])
             if sequence_courante[k][i+2]==1 && sequence_courante[j+ratio_option[i][2]][i+2]==0
-                if tab_violation[j+ratio_option[i][2]-1][i]>0
+                if tab_violation[i][j+ratio_option[i][2]-1]>0
                     tmp_viol-=1
                 end
             elseif sequence_courante[k][i+2]==0 && sequence_courante[j+ratio_option[i][2]][i+2]==1
@@ -537,12 +545,12 @@ function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
 
         # decalage dans x y z
         for j in k+1+fenetre:l-2
-            tab_violation[j][i] = tab_violation[i][j+1]
+            tab_violation[i][j] = tab_violation[i][j+1]
         end
 
         # Calucule du bous de la partie decalé
@@ -555,7 +563,7 @@ function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_
                     end
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
     end
 end
@@ -587,25 +595,25 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
                     tmp +=1
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
 
         # decalage dans x y z
         for j in k+2+fenetre:l
-            tmp3 = tab_violation[j][i]
-            tab_violation[j][i] = tmp2
+            tmp3 = tab_violation[i][j]
+            tab_violation[i][j] = tmp2
             tmp2 = tmp3
         end
 
         # Calucule du bous de la partie decalé
         for j in l+1:min(l+fenetre-1, sz)
             tmp = depart
-            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
+            for jj in 0:min(fenetre,j-1) # Boucle sur tous les element de la fenetre
                 if sequence_courante[j-jj][2+i] == 1
                     tmp +=1
                 end
             end
-            tab_violation[j][i] = tmp
+            tab_violation[i][j] = tmp
         end
     end
 end
@@ -627,40 +635,65 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
         k=l
         l=tmp
     end
-
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
 
     #seq color: ????(k)???---------?????lk?????
-    if sequence_courante[l][szcar-1]<l
+    if sequence_courante[l-1][szcar-2]>k
+
         if k!=1
-            fink=sequence_courante[k-1][szcar-1]
+            tmpDebk=sequence_courante[k-1][szcar-2]
+            tmpFink=max(sequence_courante[l][szcar-1]-1,k)
         else
-            fink=sequence_courante[l][szcar-1]
+            tmpDebk=1
+            tmpFink=max(sequence_courante[l][szcar-1]-1,1)
         end
 
-        for i in sequence_courante[l][szcar-2]:fink
-            if sequence_courante[l-1][2]!=sequence_courante[l][2]
+        if k==1 || sequence_courante[k-1][2]==sequence_courante[k][2]
+            for i in tmpDebk:tmpFink
+                sequence_courante[i][szcar-1]=tmpFink
+                sequence_courante[i][szcar-2]=tmpDebk
+            end
+        else
+            for i in tmpDebk:k-1
+                sequence_courante[i][szcar-1]=k-1
+                sequence_courante[i][szcar-2]=tmpDebk
+            end
+            for i in k:tmpFink
+                sequence_courante[i][szcar-1]=tmpFink
+                sequence_courante[i][szcar-2]=k
+            end
+        end
+
+        if sequence_courante[l-1][szcar-2]-2>1
+            for i in tmpFink+1:sequence_courante[l-1][szcar-2]-2
+                sequence_courante[i][szcar-2]-=1
                 sequence_courante[i][szcar-1]-=1
             end
         end
 
-        for i in fink+1:sequence_courante[l-1][szcar-2]-1
-            sequence_courante[i][szcar-2]-=1
-            sequence_courante[i][szcar-1]-=1
-        end
-
-
-        for i in sequence_courante[l-1][szcar-2]:l-1
+        for i in max(sequence_courante[l-1][szcar-2]-1,1):l-1
             if sequence_courante[l-1][2]!=sequence_courante[l][2]
                 sequence_courante[i][szcar-1]=l-1
+                sequence_courante[i][szcar-2]=max(sequence_courante[i][szcar-2]-1,1)
+            else
+                sequence_courante[i][szcar-2]-=1
             end
-            sequence_courante[i][szcar-2]=sequence_courante[l-1][szcar-2]-1
         end
 
         if sequence_courante[l-1][2]!=sequence_courante[l][2]
-            sequence_courante[l][szcar-1]=l
-            sequence_courante[l][szcar-2]=l
+            if l!=sz
+                if sequence_courante[l+1][2]==sequence_courante[l][2]
+                    sequence_courante[l][szcar-1]=sequence_courante[l+1][szcar-1]
+                    sequence_courante[l][szcar-2]=l
+                else
+                    sequence_courante[l][szcar-1]=l
+                    sequence_courante[l][szcar-2]=l
+                end
+            else
+                sequence_courante[l][szcar-1]=l
+                sequence_courante[l][szcar-2]=l
+            end
         else
             sequence_courante[l][szcar-2]=sequence_courante[l-1][szcar-2]
             sequence_courante[l][szcar-1]=sequence_courante[l-1][szcar-1]
@@ -668,10 +701,16 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
 
         if l!=sz
             for i in l+1:sequence_courante[l+1][szcar-1]
-                if sequence_courante[l-1][2]!=sequence_courante[l][2]
-                    sequence_courante[i][szcar-2]=l+1
+                if sequence_courante[l][2]!=sequence_courante[l+1][2]
+                    if sequence_courante[l+1][2]==sequence_courante[l-1][2]
+                        sequence_courante[i][szcar-2]=l+1
+                    end
                 else
-                    sequence_courante[i][szcar-2]-=1
+                    if sequence_courante[l-1][2]==sequence_courante[l][2]
+                        sequence_courante[i][szcar-2]-=1
+                    else
+                        sequence_courante[i][szcar-2]=l
+                    end
                 end
             end
         end
@@ -698,13 +737,18 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
 
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
-    tmpFinl=sequence_courante[k][szcar-2]
+    tmpDebl=sequence_courante[k][szcar-2]
+    tmpFinl=sequence_courante[k][szcar-1]
     #seq color: ????lk???---------?????(l)?????
     if sequence_courante[k][szcar-2]>k
         if k!=1
             for i in sequence_courante[k+1][szcar-2]:k-1
                 if sequence_courante[k][2]!=sequence_courante[k+1][2]
-                    sequence_courante[i][szcar-1]=k-1
+                    if sequence_courante[k-1][2]!=sequence_courante[k][2]
+                        sequence_courante[i][szcar-1]=k-1
+                    else
+                        sequence_courante[i][szcar-1]=k
+                    end
                 else
                     sequence_courante[i][szcar-1]+=1
                 end
@@ -712,12 +756,16 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
         end
 
         if sequence_courante[k][2]!=sequence_courante[k+1][2]
+            if k==1 || sequence_courante[k-1][2]!=sequence_courante[k][2]
+                sequence_courante[k][szcar-2]=k
+            else
+                sequence_courante[k][szcar-2]=sequence_courante[k-1][szcar-2]
+            end
             sequence_courante[k][szcar-1]=k
-            sequence_courante[k][szcar-2]=k
             sequence_courante[k+1][szcar-1]+=1
             sequence_courante[k+1][szcar-2]=k+1
         else
-            sequence_courante[k][szcar-1]=sequence_courante[k+1][szcar-1]
+            sequence_courante[k][szcar-1]=sequence_courante[k+1][szcar-1]+1
             sequence_courante[k][szcar-2]=sequence_courante[k+1][szcar-2]
             sequence_courante[k+1][szcar-1]+=1
         end
@@ -727,12 +775,13 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
             sequence_courante[i][szcar-2]=sequence_courante[k+1][szcar-2]
         end
 
-        for i in sequence_courante[k+1][szcar-1]+1:tmpFinl
+        println("DEBl",tmpDebl)
+        for i in sequence_courante[k+1][szcar-1]+1:tmpDebl #impossible de dépasser fin tab
             sequence_courante[i][szcar-2]+=1
             sequence_courante[i][szcar-1]+=1
         end
 
-        for i in tmpFinl+1:sequence_courante[l][szcar-1]
+        for i in tmpDebl+1:tmpFinl
             sequence_courante[i][szcar-2]+=1
         end
     end
