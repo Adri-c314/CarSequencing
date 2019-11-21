@@ -79,7 +79,9 @@ function GreedyRAF(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},
         end
         tmpdur=-1
         tmpduri=instance[1]
-        for car in instance
+        for ii in 1:min(size(instance)[1],300+tmpplace)
+            car = instance[ii]
+        #for car in instance
             ## avec dur
             if car[1]==0 && car[2]==tmpi && color[tmpi]>0
                 for i in 1:Hprio
@@ -145,7 +147,9 @@ function GreedyEP(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},p
     for i in 1:size(instance)[1]
         tmpdur=-1
         tmpduri=instance[1]
-        for car in instance
+        for ii in 1:min(size(instance)[1],25+tmpplace)
+            car = instance[ii]
+        #for car in instance
             if car[1]==0
                 for ii in 1:Hprio
                     pi[ii][1]+=car[2+ii]
@@ -155,7 +159,7 @@ function GreedyEP(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},p
                 if tmpdurdur>tmpdur && (tmppbl!=pbl ||  car[2]!=color)
                     tmpduri=car
                     tmpdur=tmpdurdur
-                elseif tmpdurdur==tmpdur && (car[2]==color && tmppbl!=pbl)
+                elseif tmpdurdur==tmpdur && (car[2]!=color || tmppbl!=pbl)
                     tmpduri=car
                     tmpdur=tmpdurdur
                 end

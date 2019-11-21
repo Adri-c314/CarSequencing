@@ -16,9 +16,8 @@ using Dates
 # @param ir : L'ensemble des noms d'instances avec la reference a etudié
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
-# @param temps_max : temps max pour un tuple (seconde)
-# @param outputPath : le path vers le dossier de sortie
-function main(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 60.0, outputPath::String = "../../Output/")
+# @param temps_max : temps max pour un tuple (milliseconde)
+function main(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
     for i in ir
         # Gestion affichage :
         if txtoutput

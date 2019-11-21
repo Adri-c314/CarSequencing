@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion! || LSfoo! == :shuffle! || LSfoo! == :swap! || LSfoo! == :reflection!
+    if LSfoo! == :swap! || LSfoo! == :shuffle! || LSfoo! == :reflection!
         return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
@@ -814,6 +814,10 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, r
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
+    cond = eval_pbl_reflection(sequence_courante,pbl,k,l)
+    if !cond
+        return false
+    end
     for o in obj
         if     o==1 && (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
             tmp_color = eval_couleur_reflection(sequence_courante,pbl,k,l)
@@ -933,8 +937,6 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},pbl::I
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
-    #println(k)
-    #println(l)
     ## on test le new pbl c'est important
     if sequence_courante[k][2]==sequence_courante[l][2]
         return tmp_color
@@ -944,7 +946,7 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},pbl::I
 
         if l<sz
             if sequence_courante[k][2]==sequence_courante[l+1][2]
-                if (sequence_courante[l+1][szcar-1]-l+1)+(sequence_courante[k][szcar-1]-k)>pbl
+                if (sequence_courante[l+1][szcar-1]-l+1)+(sequence_courante[k][szcar-1]-k+1)>pbl
                     return 1
                 end
                 tmp_color-=1
@@ -954,7 +956,7 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},pbl::I
 
         if k>1
             if sequence_courante[l][2]==sequence_courante[k-1][2]
-                if (k-sequence_courante[k-1][szcar-2])+(l-sequence_courante[l][szcar-2])>pbl
+                if (k-sequence_courante[k-1][szcar-2]+1)+(l-sequence_courante[l][szcar-2]+1)>pbl
                     return 1
                 end
                 tmp_color-=1
@@ -970,27 +972,26 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},pbl::I
     else
         if l<sz
             if sequence_courante[k][2]==sequence_courante[l+1][2]
-                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]==pbl
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1+1>pbl
                     return 1
                 end
                 tmp_color-=1
+            end
+            if sequence_courante[l][2]==sequence_courante[l+1][2]
+                tmp_color+=1
             end
         end
 
         if k>1
             if sequence_courante[l][2]==sequence_courante[k-1][2]
-                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]==pbl
+                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
                     return 1
                 end
                 tmp_color-=1
             end
-        end
-
-        if l<sz && sequence_courante[l][2]==sequence_courante[l+1][2]
-            tmp_color+=1
-        end
-        if k>1 && sequence_courante[k][2]==sequence_courante[k-1][2]
-            tmp_color+=1
+            if sequence_courante[k][2]==sequence_courante[k-1][2]
+                tmp_color+=1
+            end
         end
 
 
@@ -998,6 +999,77 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},pbl::I
     end
 
     return tmp_color
+end
+
+
+# Fonction qui verifie que la nouvelle sequeence est admissible
+# @param sequence_courante : la sequence ou instance courante
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+function eval_pbl_reflection(sequence_courante::Array{Array{Int,1},1},pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    ## on test le new pbl c'est important
+    if sequence_courante[k][2]==sequence_courante[l][2]
+
+        if sequence_courante[k][szcar-2]==sequence_courante[l][szcar-2]
+            return true
+        end
+
+        if (k-sequence_courante[k][szcar-2]+1)+(l-sequence_courante[l][szcar-2]+1)>pbl
+            return false
+        end
+        if (sequence_courante[k][szcar-1]-k+1)+(sequence_courante[l][szcar-1]-l+1)>pbl
+            return false
+        end
+
+    else
+        if l-k>1
+
+
+            if l<sz
+                if sequence_courante[k][2]==sequence_courante[l+1][2]
+                    if (sequence_courante[l+1][szcar-1]-(l+1)+1)+(sequence_courante[k][szcar-1]-k+1)>pbl
+                        return false
+                    end
+                end
+
+            end
+
+            if k>1
+                if sequence_courante[l][2]==sequence_courante[k-1][2]
+                    if (k-1-sequence_courante[k-1][szcar-2]+1)+(l-sequence_courante[l][szcar-2]+1)>pbl
+                        return false
+                    end
+                end
+            end
+
+        else
+            if sequence_courante[k][2]==sequence_courante[l][2]
+                return true
+            end
+            if l<sz
+                if sequence_courante[k][2]==sequence_courante[l+1][2]
+                    if sequence_courante[l+1][szcar-1]-l+1+1+1>pbl
+                        return false
+                    end
+                end
+            end
+
+            if k>1
+                if sequence_courante[l][2]==sequence_courante[k-1][2]
+                    if k-1-sequence_courante[k-1][szcar-2]+1+1>pbl
+                        return false
+                    end
+                end
+
+            end
+
+        end
+    end
+
+    return true
 end
 
 
@@ -1100,7 +1172,7 @@ function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
 end
 
 
-# Fonction qui evalue la difference de EP si on effectu le swap k,l
+# Fonction qui evalue la difference de EP si on effectu la reflection k,l
 # @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
 # @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
@@ -1142,18 +1214,6 @@ function eval_Lprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
 end
 
 
-# Fonction qui realise une evaluation de la reflection
-# @param sequence_courante : la sequence ou instance courante
-# @param ratio : liste de ratio (premiere colonne p et seconde q)
-# @param Hprio : le nombre de Hprio
-# @param tab_violation : tab_violation[i, j] = est le nombre de fois que l'option j apparait dans la fenetre finissant à i
-# @return ::Array{Int, 1} : [nbcol,Hpriofail,Lpriofail]
-function evaluation_reflection(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int,tab_violation::Array{Array{Int,1},1})
-        ## non en fait je sais mais pas c'est quoi
-end
-
-
-
 
 
 # =====================================================================
@@ -1179,6 +1239,10 @@ function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_o
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
+    cond = eval_pbl_swap(sequence_courante,pbl,k,l)
+    if !cond
+        return false
+    end
     for o in obj
         if o==1 #&& (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
             tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
@@ -1244,7 +1308,7 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
     if l-k>1
 
         if sequence_courante[k][2]==sequence_courante[l-1][2]
-            if sequence_courante[l-1][szcar-1]-sequence_courante[l-1][szcar-2]+1==pbl
+            if sequence_courante[l-1][szcar-1]-sequence_courante[l-1][szcar-2]+1+1>pbl
                 return 1
             end
             tmp_color-=1
@@ -1252,7 +1316,7 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
 
         if l<sz
             if sequence_courante[k][2]==sequence_courante[l+1][2]
-                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1==pbl
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1+1>pbl
                     return 1
                 end
                 tmp_color-=1
@@ -1266,7 +1330,7 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
         end
 
         if sequence_courante[l][2]==sequence_courante[k+1][2]
-            if sequence_courante[k+1][szcar-1]-sequence_courante[k+1][szcar-2]+1==pbl
+            if sequence_courante[k+1][szcar-1]-sequence_courante[k+1][szcar-2]+1+1>pbl
                 return 1
             end
             tmp_color-=1
@@ -1274,14 +1338,14 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
 
         if k>1
             if sequence_courante[l][2]==sequence_courante[k-1][2]
-                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1==pbl
+                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
                     return 1
                 end
                 tmp_color-=1
             end
 
             if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==sequence_courante[k-1][2]
-                if sequence_courante[k+1][szcar-1]-sequence_courante[k-1][szcar-2]+1>pbl
+                if sequence_courante[k+1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
                     return 1
                 end
             end
@@ -1303,7 +1367,7 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
     else
         if l<sz
             if sequence_courante[k][2]==sequence_courante[l+1][2]
-                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1==pbl
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1+1>pbl
                     return 1
                 end
                 tmp_color-=1
@@ -1315,7 +1379,7 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
 
         if k>1
             if sequence_courante[l][2]==sequence_courante[k-1][2]
-                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1==pbl
+                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
                     return 1
                 end
                 tmp_color-=1
@@ -1330,6 +1394,82 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k
     return tmp_color
 end
 
+# Fonction qui verifie que la nouvelle sequeence est admissible
+# @param sequence_courante : la sequence ou instance courante
+# @param pbl : paint batch limit
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+function eval_pbl_swap(sequence_courante::Array{Array{Int,1},1},pbl::Int,k::Int,l::Int)
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    ## on test le new pbl c'est important
+    if sequence_courante[k][2]==sequence_courante[l][2]
+        return true
+    end
+    if l-k>1
+
+        if sequence_courante[k][2]==sequence_courante[l-1][2]
+            if sequence_courante[l-1][szcar-1]-sequence_courante[l-1][szcar-2]+1+1>pbl
+                return false
+            end
+        end
+
+        if l<sz
+            if sequence_courante[k][2]==sequence_courante[l+1][2]
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l+1][szcar-2]+1+1>pbl
+                    return false
+                end
+            end
+
+            if sequence_courante[k][2]==sequence_courante[l+1][2]&& sequence_courante[k][2]==sequence_courante[l-1][2]
+                if sequence_courante[l+1][szcar-1]-sequence_courante[l-1][szcar-2]+1>pbl
+                    return false
+                end
+            end
+        end
+
+        if sequence_courante[l][2]==sequence_courante[k+1][2]
+            if sequence_courante[k+1][szcar-1]-sequence_courante[k+1][szcar-2]+1+1>pbl
+                return false
+            end
+        end
+
+        if k>1
+            if sequence_courante[l][2]==sequence_courante[k-1][2]
+                if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
+                    return false
+                end
+            end
+
+            if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==sequence_courante[k-1][2]
+                if sequence_courante[k+1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
+                    return false
+                end
+            end
+        end
+    else
+        if l<sz
+            if sequence_courante[k][2]==sequence_courante[l+1][2]
+                if sequence_courante[l+1][szcar-1]-l+1+1+1>pbl
+                    return false
+                end
+            end
+        end
+
+        if k>1
+            if sequence_courante[l][2]==sequence_courante[k-1][2]
+                if k-1-sequence_courante[k-1][szcar-2]+1+1>pbl
+                    return false
+                end
+            end
+
+        end
+
+    end
+
+
+    return true
+end
 
 # Fonction qui evalue la difference de EP si on effectu le swap k,l
 # @param sequence_courante : la sequence ou instance courante
@@ -1569,7 +1709,7 @@ end
 # @modify sequence_courante : la sequence courante est mise à jour
 function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     sz = size(sequence_courante)[1]
-    if pbl >10
+    if pbl >15
         l = rand(10:15,1)[1]
     else
         l = rand(10:pbl,1)[1]
@@ -1590,10 +1730,16 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, rati
     #aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
     tmp_Hprio = 0
     tmp_Lprio =0
+    cond = eval_pbl_shuffle(sequence_courante,seq,pbl,k,l)
+    if !cond
+        return false
+    end
     for o in obj
 
         if o==1
-            cond_no = eval_couleur_shuffle(sequence_courante,seq,pbl,k,l)
+            tmp_color = eval_couleur_shuffle(sequence_courante,seq,pbl,k,l)
+            cond_no = tmp_color<=0
+            cond_ui =tmp_color<0
         elseif o==2
 
             tmp_Hprio = eval_Hprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
@@ -1854,7 +2000,7 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
         end
         tmp_pbl+=1
         if(tmpnbcol>nbcol)||tmp_pbl>pbl
-            return false
+            return 1
         end
     end
     if sequence_courante[k+l][2]!= col
@@ -1862,6 +2008,46 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
     end
 
     if (tmpnbcol>nbcol)||tmp_pbl>pbl
+        return 1
+
+    end
+
+    return tmpnbcol-nbcol
+end
+
+# Fonction qui evalue la difference des lprio si on effectu le shuffle k,l
+# @param sequence_courante : la sequence ou instance courante
+# @param sequence : ???? quesaco
+# @param k : l'indice de k (avec k<l)
+# @param l : l'indice de l (avec k<l)
+# @return Int : le nombre de EP de difference
+function eval_pbl_shuffle(sequence_courante::Array{Array{Int,1},1},sequence::Array{Int,1},pbl::Int,k::Int,l::Int)
+
+    szcar = size(sequence_courante[1])[1]
+    sz = size(sequence_courante)[1]
+
+
+    deb = max(1,k-1)
+    fin = min(k+l-1,sz)
+    col = sequence_courante[deb][2]
+
+    tmp_pbl=max(1,k-1)- sequence_courante[max(1,k-1)][szcar-2]+1
+
+    for i in k:k+l-1
+        if sequence_courante[sequence[i-k+1]][2]!= col
+            col=sequence_courante[sequence[i-k+1]][2]
+            tmp_pbl=1
+        end
+        tmp_pbl+=1
+        if tmp_pbl>pbl
+            return false
+        end
+    end
+    if sequence_courante[k+l][2]== col
+        tmp_pbl+=(sequence_courante[k+l][szcar-1]-k-l)+1
+    end
+
+    if tmp_pbl>pbl
         return false
 
     end
