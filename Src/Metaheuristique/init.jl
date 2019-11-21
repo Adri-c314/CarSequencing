@@ -15,13 +15,17 @@
 # @return ::Array{Array{Int,1},1} : la sequence apres toute l'initialisation
 # @return ::Array{Int,1} : Le score courant
 # @return ::Array{Array{Int,1},1} : tab violation
+# @return ::Array{Array{Int,1},1} : ratio_option le tableau des options
+# @return ::Int : Hprio le nombre d'options prioritaires
+# @return ::Array{Int,1} : le tableau des objectifs
+# @return ::Int : PAINT_BATCH_LIMIT
 function compute_initial_sequence(datas::NTuple{4,DataFrame})
     sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int = init_sequence(datas)
     obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,prio,pbl,Hprio)
     score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1} = evaluation_init(sequence_courrante,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = deepcopy(sequence_courrante)
     score_meilleur = deepcopy(score_courrant)
-    return sequence_meilleure, score_meilleur, tab_violation,prio,Hprio,obj,pbl
+    return sequence_meilleure, score_meilleur, tab_violation, prio, Hprio, obj, pbl
 end
 
 

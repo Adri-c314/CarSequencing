@@ -36,7 +36,9 @@
 
 # Fonction principale de l'heuristique (VFLS)
 # @param datas : Le jeux de données lu
-# @param temps_max : Temps en milliseconde...
+# @param temps_max : Temps max d'execution (en seconde)
+# @param verbose : Si l'on souhaite un affichage console de l'execution
+# @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @return : La meilleure sequence
 function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
     # compute initial sequence :
@@ -155,7 +157,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     for t in tab_violation
         #println(t)
     end
-    return a, b, txt
+    return a, sequence_meilleure, txt
 end
 
 
