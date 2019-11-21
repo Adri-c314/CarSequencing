@@ -95,16 +95,20 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         n=1
         print("Phase : ",Phase ,", Execution :")
         while temps_max*(timeOPT[Phase]/100)>time()-debut
-        #for i in 1:100
-
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
-            compteurMvt!(f_mouv, nb)
+            compteurMvt!(f_mouv, nb) # C'est pas forcement le top mais au moins ça donne quelques stats
             global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
-            if (time()-debut)>(n/10)*temps_max*(timeOPT[Phase]/100)
-                print("###")
-                n+=1
+
+
+            # Gestion du suivi d'execution d'une phase
+            if verbose
+                if (time()-debut)>(n/10)*temps_max*(timeOPT[Phase]/100)
+                    print("###")
+                    n+=1
+                end
             end
+
         end
 
         # affichage a chaque fin de phase :
@@ -122,6 +126,8 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             println("Nombre d'insertion : ",nb[2])
             println("Nombre de reflection : ",nb[3])
             println("Nombre de shuffle : ",nb[4],"\n\n")
+            a, b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
+            println(a)
         end
 
 

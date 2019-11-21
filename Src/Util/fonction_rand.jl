@@ -46,8 +46,8 @@ function  choose_f_rand(sequence_meilleure::Array{Array{Int,1},1}, ratio_option:
     elseif S==  :violation_same_color!
           tmp = violation_same_color(sequence_meilleure,ratio_option,tab_violation,sz,Hprio,obj,Phase)
     end
-      k = minimum(tmp)
-      l = maximum(tmp)
+      k = max(1,minimum(tmp))
+      l = min(sz,maximum(tmp))
       return k,l
 end
 
@@ -55,8 +55,8 @@ end
 
 # Fonction avec un nom generic
 # @param size : la taille max
-# @return Array{Int32,1} : une position aleatoire
-function generic(size::Int32)
+# @return Array{Int,1} : une position aleatoire
+function generic(size::Int)
     a = rand(1:size,2)
     return a
 end
@@ -66,7 +66,7 @@ end
 # Une autre fonction similaire
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
-# @return Array{Int32,1} : une position aleatoire t'as tout compris
+# @return Array{Int,1} : une position aleatoire t'as tout compris
 function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
     if Phase ==1 ||(Phase==2 && obj[2]==2)
         while true
@@ -95,7 +95,7 @@ end
 # Fonction qui permet pas mal de chose mais si tu as scroller jusque là va donc mettre ta fonction et ça passe :)
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
-# @return Array{Int32,1} : une position aleatoire toujours
+# @return Array{Int,1} : une position aleatoire toujours
 function consecutive(instance::Array{Array{Int,1},1},sz::Int)
     k=rand(1:sz-1,1)[1]
     return [k,k+1]
