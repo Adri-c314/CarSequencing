@@ -10,10 +10,6 @@
 
 
 
-using Random
-Random.seed!(0)
-
-
 
 # Fonction qui permet selon le type pré def de générer le k et l desiré
 # @param sequence_meilleure : La sequence actuelle
@@ -172,7 +168,7 @@ end
 
 ## faudra faire un array des violation ??? un truc comme ça ou alors mettre dans instnace si l est en violation bref caca
 function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
-    tmpi = 1000
+    tmpi = 1
     if Phase ==1 ||(Phase==2 && obj[2]==2)
         #=a, b =evaluation_init(instance,ratio_option,Hprio)
         if(a[2]==0)
@@ -215,7 +211,7 @@ function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Arra
     if(a[2]==0)
         return rand(1:sz,2)
     end=#
-    tmpi = 1000
+    tmpi = 1
     while true && tmpi<size(instance)[1]
 
         tmp = rand(1:sz,2)

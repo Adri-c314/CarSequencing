@@ -10,14 +10,18 @@
 
 include("../Util/includes.jl")
 using Dates
+using DelimitedFiles
+global length_windows = 1
 
-
+using Random
+Random.seed!(1)
 # Fonction main
 # @param ir : L'ensemble des noms d'instances avec la reference a etudié
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function main(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
+function main(ir::Array{Tuple{String,String},1} = [("A", "048_39_1_EP_ENP_RAF")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
+    try_length = [1,30,50,80,100]
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -38,32 +42,31 @@ function main(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2"
                 "===================================================\n\n"
             ))
         end
-
-        # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
-
-        # Lancement de la VFLS
-        score, sol, tmp = VFLS(datas, temps_max, verbose, txtoutput)
-
-        # Gestion affichage :
-        if txtoutput
-            txt = string(txt, "\n", tmp, "===================================================\n")
-            for j in 1:length(score)
-                txt = string(txt, "Valeur sur l'objectif ", j, " : ", score[j], "\n")
+        for le in 1:5
+            global length_windows = try_length[le]
+            # Lecture du fichier csv
+            datas = lectureCSV(i[1], i[2])
+            path = "..\\..\\output\\"
+            # Lancement de la VFLS
+            score, sol, tmp = VFLS(datas, temps_max, verbose, txtoutput)
+            # Gestion affichage :
+            if txtoutput
+                txt = string(txt, "\n", tmp, "===================================================\n")
+                for j in 1:length(score)
+                    txt = string(txt, "Valeur sur l'objectif ", j, " : ", score[j], "\n")
+                end
+                txt = string(txt,"===================================================\n\n")
+                txt = string(txt, seqToCSV(sol))
+                writedlm(string(path,i[2],"__",length_windows,".txt"), score)
             end
-            txt = string(txt,"===================================================\n\n")
-            txt = string(txt, seqToCSV(sol))
-            path = pathDossier(string(outputPath, i[1], "/"), outputPath)
-            ecriture(txt, string(path, i[2], ".txt"))
-            ecriture(seqToCSV(sol), string(path, i[2], ".csv"))
-        end
-        if verbose
-            println(string("==================================================="))
-            for j in 1:length(score)
-                println(string("Valeur sur l'objectif ", j, " : ", score[j]))
+            if verbose
+                println(string("==================================================="))
+                for j in 1:length(score)
+                    println(string("Valeur sur l'objectif ", j, " : ", score[j]))
+                end
+                println(string("===================================================\n\n"))
+                #println(sol)
             end
-            println(string("===================================================\n\n"))
-            #println(sol)
         end
     end
 end
