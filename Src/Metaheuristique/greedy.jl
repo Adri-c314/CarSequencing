@@ -114,7 +114,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
         end
         tmpdur=-1
         tmpduri=instance[1]
-        for ii in 1:min(size(instance)[1],Int32(floor(sz/2+tmpplace)))
+        for ii in 1:sz
             car = instance[ii]
         #for car in instance
             ## avec dur
