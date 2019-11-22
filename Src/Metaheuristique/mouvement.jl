@@ -955,10 +955,10 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},col_av
             tmp_color+=1
         end
     else
-        if sequence_courante[l][2]==col_avant[1]
+        if sequence_courante[l][2]==col_avant[2]
             tmp_color-=1
         end
-        if sequence_courante[k][2]==col_avant[1]
+        if sequence_courante[k][2]==col_avant[2]
             tmp_color+=1
         end
     end
@@ -1003,8 +1003,8 @@ function eval_pbl_reflection(sequence_courante::Array{Array{Int,1},1},col_avant:
                 end
             end
         else
-            if sequence_courante[l][2]==col_avant[1]
-                if (col_avant[2])+(l-sequence_courante[l][szcar-2]+1)>pbl
+            if sequence_courante[l][2]==col_avant[2]
+                if (col_avant[1])+(l-sequence_courante[l][szcar-2]+1)>pbl
                     return false
                 end
             end
@@ -1276,10 +1276,10 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::
                 tmp_color+=1
             end
         else
-            if sequence_courante[l][2]==col_avant[1]
+            if sequence_courante[l][2]==col_avant[2]
                 tmp_color-=1
             end
-            if sequence_courante[k][2]==col_avant[1]
+            if sequence_courante[k][2]==col_avant[2]
                 tmp_color+=1
             end
         end
@@ -1355,13 +1355,13 @@ function eval_pbl_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::Tupl
                 end
             end
         else
-            if sequence_courante[l][2]==col_avant[1]
-                if col_avant[2]+1+1>pbl
+            if sequence_courante[l][2]==col_avant[2]
+                if col_avant[1]+1+1>pbl
                     return false
                 end
             end
-            if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==col_avant[1]
-                if col_avant[2]+sequence_courante[k+1][szcar-1]-k+1+1>pbl
+            if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==col_avant[2]
+                if col_avant[1]+sequence_courante[k+1][szcar-1]-k+1+1>pbl
                     return false
                 end
             end
