@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion! || LSfoo! == :shuffle! || LSfoo! == :swap! || LSfoo! == :reflection!
+    if LSfoo! == :insertion!
         return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
@@ -52,10 +52,10 @@ end
 # @modify sequence_courante : la sequence courante est mise à jour
 function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     if k!=l
-        if rand(1:1) == 1
-            return bw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
-        else
+        if rand(2:2) == 1
             return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+        else
+            return bw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
         end
     end
     return false
@@ -109,7 +109,7 @@ function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
             return false
         end
     end
-
+    #println(tab_violation)
     # Sinon on realise le mouvement de bw :
     if k > l # Gestion du cas ou s'est inversé. Cette solution n'est surement pas top
         tmp = l
@@ -122,11 +122,13 @@ function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     end
     sequence_courante[l] = tmp
 
-    #println("bw" ,k, "+",l)
+    #println(sequence_courante)
+    println("bw" ,k, "+",l)
     # Mise à jour du tableau de violation et pbl :
     update_tab_violation_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     update_col_and_pbl_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
-
+    #println(tab_violation)
+    println(sequence_courante)
     return true
     nothing
 end
@@ -191,7 +193,7 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     end
     sequence_courante[k] = tmp
 
-    println("fw" ,k, "+",l)
+    #println("fw" ,k, "+",l)
 
     # Mise à jour du tableau de violation et pbl :
     update_tab_violation_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
@@ -518,8 +520,6 @@ function eval_Lprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
     return tmp_viol
 end
 
-
-
 # Fonction qui maj le tab violation de la new sol
 # @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -531,39 +531,77 @@ end
 # @modify tab_violation : modifie tab_violation
 function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
-    tmp_viol=0
-    for i in 1:Hprio
+
+    for i in 1:size(ratio_option)[1]
         fenetre = ratio_option[i][2]
-        depart = -ratio_option[i][1]
-        tmp2 = tab_violation[i][l-1]
 
-        # Boucle sur toutes les fenetres contenant k ou l
-        for j in l:min(sz, l+fenetre)
-            tmp = depart
-            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
-                if sequence_courante[max(1, j-jj)][2+i] == 1
-                    tmp +=1
+        #ratio du début
+        if k==1
+            if sequence_courante[k][2+i]==0
+                tab_violation[i][k]=-ratio_option[i][1]
+            else sequence_courante[k][2+i]==1
+                tab_violation[i][k]=-ratio_option[i][1]+1
+            end
+        else
+            if k-fenetre+1<1
+                if sequence_courante[k][2+i]==0
+                    tab_violation[i][k]=tab_violation[i][k-1]
+                else sequence_courante[k][2+i]==1
+                    tab_violation[i][k]=tab_violation[i][k-1]+1
+                end
+            else
+                if sequence_courante[k][2+i]==0 && sequence_courante[l][2+i]==1
+                    tab_violation[i][k]=tab_violation[i][k-1]-1
+                elseif sequence_courante[k][2+i]==1 && sequence_courante[l][2+i]==0
+                    tab_violation[i][k]=tab_violation[i][k-1]+1
+                else
+                    tab_violation[i][k]=tab_violation[i][k-1]
                 end
             end
-            tab_violation[i][j] = tmp
         end
 
-        # decalage dans x y z
-        for j in k+1+fenetre:l-2
-            tab_violation[i][j] = tab_violation[i][j+1]
-        end
-
-        # Calucule du bous de la partie decalé
-        for j in k:min(k+fenetre,sz)
-            tmp = depart
-            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
-                if j-jj > 0
-                    if sequence_courante[j-jj][2+i] == 1
-                        tmp +=1
-                    end
+        for j in k+1:min(k+fenetre-2,l-1)
+            if j-fenetre+1<1
+                if sequence_courante[j][2+i]==0
+                    tab_violation[i][j]=tab_violation[i][j-1]
+                else sequence_courante[j][2+i]==1
+                    tab_violation[i][j]=tab_violation[i][j-1]+1
+                end
+            else
+                if sequence_courante[j][2+i]==0 && sequence_courante[l][2+i]==1
+                    tab_violation[i][j]=tab_violation[i][j-1]-1
+                elseif sequence_courante[j][2+i]==1  && sequence_courante[l][2+i]==0
+                    tab_violation[i][j]=tab_violation[i][j-1]+1
+                else
+                    tab_violation[i][j]=tab_violation[i][j-1]
                 end
             end
-            tab_violation[i][j] = tmp
+        end
+
+        #On décale tous les ratios
+        if k+fenetre-2<l-1
+            for j in k+fenetre-1:l-1
+                tab_violation[i][j] = tab_violation[i][j+1]
+            end
+        end
+
+        #ratio de la fin
+        for j in l:min(l+fenetre-1,sz)
+            if j-fenetre+1 > 1
+                if sequence_courante[l][2+i]==0 && sequence_courante[j-fenetre][2+i]==1
+                    tab_violation[i][j]=tab_violation[i][j-1]-1
+                elseif sequence_courante[l][2+i]==1 && sequence_courante[j-fenetre][2+i]==0
+                    tab_violation[i][j]=tab_violation[i][j-1]+1
+                else
+                    tab_violation[i][j]=tab_violation[i][j-1]
+                end
+            else
+                if sequence_courante[j+1][2+i]==0
+                    tab_violation[i][j]=tab_violation[i][j-1]
+                else sequence_courante[j+1][2+i]==1
+                    tab_violation[i][j]=tab_violation[i][j-1]+1
+                end
+            end
         end
     end
 end
@@ -581,39 +619,48 @@ end
 # @modify tab_violation : modifie tab_violation
 function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
-    tmp_viol=0
-    for i in 1:Hprio
+
+    for i in 1:size(ratio_option)[1]
         fenetre = ratio_option[i][2]
-        depart = -ratio_option[i][1]
-        tmp2 = tab_violation[i][min(k+1+fenetre,sz)]
+        tmp = tab_violation[i][min(k+fenetre-1,l-1)]
 
-        # Boucle sur toutes les fenetres contenant k ou l
-        for j in k:min(k+1+fenetre,sz)
-            tmp = depart
-            for jj in 0:fenetre # Boucle sur tous les element de la fenetre
-                if sequence_courante[max(1, j-jj)][2+i] == 1
-                    tmp +=1
-                end
+        if k==1
+            if sequence_courante[k][2+i]==0
+                tab_violation[i][k]=-ratio_option[i][1]
+            else sequence_courante[k][2+i]==1
+                tab_violation[i][k]=-ratio_option[i][1]+1
             end
-            tab_violation[i][j] = tmp
+        else
+            if sequence_courante[k][2+i]==0
+                tab_violation[i][k]=tab_violation[i][k-1]
+            else sequence_courante[k][2+i]==1
+                tab_violation[i][k]=tab_violation[i][k-1]+1
+            end
         end
 
-        # decalage dans x y z
-        for j in k+2+fenetre:l
-            tmp3 = tab_violation[i][j]
-            tab_violation[i][j] = tmp2
-            tmp2 = tmp3
+        for j in k+1:min(k+fenetre-1,l)
+            if sequence_courante[j][2+i]==0
+                tab_violation[i][j]=tab_violation[i][j-1]
+            else sequence_courante[j][2+i]==1
+                tab_violation[i][j]=tab_violation[i][j-1]+1
+            end
         end
 
-        # Calucule du bous de la partie decalé
-        for j in l+1:min(l+fenetre-1, sz)
-            tmp = depart
-            for jj in 0:min(fenetre,j-1) # Boucle sur tous les element de la fenetre
-                if sequence_courante[j-jj][2+i] == 1
-                    tmp +=1
+        if k+fenetre-1<l
+            tab_violation[i][k+fenetre]=tmp
+            for j in k+fenetre+1:l
+                tab_violation[i][j] = tab_violation[i][j-1]
+            end
+        end
+
+        if l!=sz
+            for j in l+1:min(l+fenetre-1,sz)
+                if sequence_courante[j][2+i]==0
+                    tab_violation[i][j]=tab_violation[i][j-1]
+                else sequence_courante[j][2+i]==1
+                    tab_violation[i][j]=tab_violation[i][j-1]+1
                 end
             end
-            tab_violation[i][j] = tmp
         end
     end
 end
@@ -638,17 +685,125 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
 
+    if sequence_courante[l][szcar-2]<=0
+        println(sequence_courante)
+    end
     #seq color: ????(k)???---------?????lk?????
     if sequence_courante[l-1][szcar-2]>k
 
-        if k!=1
-            tmpDebk=sequence_courante[k-1][szcar-2]
-            tmpFink=max(sequence_courante[l][szcar-1]-1,k)
+        #bloc couleur k
+        tmpDebk=sequence_courante[l][szcar-2]
+        tmpFink=sequence_courante[l][szcar-1]
+
+        #On met à jour le bloc de couleur k et le suivant (si en enlevant k on regroupe de bloc)
+        if k==1
+            tempDebkMoins=0
         else
-            tmpDebk=1
-            tmpFink=max(sequence_courante[l][szcar-1]-1,1)
+            tmpDebkMoins=sequence_courante[k-1][szcar-2]
+        end
+        if sequence_courante[l][szcar-1]+1<=sz
+            if sequence_courante[l][2]!=sequence_courante[l-1][2]
+                tmpFinkPlus=min(sequence_courante[sequence_courante[l][szcar-1]+1][szcar-1],l-1)
+            else
+                tmpFinkPlus=sequence_courante[sequence_courante[l][szcar-1]+1][szcar-1]
+            end
+        else
+            tmpFinkPlus=sz
         end
 
+        #On met à jour le bloc de couleur k et le suivant (si en enlevant k on regroupe de bloc)
+        #on met à jour jusqu'au bloc k+1
+        if k == 1
+            if tmpDebk != tmpFink
+                for j in 1:tmpFink-1
+                    sequence_courante[j][szcar-2]=1
+                    sequence_courante[j][szcar-1]=tmpFink-1
+                end
+                for j in tmpFink:tmpFinkPlus-1
+                    sequence_courante[j][szcar-2]-=1
+                    sequence_courante[j][szcar-1]-=1
+                end
+            else
+                for j in 1:tmpFinkPlus-1
+                    sequence_courante[j][szcar-2]-=1
+                    sequence_courante[j][szcar-1]-=1
+                end
+            end
+        elseif tmpDebk == tmpFink
+            if sequence_courante[k-1][2]==sequence_courante[k][2]
+                for j in tmpDebkMoins:tmpFinkPlus-1
+                    sequence_courante[j][szcar-2]=tmpDebkMoins
+                    sequence_courante[j][szcar-1]=tmpFinkPlus-1
+                end
+            else
+                for j in k:tmpFinkPlus-1
+                    sequence_courante[j][szcar-2]-=1
+                    sequence_courante[j][szcar-1]-=1
+                end
+            end
+        else
+            for j in tmpDebk:tmpFink-1
+                sequence_courante[j][szcar-1]-=1
+            end
+            for j in tmpFink:tmpFinkPlus-1
+                sequence_courante[j][szcar-2]=tmpFink
+                sequence_courante[j][szcar-1]=tmpFinkPlus-1
+            end
+        end
+
+        #On décale les blocs
+        if tmpFinkPlus != sequence_courante[l-1][szcar-1]+1
+            for j in tmpFinkPlus:sequence_courante[l-1][szcar-2]-2
+                sequence_courante[j][szcar-2]-=1
+                sequence_courante[j][szcar-1]-=1
+            end
+        end
+
+        #mise à jour du bloc  position l
+        if l!=sz
+            if sequence_courante[l-1][2]==sequence_courante[l][2]
+                if tmpFinkPlus != sequence_courante[l-1][szcar-1]+1
+                    for j in sequence_courante[l-1][szcar-2]-1:l
+                        sequence_courante[j][szcar-1]=l
+                        sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]-1
+                    end
+                else
+                    for j in sequence_courante[l-1][szcar-2]-1:l
+                        sequence_courante[j][szcar-1]=l
+                        sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]-1
+                    end
+                end
+            else
+                if tmpFinkPlus != sequence_courante[l-1][szcar-1]+1
+                    for j in sequence_courante[l-1][szcar-2]-1:l
+                        sequence_courante[j][szcar-1]-=1
+                        sequence_courante[j][szcar-2]-=1
+                    end
+                end
+                sequence_courante[l][szcar-2]=l
+                sequence_courante[l][szcar-1]=l
+            end
+
+            if sequence_courante[l+1][2]==sequence_courante[l][2]
+                for j in sequence_courante[l][szcar-2]:sequence_courante[l+1][szcar-1]
+                    sequence_courante[j][szcar-2]=sequence_courante[l][szcar-2]
+                    sequence_courante[j][szcar-1]=sequence_courante[l+1][szcar-1]
+                end
+            end
+        else
+            if sequence_courante[l-1][2]==sequence_courante[l][2]
+                for j in sequence_courante[l-1][szcar-2]:l
+                    sequence_courante[j][szcar-1]=l
+                    sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]
+                end
+            else
+                sequence_courante[l][szcar-2]=l
+                sequence_courante[l][szcar-1]=l
+            end
+        end
+
+        #=Une autre version de cette fonciton....
+        ###mise à jour jusquàa fin
         if k==1 || sequence_courante[k-1][2]==sequence_courante[k][2]
             for i in tmpDebk:tmpFink
                 sequence_courante[i][szcar-1]=tmpFink
@@ -713,7 +868,7 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
                     end
                 end
             end
-        end
+        end=#
     end
 end
 
@@ -775,7 +930,7 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
             sequence_courante[i][szcar-2]=sequence_courante[k+1][szcar-2]
         end
 
-        println("DEBl",tmpDebl)
+        #println("DEBl",tmpDebl)
         for i in sequence_courante[k+1][szcar-1]+1:tmpDebl #impossible de dépasser fin tab
             sequence_courante[i][szcar-2]+=1
             sequence_courante[i][szcar-1]+=1
