@@ -42,7 +42,7 @@
 # @return : La meilleure sequence
 function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
     # compute initial sequence :
-    sequence_meilleure, score_init, tab_violation, ratio_option, Hprio, obj, pbl = compute_initial_sequence(datas)
+    sequence_meilleure,sequence_avant, score_init, tab_violation,col_avant , ratio_option, Hprio, obj, pbl = compute_initial_sequence(datas)
     sz = size(sequence_meilleure)[1]
     szcar = size(sequence_meilleure[1])[1]
     timeOPT, opt = phases_init(obj)
@@ -113,7 +113,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
 
-            effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
+            effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, f_rand)
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
             if (time()-debut)>(n/50)*temps_max*(timeOPT[Phase]/100)
                 st_output=string(st_output, "#")
@@ -145,7 +145,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
             println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
             println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
-            a, b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
+            a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
             println("score : ", a,"\n\n")
         end
 
@@ -156,7 +156,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     end
 
     # Re evaluation en fin d'exection :
-    a, b =evaluation_init(sequence_meilleure,ratio_option,Hprio)
+    a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
     println(a)
     for car in sequence_meilleure
         if (car[szcar-1]-car[szcar-2]+1)>pbl
@@ -205,4 +205,34 @@ function compteurMvt!(f_mouv::Symbol, nb::Array{Int, 1},nb_effectiv::Array{Int, 
         end
     end
     nothing
+end
+
+
+function evaluation(instance::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int)
+    col = instance[1][2]
+    sz =size(instance)[1]
+    nbcol = 0
+    Hpriofail=0
+    Lpriofail=0
+    maxprio =0
+
+    for n in instance
+        if n[2]!= col
+            nbcol+=1
+            col=n[2]
+        end
+    end
+    for i in 1:sz
+        for ii in 1:size(tab_violation)[1]
+            if tab_violation[ii][i]>0
+                if ii<=Hprio
+                    Hpriofail+=tab_violation[ii][i]
+                else
+                    Lpriofail+=tab_violation[ii][i]
+                end
+
+            end
+        end
+    end
+    return [nbcol,Hpriofail,Lpriofail]
 end

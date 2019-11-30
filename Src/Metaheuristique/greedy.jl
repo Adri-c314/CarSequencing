@@ -16,7 +16,7 @@
 # @param pbl : l'entier de paint_batch_limi
 # @param Hprio : l'entier de H
 # @return ::Array{Array{Int,1},1} : La nouvelle instance (avec un petit tri en plus pas piqué des annetons mais là je m'enballe peut etre un peu dans les commentaires apres je ne sais pas)
-function GreedyRAF(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},pbl::Int,Hprio::Int)
+function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},pbl::Int,Hprio::Int)
     sz =size(instance)[1]
     szcar = size(instance[1])[1]
     pi = [Int[0,0] for i in 1:Hprio]
@@ -54,9 +54,44 @@ function GreedyRAF(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},
     end
 
     tmpfincol=mm
+    sz_avant =size(sequence_j_avant)[1]
+    tmpavant = sz_avant
+    nbcol_avant=0
+    col = sequence_j_avant[tmpavant][2]
+    for i in 1:sz_avant
+        if sequence_j_avant[tmpavant][2]!=col
+            break
+        end
+        nbcol_avant+=1
+        tmpavant-=1
+    end
 
+    tmpcol = nbcol_avant
+    tmpi = col
     while sum(color)!=0 && tmpplace != size(instance)[1]+1
-        if tmpcol==pbl && color[tmpi]!=0
+        if tmpplace==1
+            if tmpcol>=pbl
+                tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
+                tmpcol=0
+                tmpdebcol=tmpplace
+                if color[tmpi]>pbl
+                    mm = tmpplace+pbl-1
+                else
+                    mm = tmpplace+color[tmpi]-1
+                end
+                tmpfincol=mm
+            else
+
+                tmpdebcol=tmpplace
+                if color[tmpi]>pbl-tmpcol
+                    mm = tmpplace+pbl-tmpcol-1
+                else
+                    mm = tmpplace+color[tmpi]-1
+                end
+                tmpfincol=mm
+                tmpcol=0
+            end
+        elseif tmpcol==pbl && color[tmpi]!=0
             tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
             tmpcol=0
             tmpdebcol=tmpplace
@@ -79,7 +114,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},
         end
         tmpdur=-1
         tmpduri=instance[1]
-        for ii in 1:min(size(instance)[1],300+tmpplace)
+        for ii in 1:sz
             car = instance[ii]
         #for car in instance
             ## avec dur
@@ -100,8 +135,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},
                 end
             end
         end
-        if  tmpcol==pbl
-
+        if  tmpcol>=pbl
         elseif tmpduri[1]==0 && tmpduri[2]==tmpi && color[tmpi]>0
             tmpduri[1]=tmpplace
             tmpduri[szcar-1]=tmpfincol
@@ -126,7 +160,7 @@ end
 # @param pbl : l'entier de paint_batch_limi
 # @param Hprio : l'entier de H
 # @return ::Array{Array{Int,1},1} : la nouvelle instance
-function GreedyEP(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},pbl::Int,Hprio::Int)
+function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},pbl::Int,Hprio::Int)
     szcar = size(instance[1])[1]
     sz =size(instance)[1]
 
@@ -144,10 +178,23 @@ function GreedyEP(instance::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},p
     color=0
     tmpplace=1
 
+    sz_avant =size(sequence_j_avant)[1]
+    tmpavant = sz_avant
+    nbcol_avant=0
+    color = sequence_j_avant[tmpavant][2]
+    for i in 1:sz_avant
+        if sequence_j_avant[tmpavant][2]!=color
+            break
+        end
+        nbcol_avant+=1
+        tmpavant-=1
+    end
+    global length_windows
+    pbl= nbcol_avant
     for i in 1:size(instance)[1]
         tmpdur=-1
         tmpduri=instance[1]
-        for ii in 1:min(size(instance)[1],25+tmpplace)
+        for ii in 1:min(size(instance)[1],Int32(floor(sz/length_windows+tmpplace)))
             car = instance[ii]
         #for car in instance
             if car[1]==0

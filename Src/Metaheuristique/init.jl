@@ -21,11 +21,11 @@
 # @return ::Int : PAINT_BATCH_LIMIT
 function compute_initial_sequence(datas::NTuple{4,DataFrame})
     sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int, sequence_j_avant::Array{Array{Int,1},1} = init_sequence(datas)
-    obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,prio,pbl,Hprio)
-    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
-    sequence_meilleure = deepcopy(sequence_courrante)
-    score_meilleur = deepcopy(score_courrant)
-    return sequence_meilleure, score_meilleur, tab_violation, prio, Hprio, obj, pbl
+    obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,sequence_j_avant,prio,pbl,Hprio)
+    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
+    sequence_meilleure = sequence_courrante
+    score_meilleur = score_courrant
+    return sequence_meilleure,sequence_j_avant, score_meilleur, tab_violation,col_avant, prio, Hprio, obj, pbl
 end
 
 
@@ -128,13 +128,23 @@ end
 #         de fois ou l'option j est rencontrée dans la fenetre finissant a i
 #         voir p937 proposition 1
 function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int)
-    col = instance[1][2]
     sz =size(instance)[1]
     sz_avant =size(sequence_j_avant)[1]
     nbcol = 0
     Hpriofail=0
     Lpriofail=0
     maxprio =0
+    tmpavant = sz_avant
+    nbcol_avant=0
+    col = sequence_j_avant[tmpavant][2]
+    for i in 1:sz_avant
+        if sequence_j_avant[tmpavant][2]!=col
+            break
+        end
+        nbcol_avant+=1
+        tmpavant-=1
+    end
+    col_avant =(nbcol_avant,col)
 
     ra = [[-ratio[i][1] for j in 1:size(instance)[1]] for i in 1:size(ratio)[1]]
     tab_violation = ra
@@ -166,11 +176,13 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
             for i in 1:size(eval)[1]
                 #on ajoute 1 si la vouture n a bien la prio
                 if n[tmprio+2]==1
+
                     eval[i]+=1
                 end
                 #on reset quand on a regarde plus de x voitures avec x => y/x
-                if tmpi>=ratio[tmprio][2] && mod(tmpi-i,ratio[tmprio][2])==0
+                if mod(tmpi-i,ratio[tmprio][2])==0
                     tab_violation[tmprio][tmpi]+=eval[i]
+
                     if eval[i]>ratio[tmprio][1]
                         if tmprio>Hprio
                             Lpriofail+=eval[i]-ratio[tmprio][1]
@@ -178,8 +190,6 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
                             Hpriofail+=eval[i]-ratio[tmprio][1]
                         end
                     end
-                end
-                if mod(tmpi-i,ratio[tmprio][2])==0
                     eval[i]=0
                 end
             end
@@ -187,7 +197,7 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
         end
         tmpi+=1
     end
-    return [nbcol,Hpriofail,Lpriofail], tab_violation
+    return [nbcol,Hpriofail,Lpriofail], tab_violation, col_avant
 end
 
 

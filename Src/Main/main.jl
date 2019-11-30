@@ -10,14 +10,35 @@
 
 include("../Util/includes.jl")
 using Dates
+using DelimitedFiles
+global length_windows = 1
 
-
+using Random
+Random.seed!(1)
 # Fonction main
 # @param ir : L'ensemble des noms d'instances avec la reference a etudié
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function main(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
+function main(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2")
+("X", "023_EP_RAF_ENP_S49_J2")
+("X", "024_EP_RAF_ENP_S49_J2")
+("X", "025_EP_ENP_RAF_S49_J1")
+("X", "028_CH1_EP_ENP_RAF_S50_J4")
+("X", "028_CH2_EP_ENP_RAF_S51_J1")
+("X", "029_EP_RAF_ENP_S49_J5")
+("X", "034_VP_EP_RAF_ENP_S51_J1_J2_J3")
+("X", "034_VU_EP_RAF_ENP_S51_J1_J2_J3")
+("X", "035_CH1_RAF_EP_S50_J4")
+("X", "035_CH2_RAF_EP_S50_J4")
+("X", "039_CH1_EP_RAF_ENP_S49_J1")
+("X", "039_CH3_EP_RAF_ENP_S49_J1")
+("X", "048_CH1_EP_RAF_ENP_S50_J4")
+("X", "048_CH2_EP_RAF_ENP_S49_J5")
+("X", "064_CH1_EP_RAF_ENP_S49_J1")
+("X", "064_CH2_EP_RAF_ENP_S49_J4")
+("X", "655_CH1_EP_RAF_ENP_S51_J2_J3_J4")
+("X", "655_CH2_EP_RAF_ENP_S52_J1_J2_S01_J1")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -39,32 +60,30 @@ function main(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2"
             ))
         end
 
-        # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
-
-        # Lancement de la VFLS
-        score, sol, tmp = VFLS(datas, temps_max, verbose, txtoutput)
-
-        # Gestion affichage :
-        if txtoutput
-            txt = string(txt, "\n", tmp, "===================================================\n")
-            for j in 1:length(score)
-                txt = string(txt, "Valeur sur l'objectif ", j, " : ", score[j], "\n")
+            # Lecture du fichier csv
+            datas = lectureCSV(i[1], i[2])
+            path = "..\\..\\output\\"
+            # Lancement de la VFLS
+            score, sol, tmp = VFLS(datas, temps_max, verbose, txtoutput)
+            # Gestion affichage :
+            if txtoutput
+                txt = string(txt, "\n", tmp, "===================================================\n")
+                for j in 1:length(score)
+                    txt = string(txt, "Valeur sur l'objectif ", j, " : ", score[j], "\n")
+                end
+                txt = string(txt,"===================================================\n\n")
+                txt = string(txt, seqToCSV(sol))
+                writedlm(string(path,i[2],"_",length_windows,".txt"), score)
             end
-            txt = string(txt,"===================================================\n\n")
-            txt = string(txt, seqToCSV(sol))
-            path = pathDossier(string(outputPath, i[1], "/"), outputPath)
-            ecriture(txt, string(path, i[2], ".txt"))
-            ecriture(seqToCSV(sol), string(path, i[2], ".csv"))
-        end
-        if verbose
-            println(string("==================================================="))
-            for j in 1:length(score)
-                println(string("Valeur sur l'objectif ", j, " : ", score[j]))
+            if verbose
+                println(string("==================================================="))
+                for j in 1:length(score)
+                    println(string("Valeur sur l'objectif ", j, " : ", score[j]))
+                end
+                println(string("===================================================\n\n"))
+                #println(sol)
             end
-            println(string("===================================================\n\n"))
-            #println(sol)
-        end
+
     end
 end
 
