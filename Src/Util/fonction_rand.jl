@@ -95,6 +95,7 @@ function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1
 end
 
 
+
 # Fonction qui permet pas mal de chose mais si tu as scroller jusque là va donc mettre ta fonction et ça passe :)
 # @param instance : toujours la meme instance
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)

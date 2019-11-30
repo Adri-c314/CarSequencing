@@ -19,10 +19,10 @@ function selection(population::Array{Array{Array{Array{Int,1},1},1},1})
     obj = (:pbl!, :hprio!, :lprio!)
 
     # Choix de l'objectif et des parents associés :
-    choix = generic(3)
+    choix = rand(1:3)
     totalscore = 0
-    papa = choixIndice(population)
-    maman = choixIndice(population, papa)
+    papa = choixIndice(population, choix)
+    maman = choixIndice(population, choix, papa)
 
     return papa, maman, obj[choix]
 end
@@ -31,21 +31,22 @@ end
 
 # Fonction qui choisi l'indice suivant un aléatoire pondéré par les scores
 # @param population : la population comme elle est definie plus précisement dans generate.jl
+# @param choix : l'obj focus
 # @param priveDe : La valeur du pere si elle existe
 # @return ::int : Un indice :)
-function choixIndice(population::Array{Array{Array{Array{Int,1},1},1},1}, priveDe::Int=0)
+function choixIndice(population::Array{Array{Array{Array{Int,1},1},1},1}, choix::Int=1, priveDe::Int=0)
     interval = Array{Int,1}(undef, length(population))
     interval[1] = population[1][3][1][choix]
     for i in 2:length(population)
-        interval[i] = interval[i-1] + population[i][3][1][choix]
+        if i != priveDe
+            interval[i] = interval[i-1] + population[i][3][1][choix]
+        else
+            interval[i] = interval[i-1]
+        end
     end
-    tmpInterval = generic(interval[length(population)])
+    tmpInterval = rand(1:interval[length(population)])
     rtn = indiceInInterval(interval, tmpInterval)
-    if rtn >= priveDe
-        return rtn + 1
-    end
     return rtn
-
 end
 
 

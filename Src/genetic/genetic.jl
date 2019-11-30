@@ -51,9 +51,7 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
         end
 
         # selection prendre des elements de la pop
-        #papa, maman = selection(population)
-        papa = 1
-        maman = 2
+        papa, maman, focus = selection(population)
 
         # crossover
         enfant = crossover(papa, maman, population, focus)
