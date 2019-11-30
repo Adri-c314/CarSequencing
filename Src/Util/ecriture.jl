@@ -8,7 +8,44 @@
 # @param text le texte à ecrire
 # @param file le fichier (ou path/fichier) dans lequel ecrire
 function ecriture(text::String, file::String)
-    run(pipeline(`echo -e $text`, stdout=file))
+    open(file, "w") do f
+        write(f, text)
+    end
+end
+
+
+
+# Fonction qui ecris en csv la sequence
+# @param seq : la sequence
+# @return ::String : le csv lié à la sequence
+function seqToCSV(sol::Array{Array{Int,1},1})
+    return seqPropreToCSV(nettoyageDeLaMort(sol))
+end
+
+
+
+# Fonction qui permet de sortir la sequence à partir du tableau de solution
+# @param sol : la solution à etudier
+# @return ::Array{Int, 1} : la sequence nettoyer
+function nettoyageDeLaMort(sol::Array{Array{Int,1},1})
+    tmp = Array{Int,1}()
+    for i in 1:length(sol)
+        push!(tmp, sol[i][length(sol[i])])
+    end
+    return tmp
+end
+
+
+
+# Fonction qui ecris en csv la sequence
+# @param seq : la sequence ayant subit un nettoyageDeLaMort
+# @return ::String : le csv lié à la sequence
+function seqPropreToCSV(seq::Array{Int, 1})
+    txt = ""
+    for i in 1:length(seq)
+        txt = string(txt, seq[i], ";")
+    end
+    return txt
 end
 
 
