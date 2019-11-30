@@ -72,10 +72,15 @@ end
 
 # Fonction main pour l'algorithm genetique
 # @param ir : L'ensemble des noms d'instances avec la reference a etudié
+# @param nbSol : la taille de la population
+# @param temps_init : le temps alloué a la création de la solution initiale commune
+# @param temps_phase1 : Le temps alloué à la premiere phase d'amélioration pour les solutions elites
+# @param temps_phaseAutres : Le temps alloué aux autres phases d'amélioration pour les solutions elites
+# @param temps_popNonElite : Le temps alloué à tout le processus d'amélioration pour les solutions non élites
+# @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart 
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
-
-function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true, temps_init::Float64 = 120, )
+function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 120, temps_phase1::Float64 = 300, temps_phaseAutres::Float64 = 300, temps_popNonElite::Float64 = 30, temps_global::Float64 = 300, verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -102,7 +107,7 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
         datas = lectureCSV(i[1], i[2])
 
         # Lancement de la VFLS
-        VFLS(datas, temps_max, verbose, txtoutput)
+        genetic(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, verbose, txtoutput)
 
         # Gestion affichage :
         if txtoutput

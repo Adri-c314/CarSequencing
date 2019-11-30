@@ -78,6 +78,14 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             println(string("Valeur sur l'objectif ", j, " : ", score_init[j]))
         end
         println("\n\n\n","3) Période des phases :","\n","   ------------------")
+        for car in sequence_meilleure
+            if (car[szcar-1]-car[szcar-2]+1)>pbl
+                println(car)
+                println(car[szcar-1]-car[szcar-2]+1)
+            end
+        end
+        println(obj)
+        println(timeOPT)
     end
     if txtoutput
         txt = string(txt, "2) Information sur la sequence initiale :\n","   ------------------------------------")
@@ -87,17 +95,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         txt = string(txt, "\n\n\n","3) Période des phases :","\n","   ------------------")
     end
 
-    for car in sequence_meilleure
-        if (car[szcar-1]-car[szcar-2]+1)>pbl
-            println(car)
-            println(car[szcar-1]-car[szcar-2]+1)
-        end
-    end
+
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    println(obj)
-    println(timeOPT)
     @time for Phase in 1:3
         debut = time()
         n=0

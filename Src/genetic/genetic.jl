@@ -17,20 +17,25 @@
 # @param temps_phase1 : Le temps alloué à la premiere phase d'amélioration pour les solutions elites
 # @param temps_phaseAutres : Le temps alloué aux autres phases d'amélioration pour les solutions elites
 # @param temps_popNonElite : Le temps alloué à tout le processus d'amélioration pour les solutions non élites
-# @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart 
+# @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 120, temps_phase1::Float64 = 300, temps_phaseAutres::Float64 = 300, temps_popNonElite::Float64 = 30, temps_global::Float64 = 300, verbose::Bool=true, txtoutput::Bool=true)
     # Génération de la population de depart
-    generate(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, verbose, txtoutput)
+    population = generate(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, verbose, txtoutput)
 
-    while temps_global != 0 # Boucle infinie volontaire on reglera apres
+    debut = time()
+    while temps_global >= (time()-debut)
+
         # selection prendre des elements de la pop ?
 
         # crossover
+        enfant = crossover(papa, maman)
 
         # mutation
+        
 
         # insertion dans la pop ?
+        insertionPotentielle!(population, enfant)
     end
 end
