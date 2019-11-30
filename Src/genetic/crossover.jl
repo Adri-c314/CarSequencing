@@ -11,15 +11,13 @@
 
 
 # Fonction qui realise le crossover entre deux sequences
-# @param sol1 : La premiere sequence selectionnée
-# @param tab_violation1 : le tableau de violation de la premiere sequence
-# @param sol2 : La seconde sequence selectionnée
-# @param tab_violation2 : le tableau de violation de la seconde sequence
-# @return ::Array{Array{Int,1},1} : la nouvelle sequence créer à partir des deux autres
-# @return ::Array{Array{Int,1},1} : le tableau de violation associé à cette sequence
-function crossover(sol1::Array{Array{Int,1},1}, tab_violation1::Array{Array{Int,1},1}, sol2::Array{Array{Int,1},1}, tab_violation2::Array{Array{Int,1},1})
-    # TODO : realiser un crossover entre les deux solutions
-    sol3 = sol1 # Pour pas que sa plante mais ça pu !
-    tab_violation3 = tab_violation2
-    return sol3, tab_violation3
+# @param papa : l'indice du papa dans la population
+# @param maman : l'indice de la maman dans la population
+# @param population : la population globale
+# @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
+function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1})
+    # TODO : realiser le crossover
+
+    # J'ai mis return population[papa] pour respecter le typage mais c'est provisoir
+    return population[papa]
 end
