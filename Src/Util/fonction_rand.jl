@@ -64,28 +64,35 @@ end
 # @param size : la taille de l'interval (cf au dessus si tu comprends pas)
 # @return Array{Int32,1} : une position aleatoire t'as tout compris
 function similar(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
+    tmpi = 1
     if Phase ==1 ||(Phase==2 && obj[2]==2)
         while true
+            tmpi+=1
             a = rand(1:sz,2)
             for i in 3:Hprio
                 if instance[a[1]][i]==instance[a[2]][i]
                     return a
                 end
             end
+            if tmpi>sz
+                return generic(sz)
+            end
         end
     else
         while true
+            tmpi+=1
             a = rand(1:sz,2)
             for i in 3:size(ratio_option)[1]+2
                 if instance[a[1]][i]==instance[a[2]][i]
                     return a
                 end
             end
+            if tmpi>sz
+                return generic(sz)
+            end
         end
     end
-
 end
-
 
 
 # Fonction qui permet pas mal de chose mais si tu as scroller jusque là va donc mettre ta fonction et ça passe :)
@@ -170,10 +177,6 @@ end
 function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
     tmpi = 1
     if Phase ==1 ||(Phase==2 && obj[2]==2)
-        #=a, b =evaluation_init(instance,ratio_option,Hprio)
-        if(a[2]==0)
-            return rand(1:sz,2)
-        end=#
         l = rand(1:sz,1)[1]
         tmpi+=1
         while true && tmpi<size(instance)[1]
@@ -187,10 +190,6 @@ function violation(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int
         end
     else
         l = rand(1:sz,1)[1]
-        #=a, b =evaluation_init(instance,ratio_option,Hprio)
-        if(a[2]==0 &&a[3]==0)
-            return rand(1:sz,2)
-        end=#
         while true && tmpi<size(instance)[1]
             tmpi+=1
             k = rand(1:sz,1)[1]
@@ -207,10 +206,6 @@ end
 
 
 function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sz::Int,Hprio::Int,obj::Array{Int,1},Phase::Int)
-    #=a, b =evaluation_init(instance,ratio_option,Hprio)
-    if(a[2]==0)
-        return rand(1:sz,2)
-    end=#
     tmpi = 1
     while true && tmpi<size(instance)[1]
 
@@ -219,6 +214,7 @@ function violation_same_color(instance::Array{Array{Int,1},1},ratio_option::Arra
         l = tmp[2]
         cond = false
         tmpi+=1
+
         if l!=k && instance[l][2]==instance[k][2]
             for i in 1:size(ratio_option)[1]
                 if tab_violation[i][l]>0
