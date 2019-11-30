@@ -96,10 +96,10 @@ end
 # @param temps_phase1 : Le temps alloué à la premiere phase d'amélioration pour les solutions elites
 # @param temps_phaseAutres : Le temps alloué aux autres phases d'amélioration pour les solutions elites
 # @param temps_popNonElite : Le temps alloué à tout le processus d'amélioration pour les solutions non élites
-# @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart 
+# @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
-function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 120, temps_phase1::Float64 = 300, temps_phaseAutres::Float64 = 300, temps_popNonElite::Float64 = 30, temps_global::Float64 = 300, verbose::Bool = true, txtoutput::Bool = true)
+function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput

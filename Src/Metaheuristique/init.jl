@@ -25,7 +25,7 @@ function compute_initial_sequence(datas::NTuple{4,DataFrame})
     score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = sequence_courrante
     score_meilleur = score_courrant
-    return sequence_meilleure,sequence_j_avant, score_meilleur, tab_violation,col_avant, prio, Hprio, obj, pbl
+    return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, prio, Hprio, obj, pbl
 end
 
 
