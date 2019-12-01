@@ -9,11 +9,20 @@ mutable struct Sommet
     Sommet(pred::Array{Sommet} = Array{Sommet}(undef,0), succ::Array{Sommet} = Array{Sommet}(undef,0), val::T = Int32(0)) where T = new(pred, succ, val)
 end
 
+function Base.display(som::Sommet)
+    println("Sommet")
+    println("#predecesseurs : ", length(som.pred))
+    println("#successeurs : ", length(som.succ))
+    println("valeur : ", som.val)
+end
+
+# Ajoute un successeur
 function aj_suc!(som::Sommet, val::T = Int32(0)) where T
     append!(som.succ, [Sommet(val)])
     append!(som.succ[end].pred, [som])
 end
 
+# Ajoute un successeur
 function aj_suc!(som::Sommet, som_succ::Sommet)
     append!(som.succ, [som_succ])
     append!(som_succ.pred, [som])
