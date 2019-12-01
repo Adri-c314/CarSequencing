@@ -720,66 +720,52 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
                     sequence_courante[j][szcar-1]=tmpFink-1
                 end
                 for j in tmpFink:tmpFinkPlus-1
-                    sequence_courante[j][szcar-2]-=1
-                    sequence_courante[j][szcar-1]-=1
+                    sequence_courante[j][szcar-2]=sequence_courante[j+1][szcar-2]-1
+                    sequence_courante[j][szcar-1]=sequence_courante[j+1][szcar-1]-1
                 end
             else
                 for j in 1:tmpFinkPlus-1
-                    sequence_courante[j][szcar-2]-=1
-                    sequence_courante[j][szcar-1]-=1
+                    sequence_courante[j][szcar-2]=sequence_courante[j+1][szcar-2]-1
+                    sequence_courante[j][szcar-1]=sequence_courante[j+1][szcar-1]-1
                 end
             end
         elseif tmpDebk == tmpFink
             if sequence_courante[k-1][2]==sequence_courante[k][2]
-                for j in tmpDebkMoins:tmpFinkPlus-1
+                for j in tmpDebkMoins:min(tmpFinkPlus-1,l-1)
                     sequence_courante[j][szcar-2]=tmpDebkMoins
-                    sequence_courante[j][szcar-1]=tmpFinkPlus-1
+                    sequence_courante[j][szcar-1]=min(tmpFinkPlus-1,l-1)
                 end
+                tmpFinkPlus=(tmpFinkPlus,l)
             else
                 for j in k:tmpFinkPlus-1
-                    sequence_courante[j][szcar-2]-=1
-                    sequence_courante[j][szcar-1]-=1
+                    sequence_courante[j][szcar-2]=sequence_courante[j+1][szcar-2]-1
+                    sequence_courante[j][szcar-1]=sequence_courante[j+1][szcar-1]-1
                 end
             end
         else
             for j in tmpDebk:tmpFink-1
-                sequence_courante[j][szcar-1]-=1
+                sequence_courante[j][szcar-1]=sequence_courante[j+1][szcar-1]-1
             end
             for j in tmpFink:tmpFinkPlus-1
                 sequence_courante[j][szcar-2]=tmpFink
                 sequence_courante[j][szcar-1]=tmpFinkPlus-1
             end
         end
-
         #On décale les blocs
-        if tmpFinkPlus != sequence_courante[l-1][szcar-1]+1
-            for j in tmpFinkPlus:sequence_courante[l-1][szcar-2]-2
-                sequence_courante[j][szcar-2]-=1
-                sequence_courante[j][szcar-1]-=1
+        if tmpFinkPlus < l
+            for j in tmpFinkPlus:l-1
+                sequence_courante[j][szcar-2]=sequence_courante[j+1][szcar-2]-1
+                sequence_courante[j][szcar-1]=sequence_courante[j+1][szcar-1]-1
             end
         end
-
         #mise à jour du bloc  position l
         if l!=sz
             if sequence_courante[l-1][2]==sequence_courante[l][2]
-                if tmpFinkPlus != sequence_courante[l-1][szcar-1]+1
-                    for j in sequence_courante[l-1][szcar-2]-1:l
-                        sequence_courante[j][szcar-1]=l
-                        sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]-1
-                    end
-                else
-                    for j in sequence_courante[l-1][szcar-2]-1:l
-                        sequence_courante[j][szcar-1]=l
-                        sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]-1
-                    end
+                for j in sequence_courante[l-1][szcar-2]-1:l
+                    sequence_courante[j][szcar-1]=l
+                    sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]-1
                 end
             else
-                if tmpFinkPlus != sequence_courante[l-1][szcar-1]+1
-                    for j in sequence_courante[l-1][szcar-2]-1:l
-                        sequence_courante[j][szcar-1]-=1
-                        sequence_courante[j][szcar-2]-=1
-                    end
-                end
                 sequence_courante[l][szcar-2]=l
                 sequence_courante[l][szcar-1]=l
             end
@@ -794,7 +780,7 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
             if sequence_courante[l-1][2]==sequence_courante[l][2]
                 for j in sequence_courante[l-1][szcar-2]:l
                     sequence_courante[j][szcar-1]=l
-                    sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]
+                    sequence_courante[j][szcar-2]=sequence_courante[l-1][szcar-2]-1
                 end
             else
                 sequence_courante[l][szcar-2]=l
