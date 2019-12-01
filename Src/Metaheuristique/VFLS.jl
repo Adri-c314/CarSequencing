@@ -101,31 +101,38 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     debut = time()
     @time for Phase in 1:3
         debut = time()
-        n=0
-        st_output = string("Phase : ",Phase ,", Execution : [")
-        tmp_st = ""
-        for i in 1:50-n-1
-            tmp_st=string(tmp_st," ")
+
+        # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
+        if verbose
+            n=0
+            st_output = string("Phase : ",Phase ,", Execution : [")
+            tmp_st = ""
+            for i in 1:50-n-1
+                tmp_st=string(tmp_st," ")
+            end
+            tmp_st=string(tmp_st,"   ] ")
         end
-        tmp_st=string(tmp_st,"   ] ")
+
         while temps_max*(timeOPT[Phase]/100)>time()-debut
-        #for i in 1:100
+
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
-
             effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, f_rand)
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
-            if (time()-debut)>(n/50)*temps_max*(timeOPT[Phase]/100)
-                st_output=string(st_output, "#")
-                tmp_st = ""
-                for i in 1:50-n-1
-                    tmp_st=string(tmp_st," ")
-                end
-                tmp_st=string(tmp_st," ] ")
-                print(st_output,tmp_st,n*2,"% \r")
-                n+=1
-            end
 
+            # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
+            if verbose
+                if (time()-debut)>(n/50)*temps_max*(timeOPT[Phase]/100)
+                    st_output=string(st_output, "#")
+                    tmp_st = ""
+                    for i in 1:50-n-1
+                        tmp_st=string(tmp_st," ")
+                    end
+                    tmp_st=string(tmp_st," ] ")
+                    print(st_output,tmp_st,n*2,"% \r")
+                    n+=1
+                end
+            end
         end
 
         # affichage a chaque fin de phase :
@@ -208,6 +215,13 @@ function compteurMvt!(f_mouv::Symbol, nb::Array{Int, 1},nb_effectiv::Array{Int, 
 end
 
 
+
+# Fonction d'evaluation d'une instance
+# @param instance : l'instance a evaluer
+# @param tab_violation : bon si t'as toujours pas compris ce que c'etait c'est que t'as meme pas lu le sujet
+# @param ratio : idem
+# @param Hprio : Le nombre de hprio
+# @return ::Array{Int,1} : [nombre de couleurs fail, H prio fail,L prio fail]
 function evaluation(instance::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int)
     col = instance[1][2]
     sz =size(instance)[1]

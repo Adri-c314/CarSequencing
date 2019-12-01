@@ -35,16 +35,18 @@ end
 # @param priveDe : La valeur du pere si elle existe
 # @return ::int : Un indice :)
 function choixIndice(population::Array{Array{Array{Array{Int,1},1},1},1}, choix::Int=1, priveDe::Int=0)
-    interval = Array{Int,1}(undef, length(population))
-    interval[1] = population[1][3][1][choix]
+    interval = Array{Float64,1}(undef, length(population))
+    interval[1] = 1/(population[1][3][1][choix]+1)
+
     for i in 2:length(population)
         if i != priveDe
-            interval[i] = interval[i-1] + population[i][3][1][choix]
+            interval[i] = interval[i-1] + 1/(population[i][3][1][choix]+1)
         else
             interval[i] = interval[i-1]
         end
     end
-    tmpInterval = rand(1:interval[length(population)])
+    println(interval[length(population)])
+    tmpInterval = rand(0:interval[length(population)])
     rtn = indiceInInterval(interval, tmpInterval)
     return rtn
 end
@@ -56,7 +58,7 @@ end
 # @param interval : l'interval
 # @param tmpInterval : la val alea
 # @return l'indice dans la population
-function indiceInInterval(interval::Array{Int,1}, tmpInterval::Int)
+function indiceInInterval(interval::Array{Float64,1}, tmpInterval::Float64)
     for i in 1:length(interval)
         if interval[i] >= tmpInterval
             return i

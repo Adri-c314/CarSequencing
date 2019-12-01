@@ -97,9 +97,10 @@ end
 # @param temps_phaseAutres : Le temps alloué aux autres phases d'amélioration pour les solutions elites
 # @param temps_popNonElite : Le temps alloué à tout le processus d'amélioration pour les solutions non élites
 # @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart
+# @param temps_mutation : Le temps alloué à une unique mutation
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
-function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., verbose::Bool = true, txtoutput::Bool = true)
+function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -126,14 +127,14 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
         datas = lectureCSV(i[1], i[2])
 
         # Lancement de la VFLS
-        genetic(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, verbose, txtoutput)
+        genetic(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, verbose, txtoutput)
 
         # Gestion affichage :
         if txtoutput
-            # TODO : gerer un peu d'output sa serait cool
+            # TODO : gerer un peu d'output serait cool
         end
         if verbose
-            # TODO : gerer un peu d'affichage sa serait cool
+            # TODO : gerer un peu d'affichage serait cool
         end
 
 

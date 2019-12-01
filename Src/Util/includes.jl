@@ -2,6 +2,7 @@
 include("./ecriture.jl")
 include("./lecture.jl")
 include("./fonction_rand.jl")
+include("./instance.jl")
 
 # Les fichiers liés à la méta de base
 include("../Metaheuristique/choisir_klLS.jl")

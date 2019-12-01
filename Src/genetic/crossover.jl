@@ -15,8 +15,9 @@
 # @param maman : l'indice de la maman dans la population
 # @param population : la population globale
 # @param obj : l'objectif in (:pbl!, :hprio!, :lprio!) suivant l'obj qu'on focus
+# @param inst : L'instance du problème étudié cf Util/instance.jl
 # @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
-function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, obj::Symbol)
+function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, obj::Symbol, inst::Instance)
     # TODO : realiser le crossover
 
     # J'ai mis return population[papa] pour respecter le typage mais c'est provisoir

@@ -23,12 +23,15 @@
 # return[1:nbSol] : chaque indice est une solution
 # return[x][1] : Array{Array{Int,1},1} la sequence x
 # return[x][2] : Array{Array{Int,1},1} le tab violation associé à la sequence x
+# return[x][3][1] : Array{Int,1} le score sur les 3 obj
+# @return ::Instance : l'instance de pb étudié cf fichier instance.jl
 function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, temps_phase1::Float64, temps_phaseAutres::Float64, temps_popNonElite::Float64, verbose::Bool=true, txtoutput::Bool=true)
     # Initialisation de la population
     population = Array{Array{Array{Array{Int,1},1},1},1}()
 
     # création de la sequence initial commune
-    sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, prio, Hprio, obj, pbl = initGenerate(datas, temps_init, verbose, txtoutput)
+    sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, ratio, Hprio, obj, pbl = initGenerate(datas, temps_init, verbose, txtoutput)
+    inst = Instance(sequence_j_avant, col_avant, ratio, Hprio, obj, pbl)
     sz = size(sequence_meilleure)[1]
 
     if verbose
@@ -64,7 +67,7 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         push!(population, [sequence_meilleure, tab_violation, [score_meilleur]])
     end
 
-    return population
+    return population, inst
 end
 
 
