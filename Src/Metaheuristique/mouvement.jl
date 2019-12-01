@@ -23,9 +23,9 @@
 # @param sz : le nombre de vehicules
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion! || LSfoo! == :reflection! || LSfoo! == :shuffle! || LSfoo! == :swap!
-        return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
+function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+    if LSfoo! == :swap! || LSfoo! == :shuffle! || LSfoo! == :reflection!
+        return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
     nothing
