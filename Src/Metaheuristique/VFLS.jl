@@ -129,9 +129,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             for o in 1:size(b)[1]
                 for oo in 1:size(b[o])[1]
                     if b[o][oo]!=tab_violation[o][oo]
-                        println(b[o][oo])
-                        println(b[o][oo])
-                    
+                        println("pas bo")
                     end
                 end
             end

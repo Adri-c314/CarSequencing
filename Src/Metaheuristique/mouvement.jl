@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion! || LSfoo! == :swap! || LSfoo! == :reflection! || LSfoo! == :shuffle!
+    if LSfoo! == :insertion!# || LSfoo! == :swap! || LSfoo! == :reflection! || LSfoo! == :shuffle!
         return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
@@ -182,6 +182,29 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
         end
         # Si ça n'ameliore pas alors on fait rien
         if !cond
+            aa =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
+            seq = [i for i in k:l-1]
+            prepend!(seq,l)
+            tmp_tab_violation=deepcopy(tab_violation)
+            update_tab_violation_fi(sequence_courante,ratio_option,tmp_tab_violation,Hprio,pbl,k,l)
+            splice!(sequence_courante,(k):(l),sequence_courante[seq])
+            a =evaluation(sequence_courante,tmp_tab_violation,ratio_option,Hprio)
+            if a[2]<aa[2]||(a[2]==aa[2]&& a[1]<aa[1])
+                #println(tmp_Hprio)
+                #println(tmp_color)
+                #println(aa)
+                #println(a)
+
+                #println("faux negatif")
+                #=for i in k-10:l+10
+                    println(sequence_courante[i])
+                end
+                println("k : ", k," l : ",l)
+                return tamerelachienne=#
+            end
+            seq = [i+1 for i in k:l-1]
+            append!(seq,k)
+            splice!(sequence_courante,(k):(l),sequence_courante[seq])
             return false
         end
     end
@@ -204,12 +227,13 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     # Mise à jour du tableau de violation et pbl :
     update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     a =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
-    if a[2]>aa[2]#||(a[2]==aa[2]&& a[1]>aa[1])
+    if (tmp_color<0&& a[1]>aa[1])
         println(tmp_Hprio)
         println(tmp_color)
         println(aa)
         println(a)
-        for i in k-10:l+10
+        println("faux positif")
+        for i in k-1:l+1
             println(sequence_courante[i])
         end
         println("k : ", k," l : ",l)
@@ -236,46 +260,36 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
     #println("______________________")
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
-
     for i in 1:Hprio
-            #        println("k ")
-        if k+ratio_option[i][2]-1<l
-            tmp_viol += -tab_violation[i][l]
-            #println(tmp_viol)
-            #println(i)
-        end
+        #=if k+ratio_option[i][2]-1<l
+            tmp_viol += tab_violation[i][k+ratio_option[i][2]-1]-tab_violation[i][l]
+        end=#
         for j in k:min(l-1,k+ratio_option[i][2]-1)
 
             if sequence_courante[l][i+2]!=sequence_courante[j][i+2]
                 if sequence_courante[l][i+2]==1
                     if tab_violation[i][j]>=0
-                        #println("i : ", i ," ui : ", j )
                         tmp_viol+=1
                     end
                 end
                 if sequence_courante[l][i+2]==0
-                    if tab_violation[i][j]>0
-
-                            #println("i : ", i ," non : ", j )
-                        tmp_viol-=1
-                    end
+                     if tab_violation[i][j]>0
+                         tmp_viol-=1
+                     end
                 end
             end
         end
         #println("l")
         for j in l+1:min(sz,l+ratio_option[i][2]-1)
 
-            if j-ratio_option[i][2]>=k
+            if j-ratio_option[i][2]+1>k
                 if sequence_courante[l][i+2]!=sequence_courante[j-ratio_option[i][2]][i+2]
                     if sequence_courante[l][i+2]==1
                         if tab_violation[i][j]>0
-                            #println("i : ", i ," nonn : ", j)
                             tmp_viol-=1
                         end
                     elseif sequence_courante[l][i+2]==0
                         if tab_violation[i][j]>=0
-
-                            #    println("i : ", i ," uii : ", j )
                             tmp_viol+=1
                         end
                     end
@@ -283,6 +297,7 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
             end
         end
     end
+    #println(tmp_viol)
     return tmp_viol
 end
 
@@ -403,50 +418,35 @@ function eval_couleur_fi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
 
-<<<<<<< HEAD
-    #Les purges qui disparaissent
-    if l!=sz
-        if sequence_courante[k][2]!=sequence_courante[l+1][2]
-            tmp_color-=1
-        end
-    end
-    if k!=1
-        if sequence_courante[k-1][2]!=sequence_courante[k+1][2]
-            tmp_color-=1
-        end
-    end
-    if sequence_courante[k][2]!= sequence_courante[l-1][2]
-        tmp_color-=1
-    end
-
-    #Les purges qu'ont ajoute
-    if l!=sz
-        if sequence_courante[l-1][2]!=sequence_courante[l+1][2]
-            tmp_color+=1
-        end
-    end
-    if sequence_courante[k+1][2]!=sequence_courante[k][2]
-        tmp_color+=1
-    end
-    if k!=1
-        if sequence_courante[k][2]!=sequence_courante[k-1][2]
-            tmp_color+=1
-        end
-=======
     #Les purges qui change en k
     if sequence_courante[l][2]==sequence_courante[k][2]
         return 0
     else
-        if l<sz && sequence_courante[l][2]==sequence_courante[l-1][2] || sequence_courante[l][2]==sequence_courante[l+1][2]
-            if sequence_courante[l][2]!=sequence_courante[k-1][2]
-                tmp_color+=1
-            end
-        else
-            if sequence_courante[l-1][2]!=sequence_courante[l+1][2]
-                tmp_color-=1
-            end
+        ## avant :
+        if k>1 && sequence_courante[k][2]!=sequence_courante[k-1][2]
+            tmp_color-=1
         end
->>>>>>> 34543655079855f90164fd960b8eeb713e71197f
+
+        if sequence_courante[l][2]!=sequence_courante[l-1][2]
+            tmp_color-=1
+        end
+
+        if l<sz && sequence_courante[l][2]!=sequence_courante[l+1][2]
+            tmp_color-=1
+        end
+
+        ## apres
+        if sequence_courante[l][2]!=sequence_courante[k][2]
+            tmp_color+=1
+        end
+
+        if k>1 && sequence_courante[l][2]!=sequence_courante[k-1][2]
+            tmp_color+=1
+        end
+
+        if l<sz && sequence_courante[l-1][2]!=sequence_courante[l+1][2]
+            tmp_color+=1
+        end
     end
     return tmp_color
 end
