@@ -113,8 +113,11 @@ function choixIndice(population::Array{Array{Array{Array{Int,1},1},1},1}, choix:
             interval[i] = interval[i-1]
         end
     end
-    tmpInterval = rand(0:interval[length(population)])
+    tmpInterval = rand()*interval[length(population)]
     rtn = indiceInInterval(interval, tmpInterval)
+    if rtn == priveDe
+        rtn += 1
+    end
     return rtn
 end
 
