@@ -99,6 +99,8 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
+    a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
+    println("score : ", a,"\n\n")
     @time for Phase in 1:3
         debut = time()
 
@@ -172,6 +174,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         #println(car)
     end
     for car in tab_violation
+        #println(car)
+    end
+    println("___________________________________________")
+    for car in b
         #println(car)
     end
     return a, sequence_meilleure, txt

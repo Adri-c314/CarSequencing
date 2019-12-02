@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion!# || LSfoo! == :swap! #|| LSfoo! == :shuffle! || LSfoo! == :reflection!
+    if LSfoo! == :insertion! || LSfoo! == :swap!  || LSfoo! == :reflection! #|| LSfoo! == :shuffle!
         return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
@@ -57,7 +57,7 @@ function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ra
         l = k
         k =tmpl
     end
-    if k>20 && k!=l && l-k>2 && l<size(sequence_courante)[1]-20
+    if k>20 && k!=l && l-k>1 && l<size(sequence_courante)[1]-20
 
         return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
         if rand(2:2) == 1
@@ -251,28 +251,32 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
     for i in 1:Hprio
+        for j in k:min(l-1,k+ratio_option[i][2]-1)
 
-        for j in k:min(l,k+ratio_option[i][2]-1)
-            if sequence_courante[l][i+2]==1 && sequence_courante[j][i+2]==0
-                if tab_violation[i][j]>=0
-                    tmp_viol+=1
+            if sequence_courante[l][i+2]!=sequence_courante[j][i+2]
+                if sequence_courante[l][i+2]==1
+                    if tab_violation[i][j]>=0
+                        tmp_viol+=1
+                    end
                 end
-            elseif sequence_courante[l][i+2]==0 && sequence_courante[j][i+2]==1
-                if tab_violation[i][j]>0
-                    tmp_viol-=1
-                end
-            end
-        end
-
-        for j in l+1:min(sz,l+ratio_option[i][2]-1)
-            if j-ratio_option[i][2]>0
-                if sequence_courante[l][i+2]==1 && sequence_courante[j-ratio_option[i][2]][i+2]==0
+                if sequence_courante[l][i+2]==0
                     if tab_violation[i][j]>0
                         tmp_viol-=1
                     end
-                elseif sequence_courante[l][i+2]==0 && sequence_courante[j-ratio_option[i][2]][i+2]==1
-                    if tab_violation[i][j]>=0
-                        tmp_viol+=1
+                end
+            end
+        end
+        for j in l+1:min(sz,l+ratio_option[i][2]-1)
+            if j-ratio_option[i][2]+1>k
+                if sequence_courante[l][i+2]!=sequence_courante[j-ratio_option[i][2]][i+2]
+                    if sequence_courante[l][i+2]==1
+                        if tab_violation[i][j]>0
+                            tmp_viol-=1
+                        end
+                    elseif sequence_courante[l][i+2]==0
+                        if tab_violation[i][j]>=0
+                            tmp_viol+=1
+                        end
                     end
                 end
             end
@@ -470,7 +474,7 @@ function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         end
 
         for j in l+1:min(sz,l+ratio_option[i][2]-1)
-            if j-ratio_option[i][2]>0
+            if j-ratio_option[i][2]>k
                 if sequence_courante[l][i+2]==1 && sequence_courante[j-ratio_option[i][2]][i+2]==0
                     if tab_violation[i][j]>0
                         tmp_viol-=1
@@ -635,6 +639,13 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
     for i in 1:size(ratio_option)[1]
+        tmp = tab_violation[i][min(l,k+ratio_option[i][2]-1)]
+        for j in min(l,k+ratio_option[i][2]-1):l-1
+            tmp2 = tab_violation[i][j+1]
+            tab_violation[i][j+1] = tmp
+            tmp =tmp2
+        end
+
 
         for j in k:min(l-1,k+ratio_option[i][2]-1)
 
@@ -647,14 +658,10 @@ function update_tab_violation_fi(sequence_courante::Array{Array{Int,1},1},ratio_
                 end
             end
         end
-        tmp = tab_violation[i][min(l,k+ratio_option[i][2]-1)]
-        for j in min(l,k+ratio_option[i][2]-1):l-1
-            tmp2 = tab_violation[i][j+1]
-            tab_violation[i][j+1] = tmp
-            tmp =tmp2
-        end
+
+
         for j in l+1:min(sz,l+ratio_option[i][2]-1)
-            if j-ratio_option[i][2]>k
+            if j-ratio_option[i][2]+1>k
                 if sequence_courante[l][i+2]!=sequence_courante[j-ratio_option[i][2]][i+2]
                     if sequence_courante[l][i+2]==1
                         tab_violation[i][j]-=1
@@ -956,8 +963,8 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
         end
     end
 
-tmpD = sequence_courante[k][szcar-1]+1
-tmpF = sequence_courante[ll][szcar-2]-1
+    tmpD = sequence_courante[k][szcar-1]+1
+    tmpF = sequence_courante[ll][szcar-2]-1
     for i in max(k,tmpD):tmpF
         sequence_courante[i][szcar-2]+=1
         if sequence_courante[i][szcar-1]<sz
