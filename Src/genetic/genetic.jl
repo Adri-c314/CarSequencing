@@ -34,6 +34,7 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
         println("3) Réalisation de l'algorithme génétique :")
         println("   ----------------------------------")
         println("Budjet de temps de calcule : ", temps_global, " secondes")
+        println("Budjet de temps de calcule d'une mutation : ", temps_mutation, " secondes")
     end
 
     debut = time()
@@ -51,7 +52,6 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
             end
         end
 
-
         # selection prendre des elements de la pop
         papa, maman, focus = selection(population)
 
@@ -61,7 +61,9 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
         # mutation
         mutation!(enfant, focus, inst, temps_mutation)
 
-        # insertion dans la pop ?
-        #insertionPotentielle!(population, enfant)
+        # insertion dans la pop
+        insertionPotentielle!(population, enfant)
+
+
     end
 end

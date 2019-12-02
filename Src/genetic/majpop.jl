@@ -29,6 +29,74 @@ end
 
 
 
+# Fonction qui permet de dessider de l'insertion ou non d'un enfant dans la population
+# @param population : la population comme elle est definie plus précisement dans generate.jl
+# @param enfant : l'enfant générer
+# @modify population : insere potentiellement l'enfant dans la pop
+function insertionPotentielle!(population::Array{Array{Array{Array{Int,1},1},1},1}, enfant::Array{Array{Array{Int,1},1},1})
+    ordre = shuffle(MersenneTwister(1234), Vector(1:length(population)))
+
+    i = 1
+    inserer = false
+    while (i <= length(ordre)) && !inserer
+        if domineFortement(population[ordre[i]], enfant)
+            population[ordre[i]] = enfant
+            inserer = true
+        end
+        i += 1
+    end
+
+    if !inserer
+        i = 1
+        while (i <= length(ordre)) && !inserer
+            if domineClassique(population[ordre[i]], enfant)
+                population[ordre[i]] = enfant
+                inserer = true
+            end
+            i += 1
+        end
+    end
+
+    # Si il domine pas il n'est pas nécessairement à jeter donc j'en fais quoi ?
+    if !inserer
+        #println("on ne l'a pas gardé !")
+    end
+
+    return nothing
+end
+
+
+
+# Fonction qui permet de verifier si l'elmt qu'on souhaite inserer domine fortement un elmt donné
+# @param inPop : l'element dans la population
+# @param insere : l'element auquel on veut comparer
+# @return ::Bool : true si inPop est fortement dominé
+function domineFortement(inPop::Array{Array{Array{Int,1},1},1}, insere::Array{Array{Array{Int,1},1},1})
+    domination = true
+    forte = false
+    for i in 1:length(inPop[3][1])
+        domination &= inPop[3][1][i] >= insere[3][1][i]
+        forte |= inPop[3][1][i] > insere[3][1][i]
+    end
+    return  domination && forte
+end
+
+
+
+# Fonction qui permet de verifier si l'elmt qu'on souhaite inserer domine fortement un elmt donné
+# @param inPop : l'element dans la population
+# @param insere : l'element auquel on veut comparer
+# @return ::Bool : true si inPop est dominé
+function domineClassique(inPop::Array{Array{Array{Int,1},1},1}, insere::Array{Array{Array{Int,1},1},1})
+    domination = true
+    for i in 1:length(inPop[3][1])
+        domination &= inPop[3][1][i] >= insere[3][1][i]
+    end
+    return  domination
+end
+
+
+
 # Fonction qui choisi l'indice suivant un aléatoire pondéré par les scores
 # @param population : la population comme elle est definie plus précisement dans generate.jl
 # @param choix : l'obj focus
@@ -45,7 +113,6 @@ function choixIndice(population::Array{Array{Array{Array{Int,1},1},1},1}, choix:
             interval[i] = interval[i-1]
         end
     end
-    println(interval[length(population)])
     tmpInterval = rand(0:interval[length(population)])
     rtn = indiceInInterval(interval, tmpInterval)
     return rtn

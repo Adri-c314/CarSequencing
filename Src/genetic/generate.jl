@@ -64,7 +64,7 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
     #ameliorationENP(temps_phase1)
 
     for i in 1:nbSol
-        push!(population, [sequence_meilleure, tab_violation, [score_meilleur]])
+        push!(population, [copy(sequence_meilleure), copy(tab_violation), [copy(score_meilleur)]])
     end
 
     return population, inst
