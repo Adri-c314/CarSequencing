@@ -402,40 +402,33 @@ function eval_couleur_fi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::
     #szcar =size(sequence_courante[1])[1]
     tmp_color=0
 
-    #Les purges qui change en k
-
-    if k!=1
-        if sequence_courante[k-1][2]==sequence_courante[k][2] && sequence_courante[k][2]==sequence_courante[l][2]
-            tmp_color+=0
-        else
-            if sequence_courante[k-1][2]==sequence_courante[k][2]
-                tmp_color+=2
-            end
-
-            if sequence_courante[k][2]==sequence_courante[l][2]
-                tmp_color-=0
-            end
+    #Les purges qui disparaissent
+    if l!=sz
+        if sequence_courante[k][2]!=sequence_courante[l+1][2]
+            tmp_color-=1
         end
-    else
-    ##gerer col avant ici
-    tmp_color+=100
+    end
+    if k!=1
+        if sequence_courante[k-1][2]!=sequence_courante[k+1][2]
+            tmp_color-=1
+        end
+    end
+    if sequence_courante[k][2]!= sequence_courante[l-1][2]
+        tmp_color-=1
     end
 
-    if l<sz
-        if sequence_courante[l-1][2]==sequence_courante[l+1][2]
-            tmp_color-=1
+    #Les purges qu'ont ajoute
+    if l!=sz
+        if sequence_courante[l-1][2]!=sequence_courante[l+1][2]
+            tmp_color+=1
         end
-
-        if sequence_courante[l-1][2]==sequence_courante[l][2] && sequence_courante[l+1][2]==sequence_courante[l][2]
-            tmp_color+=0
-        else
-            if sequence_courante[l-1][2]==sequence_courante[l+1][2]
-                tmp_color-=2
-            end
-        end
-    else
-        if sequence_courante[l-1][2]!=sequence_courante[l][2]
-            tmp_color-=1
+    end
+    if sequence_courante[k+1][2]!=sequence_courante[k][2]
+        tmp_color+=1
+    end
+    if k!=1
+        if sequence_courante[k][2]!=sequence_courante[k-1][2]
+            tmp_color+=1
         end
     end
 
@@ -551,75 +544,32 @@ end
 # @modify tab_violation : modifie tab_violation
 function update_tab_violation_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
+    tmp_viol=0 ##sorry pour ce nom xD
 
     for i in 1:size(ratio_option)[1]
-        fenetre = ratio_option[i][2]
+        for j in min(l-1,k+ratio_option[i][2]-1):l-1
+            tab_violation[i][j] = tab_violation[i][j+1]
+        end
 
-        #ratio du début
-        if k==1
-            if sequence_courante[k][2+i]==0
-                tab_violation[i][k]=-ratio_option[i][1]
-            else sequence_courante[k][2+i]==1
-                tab_violation[i][k]=-ratio_option[i][1]+1
-            end
-        else
-            if k-fenetre+1<1
-                if sequence_courante[k][2+i]==0
-                    tab_violation[i][k]=tab_violation[i][k-1]
-                else sequence_courante[k][2+i]==1
-                    tab_violation[i][k]=tab_violation[i][k-1]+1
+        for j in k:min(l-1,k+ratio_option[i][2]-2)
+            if sequence_courante[k][i+2]!=sequence_courante[j+1][i+2]
+                if sequence_courante[k][i+2]==1
+                    tab_violation[i][j]-=1
                 end
-            else
-                if sequence_courante[k][2+i]==0 && sequence_courante[l][2+i]==1
-                    tab_violation[i][k]=tab_violation[i][k-1]-1
-                elseif sequence_courante[k][2+i]==1 && sequence_courante[l][2+i]==0
-                    tab_violation[i][k]=tab_violation[i][k-1]+1
-                else
-                    tab_violation[i][k]=tab_violation[i][k-1]
+                if sequence_courante[k][i+2]==0
+                    tab_violation[i][j]+=1
                 end
             end
         end
 
-        for j in k+1:min(k+fenetre-2,l-1)
-            if j-fenetre+1<1
-                if sequence_courante[j][2+i]==0
-                    tab_violation[i][j]=tab_violation[i][j-1]
-                else sequence_courante[j][2+i]==1
-                    tab_violation[i][j]=tab_violation[i][j-1]+1
-                end
-            else
-                if sequence_courante[j][2+i]==0 && sequence_courante[l][2+i]==1
-                    tab_violation[i][j]=tab_violation[i][j-1]-1
-                elseif sequence_courante[j][2+i]==1  && sequence_courante[l][2+i]==0
-                    tab_violation[i][j]=tab_violation[i][j-1]+1
-                else
-                    tab_violation[i][j]=tab_violation[i][j-1]
-                end
-            end
-        end
-
-        #On décale tous les ratios
-        if k+fenetre-2<l-1
-            for j in k+fenetre-1:l-1
-                tab_violation[i][j] = tab_violation[i][j+1]
-            end
-        end
-
-        #ratio de la fin
-        for j in l:min(l+fenetre-1,sz)
-            if j-fenetre+1 > 1
-                if sequence_courante[l][2+i]==0 && sequence_courante[j-fenetre][2+i]==1
-                    tab_violation[i][j]=tab_violation[i][j-1]-1
-                elseif sequence_courante[l][2+i]==1 && sequence_courante[j-fenetre][2+i]==0
-                    tab_violation[i][j]=tab_violation[i][j-1]+1
-                else
-                    tab_violation[i][j]=tab_violation[i][j-1]
-                end
-            else
-                if sequence_courante[j+1][2+i]==0
-                    tab_violation[i][j]=tab_violation[i][j-1]
-                else sequence_courante[j+1][2+i]==1
-                    tab_violation[i][j]=tab_violation[i][j-1]+1
+        for j in l+1:min(sz,l+ratio_option[i][2]-1)
+            if j-ratio_option[i][2]+1>k
+                if sequence_courante[k][i+2]!=sequence_courante[j-ratio_option[i][2]][i+2]
+                    if sequence_courante[k][i+2]==1
+                        tab_violation[i][j]+=1
+                    elseif sequence_courante[k][i+2]==0
+                        tab_violation[i][j]-=1
+                    end
                 end
             end
         end
