@@ -144,6 +144,9 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
                 "Nombre de shuffle : ",nb[4], "\n",
             )
         end
+        for car in sequence_meilleure
+            #println(car)
+        end
         if verbose
             st_output=string(st_output, "#] ")
             println(st_output,100,"%")
@@ -166,10 +169,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
     println(a)
     for car in sequence_meilleure
-        if (car[szcar-1]-car[szcar-2]+1)>pbl
-            println(car)
-            println(car[szcar-1]-car[szcar-2]+1)
-        end
+        #println(car)
+    end
+    for car in tab_violation
+        #println(car)
     end
     return a, sequence_meilleure, txt
 end

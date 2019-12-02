@@ -13,8 +13,10 @@
 # Fonction de réalisation de l'operation initial de l'algorithm VFLS
 # @param Datas : Tableau de DataFrame bien degueu qu'on s'empresse de nettoyer
 # @return ::Array{Array{Int,1},1} : la sequence apres toute l'initialisation
+# @return ::Array{Array{Int,1},1} : la sequence du jour d'avant
 # @return ::Array{Int,1} : Le score courant
 # @return ::Array{Array{Int,1},1} : tab violation
+# @return ::Array{Array{Int,1},1} : col_avant
 # @return ::Array{Array{Int,1},1} : ratio_option le tableau des options
 # @return ::Int : Hprio le nombre d'options prioritaires
 # @return ::Array{Int,1} : le tableau des objectifs
