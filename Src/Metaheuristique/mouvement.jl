@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion! || LSfoo! == :swap!  || LSfoo! == :reflection! #|| LSfoo! == :shuffle!
+    if LSfoo! == :insertion! || LSfoo! == :swap! || LSfoo! == :reflection! || LSfoo! == :shuffle!
         return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
@@ -117,7 +117,7 @@ function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
             return false
         end
     end
-    ##println(tab_violation)
+    ###println(tab_violation)
     # Sinon on realise le mouvement de bw :
     if k > l # Gestion du cas ou s'est inversé. Cette solution n'est surement pas top
         tmp = l
@@ -130,13 +130,13 @@ function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     end
     sequence_courante[l] = tmp
 
-    ##println(sequence_courante)
-    #println("bw" ,k, "+",l)
+    ###println(sequence_courante)
+    ##println("bw" ,k, "+",l)
     # Mise à jour du tableau de violation et pbl :
     update_tab_violation_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     update_col_and_pbl_bi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
-    ##println(tab_violation)
-    #println(sequence_courante)
+    ###println(tab_violation)
+    ##println(sequence_courante)
     return true
     nothing
 end
@@ -193,42 +193,28 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     end
     oui = sequence_courante[k][2]!=sequence_courante[l][2]
     if oui
-        ##println(k)
-        ##println(l)
+        ###println(k)
+        ###println(l)
     end
+    aa =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
     seq = [i for i in k:l-1]
     prepend!(seq,l)
     update_tab_violation_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l),sequence_courante[seq])
     # Mise à jour du tableau de violation et pbl :
     update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
-    ##println("seqfin",sequence_courante
-    tmpi=1
-    #=for i in 1:size(sequence_courante)[1]-1
-        col =  sequence_courante[i][2]
-        if sequence_courante[i][szcar-1]>sequence_courante[i+1][szcar-1]
-            for car in sequence_courante
-                println(car)
-            end
-            println("k : ",k ," l : ",l)
-            return tamere
+    a =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
+    if a[2]>aa[2]#||(a[2]==aa[2]&& a[1]>aa[1])
+        println(tmp_Hprio)
+        println(tmp_color)
+        println(aa)
+        println(a)
+        for i in k-10:l+10
+            println(sequence_courante[i])
         end
-        if sequence_courante[i][szcar-2]>sequence_courante[i+1][szcar-2]
-            for car in sequence_courante
-                println(car)
-            end
-            println("k : ",k ," l : ",l)
-            return tasal
-        end
-        if sequence_courante[i][2]==sequence_courante[i+1][2] && (sequence_courante[i][szcar-2]!=sequence_courante[i+1][szcar-2] ||sequence_courante[i][szcar-1]!=sequence_courante[i+1][szcar-1] )
-            for car in sequence_courante
-                println(car)
-            end
-            println("k : ",k ," l : ",l)
-            return tamerde
-        end
-    end=#
-
+        println("k : ", k," l : ",l)
+        return tamerepute
+    end
     return true
     nothing
 end
@@ -247,34 +233,49 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         k=l
         l=tmp
     end
-
+    #println("______________________")
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
+
     for i in 1:Hprio
+            #        println("k ")
+        if k+ratio_option[i][2]-1<l
+            tmp_viol += -tab_violation[i][l]
+            #println(tmp_viol)
+            #println(i)
+        end
         for j in k:min(l-1,k+ratio_option[i][2]-1)
 
             if sequence_courante[l][i+2]!=sequence_courante[j][i+2]
                 if sequence_courante[l][i+2]==1
                     if tab_violation[i][j]>=0
+                        #println("i : ", i ," ui : ", j )
                         tmp_viol+=1
                     end
                 end
                 if sequence_courante[l][i+2]==0
                     if tab_violation[i][j]>0
+
+                            #println("i : ", i ," non : ", j )
                         tmp_viol-=1
                     end
                 end
             end
         end
+        #println("l")
         for j in l+1:min(sz,l+ratio_option[i][2]-1)
-            if j-ratio_option[i][2]+1>k
+
+            if j-ratio_option[i][2]>=k
                 if sequence_courante[l][i+2]!=sequence_courante[j-ratio_option[i][2]][i+2]
                     if sequence_courante[l][i+2]==1
                         if tab_violation[i][j]>0
+                            #println("i : ", i ," nonn : ", j)
                             tmp_viol-=1
                         end
                     elseif sequence_courante[l][i+2]==0
                         if tab_violation[i][j]>=0
+
+                            #    println("i : ", i ," uii : ", j )
                             tmp_viol+=1
                         end
                     end
@@ -399,46 +400,23 @@ function eval_couleur_fi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::
     end
 
     sz = size(sequence_courante)[1]
-    #szcar =size(sequence_courante[1])[1]
+    szcar =size(sequence_courante[1])[1]
     tmp_color=0
 
     #Les purges qui change en k
-
-    if k!=1
-        if sequence_courante[k-1][2]==sequence_courante[k][2] && sequence_courante[k][2]==sequence_courante[l][2]
-            tmp_color+=0
-        else
-            if sequence_courante[k-1][2]==sequence_courante[k][2]
-                tmp_color+=2
-            end
-
-            if sequence_courante[k][2]==sequence_courante[l][2]
-                tmp_color-=0
-            end
-        end
+    if sequence_courante[l][2]==sequence_courante[k][2]
+        return 0
     else
-    ##gerer col avant ici
-    tmp_color+=100
-    end
-
-    if l<sz
-        if sequence_courante[l-1][2]==sequence_courante[l+1][2]
-            tmp_color-=1
-        end
-
-        if sequence_courante[l-1][2]==sequence_courante[l][2] && sequence_courante[l+1][2]==sequence_courante[l][2]
-            tmp_color+=0
-        else
-            if sequence_courante[l-1][2]==sequence_courante[l+1][2]
-                tmp_color-=2
+        if l<sz && sequence_courante[l][2]==sequence_courante[l-1][2] || sequence_courante[l][2]==sequence_courante[l+1][2]
+            if sequence_courante[l][2]!=sequence_courante[k-1][2]
+                tmp_color+=1
             end
-        end
-    else
-        if sequence_courante[l-1][2]!=sequence_courante[l][2]
-            tmp_color-=1
+        else
+            if sequence_courante[l-1][2]!=sequence_courante[l+1][2]
+                tmp_color-=1
+            end
         end
     end
-
     return tmp_color
 end
 
@@ -474,7 +452,7 @@ function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         end
 
         for j in l+1:min(sz,l+ratio_option[i][2]-1)
-            if j-ratio_option[i][2]>k
+            if j-ratio_option[i][2]+1>k
                 if sequence_courante[l][i+2]==1 && sequence_courante[j-ratio_option[i][2]][i+2]==0
                     if tab_violation[i][j]>0
                         tmp_viol-=1
@@ -693,7 +671,7 @@ function update_col_and_pbl_bi(sequence_courante::Array{Array{Int,1},1},ratio_op
     szcar =size(sequence_courante[1])[1]
 
     if sequence_courante[l][szcar-2]<=0
-        #println(sequence_courante)
+        ##println(sequence_courante)
     end
     #seq color: ????(k)???---------?????lk?????
     if sequence_courante[l-1][szcar-2]>k
@@ -902,12 +880,22 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
         end
         tmpFink+=1
     else
-        tmpDebk = k
-        tmpFink+=1
+        #println("k : ", k)
+        #println(tmpDebk)
+        #println(tmpFink)
+        if tmpDebk== tmpFink
+            tmpDebk = k
+            tmpFink = k
+        else
+            tmpDebk = k
+            tmpFink+=1
+        end
+
         for i in tmpDebk:tmpFink
             sequence_courante[i][szcar-2]=tmpDebk
             sequence_courante[i][szcar-1]=tmpFink
         end
+        #println(sequence_courante[k])
 
         if sequence_courante[l][2] == sequence_courante[l-1][2]
             for i in sequence_courante[l-1][szcar-2]:l
@@ -921,13 +909,17 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
                 sequence_courante[i][szcar-1]=l-1
             end
         end
+        #println(sequence_courante[k])
 
         tmpFink+=1
     end
     # update des sequences de l
     tmpDebl=sequence_courante[ll][szcar-2]
     tmpFinl=sequence_courante[ll][szcar-1]
-    if sequence_courante[k][szcar-2] != sequence_courante[ll][szcar-2]
+    #println( sequence_courante[k])
+    #println( sequence_courante[ll])
+    if sequence_courante[k][szcar-2] != sequence_courante[ll][szcar-2] || sequence_courante[k][2]!=sequence_courante[ll][2]
+        #println("ui")
         if sequence_courante[ll][2] == sequence_courante[ll+1][2]
             tmpDebl=sequence_courante[ll][szcar-2]+1
             tmpFinl=sequence_courante[ll+1][szcar-1]
@@ -936,6 +928,7 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
                 sequence_courante[i][szcar-1]=tmpFinl
             end
         else
+            #println(tmpDebl)
             if sequence_courante[l][2] == sequence_courante[ll+1][2]
                 tmpDebl=ll+1
                 tmpFinl=sequence_courante[ll+1][szcar-1]
@@ -944,6 +937,7 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
                 end
             end
             tmpDebl=sequence_courante[ll][szcar-2]+1
+
             tmpFinl=ll
             for i in tmpDebl:tmpFinl
                 sequence_courante[i][szcar-2]=tmpDebl
@@ -951,27 +945,49 @@ function update_col_and_pbl_fi(sequence_courante::Array{Array{Int,1},1},ratio_op
             end
         end
     else
+        #println("non")
         if sequence_courante[ll][2] == sequence_courante[ll+1][2]
             tmpFinl=sequence_courante[ll+1][szcar-1]
             tmpDebl=sequence_courante[ll][szcar-2]
             for i in tmpDebl:tmpFinl
-                #println("i : ", i)
+                ##println("i : ", i)
                 sequence_courante[i][szcar-2]=tmpDebl
                 sequence_courante[i][szcar-1]=tmpFinl
-                #println(sequence_courante[i])
+                ##println(sequence_courante[i])
+            end
+        else
+            #println("la")
+            #println(sequence_courante[ll])
+            tmpFinl= ll
+            tmpDebl=sequence_courante[ll][szcar-2]
+            for i in tmpDebl:tmpFinl
+                ##println("i : ", i)
+                sequence_courante[i][szcar-2]=tmpDebl
+                sequence_courante[i][szcar-1]=tmpFinl
+                ##println(sequence_courante[i])
+            end
+            if sequence_courante[l][2] == sequence_courante[ll+1][2]
+                tmpFinl=sequence_courante[ll+1][szcar-1]
+                tmpDebl=sequence_courante[ll+1][szcar-2]+1
+                for i in ll+1:tmpFinl
+                    ##println("i : ", i)
+                    sequence_courante[i][szcar-2]=tmpDebl
+                    sequence_courante[i][szcar-1]=tmpFinl
+                    ##println(sequence_courante[i])
+                end
             end
         end
-    end
 
+    end
+    #println(sequence_courante[358])
     tmpD = sequence_courante[k][szcar-1]+1
     tmpF = sequence_courante[ll][szcar-2]-1
-    for i in max(k,tmpD):tmpF
+    #println(tmpD)
+    #println(tmpF)
+    for i in tmpD:tmpF
         sequence_courante[i][szcar-2]+=1
-        if sequence_courante[i][szcar-1]<sz
-            sequence_courante[i][szcar-1]+=1
-        end
+        sequence_courante[i][szcar-1]+=1
     end
-
 end
 
 
@@ -998,6 +1014,8 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, r
     if l-k<=1
         return swap!(sequence_courante, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, :rand_mov)
     end
+
+    szcar = size(sequence_courante[1])[1]
     sz = size(sequence_courante)[1]
     cond = true
     tmp_color=0
@@ -1035,17 +1053,14 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, r
     tmp =reverse(tmp)
 
 
-    update_col_seq_reflection(sequence_courante,ratio_option,pbl,k,l)
+    #update_col_seq_reflection(sequence_courante,ratio_option,pbl,k,l)
     update_tab_violation_reflection(sequence_courante,ratio_option,tab_violation,tmp,Hprio,pbl,k,l)
     reverse!(sequence_courante,k,l)
     update_col_and_pbl_reflection(sequence_courante,ratio_option,pbl,k,l)
-
-
     return true
 
     nothing # Pas de return pour eviter les copies de memoire.
 end
-
 
 function update_col_seq_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
@@ -1151,7 +1166,6 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},col_av
     return tmp_color
 end
 
-
 # Fonction qui verifie que la nouvelle sequeence est admissible
 # @param sequence_courante : la sequence ou instance courante
 # @param pbl : paint batch limit
@@ -1200,7 +1214,6 @@ function eval_pbl_reflection(sequence_courante::Array{Array{Int,1},1},col_avant:
     return true
 end
 
-
 # Fonction qui maj les color de la new sol
 # @param sequence_courante : la sequence ou instance courante
 # @param ratio_option : liste de ratio (premiere colonne p et seconde q)
@@ -1213,28 +1226,49 @@ end
 function update_col_and_pbl_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
-    col = sequence_courante[k][2]
-    debk = k
-    if col==sequence_courante[debk][2]
-        while debk>=1 && col==sequence_courante[debk][2]
-            debk-=1
-        end
-        debk+=1
-    end
-    debseq = debk
 
-    col = sequence_courante[l][2]
-    finl = l
-    if col==sequence_courante[finl][2]
-        while finl<= sz col==sequence_courante[finl][2]
-            finl+=1
+    if sequence_courante[k][szcar-2]!=sequence_courante[l][szcar-2]
+        if k>1 && sequence_courante[k][2] == sequence_courante[k-1][2]
+            tmpfin = l-sequence_courante[k][szcar - 2]+k
+            for i in sequence_courante[k-1][szcar-2]:tmpfin
+                sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
+                sequence_courante[i][szcar-1] = tmpfin
+            end
+            debk = sequence_courante[k][szcar-1]+1
+        else
+            if k>1
+                for i in sequence_courante[k-1][szcar-2]:k-1
+                    sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
+                    sequence_courante[i][szcar-1] = k-1
+                end
+            end
+            debk = k
         end
-        finl-=1
+        if l<sz && sequence_courante[l][2] == sequence_courante[l+1][2]
+            tmpdeb = k-sequence_courante[l][szcar - 1]+l
+            for i in tmpdeb:sequence_courante[l+1][szcar-1]
+                sequence_courante[i][szcar-2] = tmpdeb
+                sequence_courante[i][szcar-1] = sequence_courante[l+1][szcar-1]
+            end
+            finl = sequence_courante[l][szcar-2]-1
+        else
+            if l<sz
+                for i in l+1:sequence_courante[l+1][szcar-1]
+                    sequence_courante[i][szcar-2] = l+1
+                    sequence_courante[i][szcar-1] = sequence_courante[l+1][szcar-1]
+                end
+            end
+            finl = l
+        end
+    else
+        debk=sequence_courante[k][szcar-2]
+        finl=sequence_courante[k][szcar-1]
     end
+
     finseq = min(sz,finl)
-    deb = debseq
-    col=sequence_courante[debseq][2]
-    for i in debseq:finseq
+    deb = debk
+    col=sequence_courante[debk][2]
+    for i in debk:finl
         if sequence_courante[i][2]!= col
             col=sequence_courante[i][2]
             deb = i
@@ -1242,10 +1276,10 @@ function update_col_and_pbl_reflection(sequence_courante::Array{Array{Int,1},1},
         sequence_courante[i][szcar-2]=deb
     end
 
-    tmpi = finseq
-    fin = finseq
-    col=sequence_courante[finseq][2]
-    for i in debseq:finseq
+    tmpi = finl
+    fin = finl
+    col=sequence_courante[finl][2]
+    for i in debk:finl
         if tmpi>=1 &&sequence_courante[tmpi][2]!= col
             col=sequence_courante[tmpi][2]
             fin = tmpi
@@ -1255,7 +1289,6 @@ function update_col_and_pbl_reflection(sequence_courante::Array{Array{Int,1},1},
         tmpi-=1
     end
 end
-
 
 # Fonction qui permet l'evaluation des Hprio
 # @param sequence_courante : la sequence ou instance courante
@@ -1298,7 +1331,6 @@ function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
 
     return tmp_viol
 end
-
 
 # Fonction qui evalue la difference de EP si on effectu la reflection k,l
 # @param sequence_courante : la sequence ou instance courante
@@ -1404,20 +1436,11 @@ function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_o
     sequence_courante[l]=tmp
     # Mise à jour du tableau de violation et pbl :
     update_tab_violation_and_pbl_swap!(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
-    #a , b =evaluation_init(sequence_courante,ratio_option,Hprio)
-    #=
-    if (a[1]==aa[1]&&a[2]==aa[2]&& a[3]>aa[3])
-        #println(tmp_Hprio)
-        #println(aa)
-        #println(a)
-        return swapp
-    end=#
+
     return true
 
     nothing # Pas de return pour eviter les copies de memoire.
 end
-
-
 
 # Fontion qui evalue la difference de RAF si on effectu le swap k,l
 # @param sequence_courante : la sequence ou instance courante
@@ -1615,7 +1638,7 @@ function eval_Hprio_swap(sequence_courante::Array{Array{Int,1},1}, ratio_option:
             end
         end
     end
-    ##println(tmp_viol)
+    ###println(tmp_viol)
     return tmp_viol
 end
 
@@ -1634,91 +1657,116 @@ function update_tab_violation_and_pbl_swap!(sequence_courante::Array{Array{Int,1
 
 
     ## update des color k
-    if sequence_courante[k]!=sequence_courante[l]
+    if sequence_courante[k][2]!=sequence_courante[l][2]
 
-        if sequence_courante[l][szcar-1]==k
-            tmpk=k-1
-            col = sequence_courante[l][2]
-            while tmpk>=1 && sequence_courante[tmpk][2]==col
-                sequence_courante[tmpk][szcar-1]=k-1
-                tmpk-=1
+        if k> 1 && sequence_courante[k][2]==sequence_courante[k-1][2]
+            if sequence_courante[k][2]==sequence_courante[k+1][2]
+                for i in sequence_courante[k-1][szcar-2]:sequence_courante[k+1][szcar-1]
+                    sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
+                    sequence_courante[i][szcar-1] = sequence_courante[k+1][szcar-1]
+                end
+            else
+                for i in sequence_courante[k-1][szcar-2]:k
+                    sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
+                    sequence_courante[i][szcar-1] = k
+                end
+                if sequence_courante[l][2]==sequence_courante[k+1][2]
+                    for i in k+1:sequence_courante[k+1][szcar-1]
+                        sequence_courante[i][szcar-2] = k+1
+                        sequence_courante[i][szcar-1] = sequence_courante[k+1][szcar-1]
+                    end
+                end
             end
-        elseif sequence_courante[l][szcar-2]==k
-            tmpk=k+1
-            col = sequence_courante[l][2]
-            while tmpk<= sz &&  sequence_courante[tmpk][2]==col
-                sequence_courante[tmpk][szcar-2]=k+1
-                tmpk+=1
+        else
+            if sequence_courante[k][2]==sequence_courante[k+1][2]
+                for i in k:sequence_courante[k+1][szcar-1]
+                    sequence_courante[i][szcar-2] = k
+                    sequence_courante[i][szcar-1] = sequence_courante[k+1][szcar-1]
+                end
+                if k>1 && sequence_courante[l][2]==sequence_courante[k-1][2]
+                    for i in sequence_courante[k-1][szcar-2]:k-1
+                        sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
+                        sequence_courante[i][szcar-1] = k-1
+                    end
+                end
+            else
+                sequence_courante[k][szcar-2] = k
+                sequence_courante[k][szcar-1] = k
+                if k>1 && sequence_courante[l][2]==sequence_courante[k-1][2]
+                    for i in sequence_courante[k-1][szcar-2]:k-1
+                        sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
+                        sequence_courante[i][szcar-1] = k-1
+                    end
+                end
+                if sequence_courante[l][2]==sequence_courante[k+1][2]
+                    for i in k+1:sequence_courante[k+1][szcar-1]
+                        sequence_courante[i][szcar-2] = k+1
+                        sequence_courante[i][szcar-1] = sequence_courante[k+1][szcar-1]
+                    end
+                end
             end
         end
-        if sequence_courante[k][szcar-2]==l
-            tmpl=l+1
-            col = sequence_courante[k][2]
-            while tmpl<= sz &&sequence_courante[tmpl][2]==col
-                sequence_courante[tmpl][szcar-2]=l+1
-                tmpl+=1
+
+        if sequence_courante[l][2]==sequence_courante[l-1][2]
+            if l<sz && sequence_courante[l][2]==sequence_courante[l+1][2]
+                for i in sequence_courante[l-1][szcar-2]:sequence_courante[l+1][szcar-1]
+                    sequence_courante[i][szcar-2] = sequence_courante[l-1][szcar-2]
+                    sequence_courante[i][szcar-1] = sequence_courante[l+1][szcar-1]
+                end
+            else
+                for i in sequence_courante[l-1][szcar-2]:l
+                    sequence_courante[i][szcar-2] = sequence_courante[l-1][szcar-2]
+                    sequence_courante[i][szcar-1] = l
+                end
+                if  l<sz && sequence_courante[k][2]==sequence_courante[l+1][2]
+                    for i in l+1:sequence_courante[l+1][szcar-1]
+                        sequence_courante[i][szcar-2] = l+1
+                        sequence_courante[i][szcar-1] = sequence_courante[l+1][szcar-1]
+                    end
+                end
             end
-        elseif  sequence_courante[k][szcar-1]==l
-            tmpl=l-1
-            col = sequence_courante[k][2]
-            while tmpl>=1 && sequence_courante[tmpl][2]==col
-                sequence_courante[tmpl][szcar-1]=l-1
-                tmpl-=1
+        else
+            if  l<sz && sequence_courante[l][2]==sequence_courante[l+1][2]
+                for i in l:sequence_courante[l+1][szcar-1]
+                    sequence_courante[i][szcar-2] = l
+                    sequence_courante[i][szcar-1] = sequence_courante[l+1][szcar-1]
+                end
+                if sequence_courante[k][2]==sequence_courante[l-1][2]
+                    for i in sequence_courante[l-1][szcar-2]:l-1
+                        sequence_courante[i][szcar-2] = sequence_courante[l-1][szcar-2]
+                        sequence_courante[i][szcar-1] = l-1
+                    end
+                end
+            else
+                sequence_courante[l][szcar-2] = l
+                sequence_courante[l][szcar-1] = l
+                if sequence_courante[k][2]==sequence_courante[l-1][2]
+                    for i in sequence_courante[l-1][szcar-2]:l-1
+                        sequence_courante[i][szcar-2] = sequence_courante[l-1][szcar-2]
+                        sequence_courante[i][szcar-1] = l-1
+                    end
+                end
+                if l<sz && sequence_courante[k][2]==sequence_courante[l+1][2]
+                    for i in l+1:sequence_courante[l+1][szcar-1]
+                        sequence_courante[i][szcar-2] = l+1
+                        sequence_courante[i][szcar-1] = sequence_courante[l+1][szcar-1]
+                    end
+                end
             end
         end
 
-        ## update des color k
-        tmpkdeb=k
-        tmpkfin=k
-        while tmpkdeb>=1 &&(sequence_courante[k][2]==sequence_courante[tmpkdeb][2])
-            tmpkdeb-=1
-        end
-        tmpkdeb+=1
-        debk = tmpkdeb
-
-
-        while tmpkfin<=sz &&(sequence_courante[k][2]==sequence_courante[tmpkfin][2])
-            tmpkfin+=1
-        end
-        tmpkfin-=1
-        fink = tmpkfin
-
-        while tmpkfin>=debk
-            sequence_courante[tmpkfin][szcar-2]= tmpkdeb
-            sequence_courante[tmpkfin][szcar-1]= fink
-            tmpkfin-=1
-
-        end
-
-
-        ## update des color l
-        tmpldeb=l
-        tmplfin=l
-
-        while tmpldeb>=1 &&(sequence_courante[l][2]==sequence_courante[tmpldeb][2])
-            tmpldeb-=1
-        end
-        tmpldeb+=1
-        debl = tmpldeb
-
-        while tmplfin<=sz &&(sequence_courante[l][2]==sequence_courante[tmplfin][2])
-            tmplfin+=1
-        end
-        tmplfin-=1
-        finl = tmplfin
-        while tmplfin>=debl
-            sequence_courante[tmplfin][szcar-2]= tmpldeb
-            sequence_courante[tmplfin][szcar-1]= finl
-            tmplfin-=1
-        end
     else
-        tmp_fin_l = sequence_courante[l][szcar-1]
-        tmp_deb_l = sequence_courante[l][szcar-2]
-        sequence_courante[l][szcar-2]= sequence_courante[k][szcar-2]
-        sequence_courante[l][szcar-1]= sequence_courante[k][szcar-1]
-        sequence_courante[k][szcar-2]= tmp_deb_l
-        sequence_courante[k][szcar-1]= tmp_fin_l
+        tmpdeb =sequence_courante[l][szcar-2]
+        tmpfin =sequence_courante[l][szcar-1]
+        sequence_courante[l][szcar-2]=sequence_courante[k][szcar-2]
+        sequence_courante[l][szcar-1]=sequence_courante[k][szcar-1]
+        sequence_courante[k][szcar-2]=tmpdeb
+        sequence_courante[k][szcar-1]=tmpfin
     end
+
+
+
+
 
     ## update du tab_violation
     for i in 1:size(ratio_option)[1]
@@ -1741,8 +1789,6 @@ function update_tab_violation_and_pbl_swap!(sequence_courante::Array{Array{Int,1
         end
     end
 end
-
-
 
 # Fonction qui evalue la difference de EP si on effectu le swap k,l
 # @param sequence_courante : la sequence ou instance courante
@@ -1808,7 +1854,7 @@ end
 # @modify sequence_courante : la sequence courante est mise à jour
 function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     sz = size(sequence_courante)[1]
-
+    szcar = size(sequence_courante[1])[1]
     l = rand(5:15,1)[1]
 
 
@@ -1860,42 +1906,54 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, rati
 
     #aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
 
-    update_col_seq_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
     update_col_and_pbl_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
-    #a , b =evaluation_init(sequence_courante,ratio_option,Hprio)
+#=
+        col = sequence_courante[1][2]
+        deb = sequence_courante[1][szcar-2]
+        fin = sequence_courante[1][szcar-1]
+        for i in 1:1:size(sequence_courante)[1]
 
+            if col !=  sequence_courante[i][2]
+                col = sequence_courante[i][2]
+                if fin+1 != sequence_courante[i][szcar-2]
+                    for car in sequence_courante
+                        println(car)
+                    end
+                    println("k : ",k, " l : ", l)
+                    println(sequence_courante[k])
+                    println(sequence_courante[l])
+                    println(i)
+                    return FAUX
+                end
+                deb = sequence_courante[i][szcar-2]
+                fin = sequence_courante[i][szcar-1]
+            else
+                if fin != sequence_courante[i][szcar-1] || deb != sequence_courante[i][szcar-2]
+
+                    for car in sequence_courante
+                        println(car)
+                    end
+                    println("k : ",k, " l : ", l)
+                    println(sequence_courante[k])
+                    println(sequence_courante[l])
+                    return FAUXXXXX
+                end
+            end
+
+        end
+    #a , b =evaluation_init(sequence_courante,ratio_option,Hprio)
+=#
     #=
     if (a[1]==aa[1]&&a[2]==aa[2]&& a[3]>aa[3])
-        #println(tmp_Hprio)
-        #println(aa)
-        #println(a)
+        ##println(tmp_Hprio)
+        ##println(aa)
+        ##println(a)
         return shuffle
     end=#
 
     return true
-end
-
-function update_col_seq_shuffle(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},sequence::Array{Int,1},Hprio::Int,pbl::Int,k::Int,l::Int)
-    sz = size(sequence_courante)[1]
-    szcar =size(sequence_courante[1])[1]
-    if sequence_courante[k][szcar-1]==k
-        tmpk=k-1
-        col = sequence_courante[k][2]
-        while tmpk>=1 && sequence_courante[tmpk][2]==col
-            sequence_courante[tmpk][szcar-1]=k-1
-            tmpk-=1
-        end
-    end
-    if sequence_courante[k+l-1][szcar-2]==k+l-1
-        tmpk=k+l
-        col = sequence_courante[k+l-1][2]
-        while tmpk<=sz && sequence_courante[tmpk][2]==col
-            sequence_courante[tmpk][szcar-2]=k+l
-            tmpk+=1
-        end
-    end
 end
 
 # Sincerement j'ai la flemme de commenter ça # tqt je comprend xDD d
@@ -1942,6 +2000,20 @@ function update_col_and_pbl_shuffle(sequence_courante::Array{Array{Int,1},1},rat
         sequence_courante[tmpi][szcar-1]=fin
         tmpi-=1
     end
+
+    if k>1 && sequence_courante[k][2]!=sequence_courante[k-1][2] && k-1!=sequence_courante[k-1][szcar-1]
+        for i in sequence_courante[k-1][szcar-2]:k-1
+            sequence_courante[i][szcar-2]=sequence_courante[k-1][szcar-2]
+            sequence_courante[i][szcar-1]=k-1
+        end
+    end
+    if k+l-1<sz && sequence_courante[k+l-1][2]!=sequence_courante[k+l][2] && sequence_courante[k+l][szcar-2]!=k+l
+        for i in k+l:sequence_courante[k+l][szcar-1]
+            sequence_courante[i][szcar-2]=k+l
+            sequence_courante[i][szcar-1]=sequence_courante[k+l][szcar-1]
+        end
+    end
+
 end
 
 # Fonction qui reevalue les color et le tab_violation de la new sol
