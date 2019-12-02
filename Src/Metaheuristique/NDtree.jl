@@ -10,11 +10,17 @@
 # 3) Lecture de toutes les solutions inserees
 # solutions = get_solutions(NDtree)
 #
+# 4) Ploter les solutions
+# plot_pareto(solutions ; file_name = "instance") # Puis le graphique est enregistre dans "./Output/plots"
+#
+# 5) Enregistre les solutions dans un CSV
+# CSV_pareto(solutions ; file_name = "instance") # Enregistre dans "./Output/CSV"
+#
 
 # Le code est suffisament claire pour pouvoir etre compris avec l'article d'Andrzej Jaszkiewicz et de Thibaut Lust : "ND-Tree-based update: a Fast Algorithm for the Dynamic Non-Dominance Problem", 07/11/2017.
 
-const TAILLE_MAX_FEUILLE = Int32(10)
-const DEBBUG = true
+const TAILLE_MAX_FEUILLE = Int32(2)
+const DEBBUG = false
 
 function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real where U
     DEBBUG ? println("Tentative d'insertion de la solution : ", y, "\ndans la branche : ", som) : nothing
@@ -33,7 +39,7 @@ function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real whe
     return false
 end
 
-function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{U,1}, Array{T,1}}) where U where T <: Real
+function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{V,1}, Array{W,1}}) where U where V where T <: Real where W <: Real
     domination = true
     forte = false
     for i in 1:length(y1[2])
@@ -43,7 +49,7 @@ function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{U,1
     return  domination && forte
 end
 
-function domine(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{U,1}, Array{T,1}}) where U where T <: Real
+function domine(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{V,1}, Array{W,1}}) where U where V where T <: Real where W <: Real
     domination = true
     for i in 1:length(y1[2])
         domination &= y1[2][i] <= y2[2][i]
@@ -99,7 +105,7 @@ function insert!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real 
         DEBBUG ? println("Ajout de la solution a la feuille : ", som.val) : nothing
         append!(som.val[3], [y])
         DEBBUG ? println("La solution a ete ajoutee a la feuille : ", som.val) : nothing
-        maj_nadir_zenith!(som, y)
+        maj_nadir_ideal!(som, y)
         if length(som.val[3]) > TAILLE_MAX_FEUILLE
             DEBBUG ? println("La feuille et trop chargee, elle va etre decoupee en plusieurs autres feuilles.") : nothing
             split!(som)
@@ -143,7 +149,7 @@ function split!(som::Sommet)
     aj_suc!(som, (ideal(som), nadir(som), [y]))
     lambda = ys -> ys != y
     filter!(lambda, som.val[3])
-    maj_nadir_zenith!(som.succ[end], y)
+    maj_nadir_ideal!(som.succ[end], y)
     global TAILLE_MAX_FEUILLE
     nb_feuilles = Int32(floor(length(som.val[3])/TAILLE_MAX_FEUILLE))
     for i in 1:nb_feuilles # Il faut qu'il y ait suffisament de feuilles successeurs pour pouvoir y recaser toutes les solutions y.
@@ -152,7 +158,7 @@ function split!(som::Sommet)
         DEBBUG ? println("Ajout a la ", i+1, "-eme feuille de la solution ", y) : nothing
         local feuille = Sommet((ideal(som), nadir(som), [y]))
         aj_suc!(som, feuille)
-        maj_nadir_zenith!(feuille, y)
+        maj_nadir_ideal!(feuille, y)
         filter!(lambda, som.val[3]) # Le y du lambda pointe sur le y redfinit dans la boucle.
     end
     DEBBUG ? println("Repartition des solutions dans les nouvelles feuilles.") : nothing
@@ -162,7 +168,7 @@ function split!(som::Sommet)
         local feuille = som.succ[ipp]
         DEBBUG ? println("Deplacement de la solution : ", y, "\ndans la feuille : ", ipp) : nothing
         append!(feuille.val[3], [y])
-        maj_nadir_zenith!(feuille, y)
+        maj_nadir_ideal!(feuille, y)
     end
 end
 
@@ -188,7 +194,7 @@ function get_solutions(som::Sommet) where T
     return solutions
 end
 
-function maj_nadir_zenith!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real where U
+function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real where U
     DEBBUG ? println("Maj de l'ideal et du nadir dans le sommet : ", som) : nothing
     global DEBBUG
     drapeau = false
@@ -204,7 +210,7 @@ function maj_nadir_zenith!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where 
         end
     end
     if drapeau && !isempty(som.pred)
-        maj_nadir_zenith!(som.pred[1], y)
+        maj_nadir_ideal!(som.pred[1], y)
     end
     DEBBUG ? println("Maj terminee de l'ideal et du nadir dans le sommet : ", som) : nothing
 end
@@ -232,11 +238,13 @@ end
 
 function ideal(som::Sommet)
     if isempty(som)
-        return (Int32.([]), Int32.([0, 0, 0]))
+        return (Int32.([]), Int32.([1-2^31, 1-2^31+1, 1-2^31]))
     else
         return som.val[1]
     end
 end
+
+
 
 function test_domination()
     y1 = (zeros(0), [1,2,3])
@@ -292,8 +300,8 @@ end
 function test_NDtree()
     nb_obj = 3
     @time NDtree = Sommet()
-    @time y1 = ([rand(1:10) for i in 1:10], [1,2,3])
-    @time maj!(NDtree, y1)
+    @time y1 = (Int32.([rand(1:10) for i in 1:10]), Int32.([1,2,3]))
+    @assert maj!(NDtree, y1)
     @assert !isempty(NDtree)
     @assert isempty(NDtree.succ)
     @assert length(NDtree.val) == 3
@@ -303,8 +311,8 @@ function test_NDtree()
         @assert domine(ideal(NDtree), ys)
         @assert domine(ys, nadir(NDtree))
     end
-    @time y2 = ([rand(1:10) for i in 1:10], copy(y1[2]) - ones(typeof(y1[2][1]),length(y1[2])))
-    @time maj!(NDtree, y2)
+    @time y2 = (Int32.([rand(1:10) for i in 1:10]), copy(y1[2]) - ones(typeof(y1[2][1]),length(y1[2])))
+    @assert maj!(NDtree, y2)
     @assert isempty(NDtree.succ)
     @assert length(NDtree.val[3]) == 1
     @assert NDtree.val[3][1] == y2
@@ -317,7 +325,7 @@ function test_NDtree()
     y3 = deepcopy(y2)
     y3[2][1] += 1
     y3[2][2] -= 1
-    @time maj!(NDtree, y3)
+    @assert maj!(NDtree, y3)
     @assert isempty(NDtree.succ)
     @assert length(NDtree.val[3]) == 2
     @assert NDtree.val[3][2] == y3
@@ -331,7 +339,7 @@ function test_NDtree()
     y4 = deepcopy(y3)
     y4[2][1] += 1
     y4[2][2] -= 1
-    @time maj!(NDtree, y4)
+    @assert maj!(NDtree, y4)
     @assert !isempty(NDtree.succ)
     @assert length(NDtree.succ) == 2
     display(NDtree.val)
@@ -383,4 +391,100 @@ function test_NDtree()
     @assert !drapeau
 
     @time solutions = get_solutions(NDtree)
+
+    pareto = get_solutions(NDtree)
+
+    x = [ys[2][1] for ys in pareto]
+    y = [ys[2][2] for ys in pareto]
+    z = [ys[2][3] for ys in pareto]
+
+    scatter(x, y, z, xlabel = "RAF", ylabel = "EP", zlabel = "ENP")
+    try
+        mkdir("./Plots")
+    catch
+        nothing
+    end
+    savefig("./Plots/plot1.png")
+
+    directory = "./Output/CSV"
+    try
+        mkdir(directory)
+    catch
+        nothing
+    end
+    df = DataFrame(pareto)
+    names!(df, [:Obj, :Solution])
+    file_name = "instance1"
+    CSV.write(directory * "/" * file_name * ".csv", df, writeheader=true)
+    CSV_pareto(pareto)
+    plot_pareto(pareto)
+end
+
+try
+    using Plots
+catch
+    using Pkg
+    Pkg.add("Plots")
+    using Plots
+finally
+    pyplot()
+end
+
+try
+    mkdir("./Output")
+catch
+    nothing
+end
+
+# Fonction qui plot une archive de Pareto et l'enregistre
+# @param pareto : l'archive de Pareto
+# @param file_name : nom du fichier (de l'instance par exemple)
+# @param directory : dossier ou est enregistrer le graphique
+function plot_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}},1} ; xlabel::String = "RAF", ylabel::String = "EP", zlabel::String = "ENP", directory::String = "./Output/plots/", file_name::String = "instance") where U where T <: Number
+    if !isempty(pareto)
+        try
+            mkdir(directory)
+        catch
+            nothing
+        end
+        x = [ys[2][1] for ys in pareto]
+        y = [ys[2][2] for ys in pareto]
+        z = [ys[2][3] for ys in pareto]
+        scatter(x, y, z, xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
+        nb_plots = length(readdir(directory))
+        savefig(directory * "/" * file_name * ".png")
+    end
+end
+
+try
+    using CSV
+catch
+    using Pkg
+    Pkg.add("CSV")
+    using CSV
+end
+
+try
+    using DataFrames
+catch
+    using Pkg
+    Pkg.add("DataFrames")
+    using DataFrames
+end
+
+# Fonction qui enregistre une archive de Pareto dans un fichier CSV
+# @param pareto : l'archive de Pareto
+# @param file_name : nom du fichier (de l'instance par exemple)
+# @param directory : dossier ou est enregistrer le .csv
+function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}},1} ; file_name::String = "instance", directory::String = "./Output/CSV") where U where T <: Number
+    if !isempty(pareto)
+        try
+            mkdir(directory)
+        catch
+            nothing
+        end
+        df = DataFrame(pareto)
+        names!(df, [:Obj, :Solution])
+        CSV.write(directory * "/" * file_name * ".csv", df, writeheader=true)
+    end
 end
