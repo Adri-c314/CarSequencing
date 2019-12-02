@@ -146,7 +146,7 @@ function split!(som::Sommet)
     global DEBBUG
     DEBBUG ? println("Decoupage du sommet en plusieurs feuilles.") : nothing
     y = y_le_plus_eloigne(som.val[3])
-    aj_suc!(som, (ideal(som), nadir(som), [y]))
+    aj_suc!(som, (deepcopy(y), deepcopy(y), [y]))
     lambda = ys -> ys != y
     filter!(lambda, som.val[3])
     maj_nadir_ideal!(som.succ[end], y)
@@ -156,7 +156,7 @@ function split!(som::Sommet)
         DEBBUG ? println("Creation d'une ", i+1, "-eme feuille.") : nothing
         y = y_le_plus_eloigne2(y, som)
         DEBBUG ? println("Ajout a la ", i+1, "-eme feuille de la solution ", y) : nothing
-        local feuille = Sommet((ideal(som), nadir(som), [y]))
+        local feuille = Sommet((deepcopy(y), deepcopy(y), [y]))
         aj_suc!(som, feuille)
         maj_nadir_ideal!(feuille, y)
         filter!(lambda, som.val[3]) # Le y du lambda pointe sur le y redfinit dans la boucle.
@@ -243,8 +243,6 @@ function ideal(som::Sommet)
         return som.val[1]
     end
 end
-
-
 
 function test_domination()
     y1 = (zeros(0), [1,2,3])
@@ -374,16 +372,19 @@ function test_NDtree()
     @assert y5 in get_solutions(NDtree)
     @assert !isempty(NDtree.succ)
     @assert length(NDtree.succ) == 2
-    noeud1 = NDtree.succ[1]
+    feuille1 = NDtree.succ[1]
     feuille2 = NDtree.succ[2]
-    feuille1 = noeud1.succ[1]
-    feuille3 = noeud1.succ[2]
     @assert length(feuille2.val[3]) <= TAILLE_MAX_FEUILLE && isempty(feuille2.succ)
-    @assert isempty(noeud1.val[3]) && !isempty(noeud1.succ)
-    @assert length(noeud1.succ) == 2
-    @assert length(feuille1.val[3]) + length(feuille3.val[3]) == 3
-    @assert isempty(feuille1.succ) && isempty(feuille3.succ)
-    @assert length(noeud1.pred) == 1 && length(feuille1.pred) == 1 && length(feuille2.pred) == 1 && length(feuille3.pred) == 1
+    @assert length(feuille1.val[3]) <= TAILLE_MAX_FEUILLE && isempty(feuille1.succ)
+    @assert length(feuille1.val[3]) + length(feuille2.val[3]) == 4
+    display(ideal(feuille1))
+    display(ideal(feuille2))
+    display(ideal(noeud1))
+    display(nadir(NDtree))
+    display(nadir(feuille1))
+    display(nadir(feuille2))
+    display(nadir(noeud1))
+    display(nadir(NDtree))
 
     y6 = deepcopy(y5)
     y5[2][1] += 1
