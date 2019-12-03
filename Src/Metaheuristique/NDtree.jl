@@ -22,12 +22,12 @@
 const TAILLE_MAX_FEUILLE = Int32(2)
 const DEBBUG = false
 
-function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real where U
+function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
     DEBBUG ? println("Tentative d'insertion de la solution : ", y, "\ndans la branche : ", som) : nothing
     global DEBBUG
     if isempty(som)
         DEBBUG ? println("Ajout de l'unique solution a la racine.") : nothing
-        som.val = (ideal(som), nadir(som), [y])
+        som.val = (deepcopy(ideal(som)), deepcopy(nadir(som)), [y])
         return true
     else
         if maj_sommet!(som, y)
@@ -39,7 +39,7 @@ function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real whe
     return false
 end
 
-function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{V,1}, Array{W,1}}) where U where V where T <: Real where W <: Real
+function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{V,1}, Array{W,1}, Q}) where U where V where Q where T <: Real where W <: Real
     domination = true
     forte = false
     for i in 1:length(y1[2])
@@ -49,7 +49,7 @@ function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{V,1
     return  domination && forte
 end
 
-function domine(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{V,1}, Array{W,1}}) where U where V where T <: Real where W <: Real
+function domine(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{V,1}, Array{W,1}, Q}) where U where V where Q where T <: Real where W <: Real
     domination = true
     for i in 1:length(y1[2])
         domination &= y1[2][i] <= y2[2][i]
@@ -57,7 +57,7 @@ function domine(y1::Tuple{Array{U,1}, Array{T,1}}, y2::Tuple{Array{V,1}, Array{W
     return  domination
 end
 
-function maj_sommet!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real where U
+function maj_sommet!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
     global DEBBUG
     if domine(som.val[2], y)
         DEBBUG ? println("La solution est dominee par le nadir local : ", som.val[2]) : nothing
@@ -98,7 +98,7 @@ function maj_sommet!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: R
     return true
 end
 
-function insert!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real where U
+function insert!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
     global DEBBUG
     global TAILLE_MAX_FEUILLE
     if isempty(som.succ)
@@ -117,7 +117,7 @@ function insert!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real 
     end
 end
 
-function y_le_plus_eloigne(liste::Array{Tuple{Array{U,1}, Array{T,1}},1}) where T <:Real where U
+function y_le_plus_eloigne(liste::Array{Tuple{Array{U,1}, Array{T,1}, Q},1}) where T <:Real where U where Q
     dist = zeros(length(liste))
     for i in 1:length(liste)
         for j in i+1:length(liste)
@@ -129,7 +129,7 @@ function y_le_plus_eloigne(liste::Array{Tuple{Array{U,1}, Array{T,1}},1}) where 
     return liste[argmax(dist)]
 end
 
-function y_le_plus_eloigne2(y::Tuple{Array{U,1}, Array{T,1}}, som::Sommet)  where T <: Real where U
+function y_le_plus_eloigne2(y::Tuple{Array{U,1}, Array{T,1}, Q}, som::Sommet)  where T <: Real where U where Q
     dist = zeros(sum([length(suc.val[3]) for suc in som.succ]))
     I = 0
     for suc in som.succ
@@ -146,7 +146,7 @@ function split!(som::Sommet)
     global DEBBUG
     DEBBUG ? println("Decoupage du sommet en plusieurs feuilles.") : nothing
     y = y_le_plus_eloigne(som.val[3])
-    aj_suc!(som, (deepcopy(y), deepcopy(y), [y]))
+    aj_suc!(som, ((Int32.([]), copy(y[2]), Int32.([])), (Int32.([]), copy(y[2]), Int32.([])), [y]))
     lambda = ys -> ys != y
     filter!(lambda, som.val[3])
     maj_nadir_ideal!(som.succ[end], y)
@@ -156,7 +156,7 @@ function split!(som::Sommet)
         DEBBUG ? println("Creation d'une ", i+1, "-eme feuille.") : nothing
         y = y_le_plus_eloigne2(y, som)
         DEBBUG ? println("Ajout a la ", i+1, "-eme feuille de la solution ", y) : nothing
-        local feuille = Sommet((deepcopy(y), deepcopy(y), [y]))
+        local feuille = Sommet(((Int32.([]), copy(y[2]), Int32.([])), (Int32.([]), copy(y[2]), Int32.([])), [y]))
         aj_suc!(som, feuille)
         maj_nadir_ideal!(feuille, y)
         filter!(lambda, som.val[3]) # Le y du lambda pointe sur le y redfinit dans la boucle.
@@ -183,7 +183,7 @@ function profondeur(som::Sommet, solutions::Array{T,1}) where T
 end
 
 function get_solutions(som::Sommet) where T
-    solutions = Array{Tuple{Array{Int32,1}, Array{Int32,1}},1}(undef,0)
+    solutions = Array{Tuple{Array{Int32,1}, Array{Int32,1}, Any},1}(undef,0)
     if isempty(som.succ)
         append!(solutions, som.val[3])
     else
@@ -194,18 +194,19 @@ function get_solutions(som::Sommet) where T
     return solutions
 end
 
-function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T <: Real where U
+function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
     DEBBUG ? println("Maj de l'ideal et du nadir dans le sommet : ", som) : nothing
     global DEBBUG
     drapeau = false
     if !domine(som.val[1], y)
         drapeau = true
-        for i in 1:length(y)
+        for i in 1:length(y[2])
             som.val[1][2][i] = min(som.val[1][2][i], y[2][i])
         end
-    elseif !domine(y, som.val[2])
+    end
+    if !domine(y, som.val[2])
         drapeau = true
-        for i in 1:length(y)
+        for i in 1:length(y[2])
             som.val[2][2][i] = max(som.val[2][2][i], y[2][i])
         end
     end
@@ -215,7 +216,7 @@ function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}}) where T
     DEBBUG ? println("Maj terminee de l'ideal et du nadir dans le sommet : ", som) : nothing
 end
 
-function suc_le_plus_proche(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}},) where T <: Real where U
+function suc_le_plus_proche(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q},) where T <: Real where U where Q
     ipp = 1
     dpp = sum(y[2].*(som.succ[1].val[1][2]+som.succ[1].val[2][2])) # Calcul de la distance de y par rapport au baricentre de l'ideal et du nadir
     for i in 2:length(som.succ)
@@ -230,7 +231,7 @@ end
 
 function nadir(som::Sommet)
     if isempty(som)
-        return (Int32.([]), Int32.([2^31-1, 2^31-1, 2^31-1]))
+        return (Int32.([]), Int32.([2^31-1, 2^31-1, 2^31-1]), Int32.([]))
     else
         return som.val[2]
     end
@@ -238,59 +239,59 @@ end
 
 function ideal(som::Sommet)
     if isempty(som)
-        return (Int32.([]), Int32.([1-2^31, 1-2^31+1, 1-2^31]))
+        return (Int32.([]), Int32.([1-2^31, 1-2^31+1, 1-2^31]), Int32.([]))
     else
         return som.val[1]
     end
 end
 
 function test_domination()
-    y1 = (zeros(0), [1,2,3])
-    y2 = (zeros(0), [1,2,3])
+    y1 = (zeros(0), [1,2,3], [])
+    y2 = (zeros(0), [1,2,3], [])
     @assert domine(y1, y2)
     @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [1,2,3])
-    y2 = (zeros(0), [2,2,3])
-    @assert domine(y1, y2)
-    @assert domine_fortement(y1,y2)
-    y1 = (zeros(0), [2,2,3])
-    y2 = (zeros(0), [1,2,3])
-    @assert !domine(y1, y2)
-    @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [1,2,3])
-    y2 = (zeros(0), [1,2,2])
-    @assert !domine(y1, y2)
-    @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [1,2,3])
-    y2 = (zeros(0), [1,1,3])
-    @assert !domine(y1, y2)
-    @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [2,2,3])
-    y2 = (zeros(0), [1,1,3])
-    @assert !domine(y1, y2)
-    @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [2,2,3])
-    y2 = (zeros(0), [1,1,1])
-    @assert !domine(y1, y2)
-    @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [0,1,2])
-    y2 = (zeros(0), [1,0,2])
-    @assert !domine(y1, y2)
-    @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [1,2,2])
-    y2 = (zeros(0), [1,2,3])
+    y1 = (zeros(0), [1,2,3], [])
+    y2 = (zeros(0), [2,2,3], [])
     @assert domine(y1, y2)
     @assert domine_fortement(y1,y2)
-    y1 = (zeros(0), [1,1,3])
-    y2 = (zeros(0), [2,2,3])
-    @assert domine(y1, y2)
-    @assert domine_fortement(y1,y2)
-    y1 = (zeros(0), [2,1,1])
-    y2 = (zeros(0), [1,2,3])
+    y1 = (zeros(0), [2,2,3], [])
+    y2 = (zeros(0), [1,2,3], [])
     @assert !domine(y1, y2)
     @assert !domine_fortement(y1,y2)
-    y1 = (zeros(0), [1,1,1])
-    y2 = (zeros(0), [1,2,3])
+    y1 = (zeros(0), [1,2,3], [])
+    y2 = (zeros(0), [1,2,2], [])
+    @assert !domine(y1, y2)
+    @assert !domine_fortement(y1,y2)
+    y1 = (zeros(0), [1,2,3], [])
+    y2 = (zeros(0), [1,1,3], [])
+    @assert !domine(y1, y2)
+    @assert !domine_fortement(y1,y2)
+    y1 = (zeros(0), [2,2,3], [])
+    y2 = (zeros(0), [1,1,3], [])
+    @assert !domine(y1, y2)
+    @assert !domine_fortement(y1,y2)
+    y1 = (zeros(0), [2,2,3], [])
+    y2 = (zeros(0), [1,1,1], [])
+    @assert !domine(y1, y2)
+    @assert !domine_fortement(y1,y2)
+    y1 = (zeros(0), [0,1,2], [])
+    y2 = (zeros(0), [1,0,2], [])
+    @assert !domine(y1, y2)
+    @assert !domine_fortement(y1,y2)
+    y1 = (zeros(0), [1,2,2], [])
+    y2 = (zeros(0), [1,2,3], [])
+    @assert domine(y1, y2)
+    @assert domine_fortement(y1,y2)
+    y1 = (zeros(0), [1,1,3], [])
+    y2 = (zeros(0), [2,2,3], [])
+    @assert domine(y1, y2)
+    @assert domine_fortement(y1,y2)
+    y1 = (zeros(0), [2,1,1], [])
+    y2 = (zeros(0), [1,2,3], [])
+    @assert !domine(y1, y2)
+    @assert !domine_fortement(y1,y2)
+    y1 = (zeros(0), [1,1,1], [])
+    y2 = (zeros(0), [1,2,3], [])
     @assert domine(y1, y2)
     @assert domine_fortement(y1,y2)
 end
@@ -298,7 +299,7 @@ end
 function test_NDtree()
     nb_obj = 3
     @time NDtree = Sommet()
-    @time y1 = (Int32.([rand(1:10) for i in 1:10]), Int32.([1,2,3]))
+    @time y1 = (Int32.([rand(1:10) for i in 1:10]), Int32.([1,2,3]), [])
     @assert maj!(NDtree, y1)
     @assert !isempty(NDtree)
     @assert isempty(NDtree.succ)
@@ -309,7 +310,7 @@ function test_NDtree()
         @assert domine(ideal(NDtree), ys)
         @assert domine(ys, nadir(NDtree))
     end
-    @time y2 = (Int32.([rand(1:10) for i in 1:10]), copy(y1[2]) - ones(typeof(y1[2][1]),length(y1[2])))
+    @time y2 = (Int32.([rand(1:10) for i in 1:10]), copy(y1[2]) - ones(typeof(y1[2][1]),length(y1[2])), [])
     @assert maj!(NDtree, y2)
     @assert isempty(NDtree.succ)
     @assert length(NDtree.val[3]) == 1
@@ -376,14 +377,12 @@ function test_NDtree()
     feuille2 = NDtree.succ[2]
     @assert length(feuille2.val[3]) <= TAILLE_MAX_FEUILLE && isempty(feuille2.succ)
     @assert length(feuille1.val[3]) <= TAILLE_MAX_FEUILLE && isempty(feuille1.succ)
-    @assert length(feuille1.val[3]) + length(feuille2.val[3]) == 4
+    @assert length(feuille1.val[3]) + length(feuille2.val[3])  == 4
     display(ideal(feuille1))
     display(ideal(feuille2))
-    display(ideal(noeud1))
     display(nadir(NDtree))
     display(nadir(feuille1))
     display(nadir(feuille2))
-    display(nadir(noeud1))
     display(nadir(NDtree))
 
     y6 = deepcopy(y5)
@@ -413,10 +412,6 @@ function test_NDtree()
     catch
         nothing
     end
-    df = DataFrame(pareto)
-    names!(df, [:Obj, :Solution])
-    file_name = "instance1"
-    CSV.write(directory * "/" * file_name * ".csv", df, writeheader=true)
     CSV_pareto(pareto)
     plot_pareto(pareto)
 end
@@ -441,7 +436,7 @@ end
 # @param pareto : l'archive de Pareto
 # @param file_name : nom du fichier (de l'instance par exemple)
 # @param directory : dossier ou est enregistrer le graphique
-function plot_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}},1} ; xlabel::String = "RAF", ylabel::String = "EP", zlabel::String = "ENP", directory::String = "./Output/plots/", file_name::String = "instance") where U where T <: Number
+function plot_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; xlabel::String = "RAF", ylabel::String = "EP", zlabel::String = "ENP", directory::String = "./Output/plots/", file_name::String = "instance", verbose::Bool = true) where U where Q where T <: Number
     if !isempty(pareto)
         try
             mkdir(directory)
@@ -454,6 +449,10 @@ function plot_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}},1} ; xlabel::St
         scatter(x, y, z, xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
         nb_plots = length(readdir(directory))
         savefig(directory * "/" * file_name * ".png")
+        if verbose
+            println("   ----------------------------------")
+            println("   Enregistrement du plot de Pareto dans : ", directory * "/" * file_name * ".png" )
+        end
     end
 end
 
@@ -477,7 +476,7 @@ end
 # @param pareto : l'archive de Pareto
 # @param file_name : nom du fichier (de l'instance par exemple)
 # @param directory : dossier ou est enregistrer le .csv
-function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}},1} ; file_name::String = "instance", directory::String = "./Output/CSV") where U where T <: Number
+function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; file_name::String = "instance", directory::String = "./Output/CSV", verbose::Bool = true) where U where Q where T <: Number
     if !isempty(pareto)
         try
             mkdir(directory)
@@ -485,7 +484,14 @@ function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}},1} ; file_name::
             nothing
         end
         df = DataFrame(pareto)
-        names!(df, [:Obj, :Solution])
+        names!(df, [:Solution, :Obj, :Ctr])
         CSV.write(directory * "/" * file_name * ".csv", df, writeheader=true)
+        if verbose
+            println("   ----------------------------------")
+            println("   Enregistrement de l'ensemble de Pareto dans : ", directory * "/" * file_name * ".csv" )
+        end
     end
 end
+
+#test_domination()
+#test_NDtree()

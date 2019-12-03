@@ -25,7 +25,7 @@
 # @modify ::Array{Array{Array{Int,1},1},1} : L'enfant applique la mutation sur l'enfant
 function mutation!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, inst::Instance, temps_mutation::Float64 = 0.1, verbose::Bool = false, txtoutput::Bool = false)
 
-    # Initialisation 
+    # Initialisation
     obj = generateObj(objectif, inst)
     sz = size(enfant[1])[1]
     szcar = size(enfant[1][1])[1]
@@ -37,8 +37,8 @@ function mutation!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, ins
     if verbose
         println("1) Information sur les données :")
         println("   ---------------------------")
-        println("Nombre d'options prioritaires : ", Hprio)
-        println("PAINT_BATCH_LIMIT : ", pbl)
+        println("Nombre d'options prioritaires : ", inst.Hprio)
+        println("PAINT_BATCH_LIMIT : ", inst.pbl)
         println("Nombre de vehicules : ", sz)
         println("\n\n\n")
     end
@@ -46,8 +46,8 @@ function mutation!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, ins
     if txtoutput
         txt = string(txt, "1) Information sur l'instance :\n",
                 "   ----------------------------\n",
-                "Nombre d'options prioritaires : ", Hprio, "\n",
-                "PAINT_BATCH_LIMIT : ", pbl, "\n",
+                "Nombre d'options prioritaires : ", inst.Hprio, "\n",
+                "PAINT_BATCH_LIMIT : ", inst.pbl, "\n",
                 "Nombre de vehicules : ", sz, "\n",
                 "\n\n\n")
     end
