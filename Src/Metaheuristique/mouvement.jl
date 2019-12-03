@@ -190,12 +190,6 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
         l = k
         k = tmp
     end
-    oui = sequence_courante[k][2]!=sequence_courante[l][2]
-    if oui
-        ###println(k)
-        ###println(l)
-    end
-
     seq = [i for i in k:l-1]
     prepend!(seq,l)
     update_tab_violation_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
