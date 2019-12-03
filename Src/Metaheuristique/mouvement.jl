@@ -24,7 +24,7 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion!# || LSfoo! == :swap! || LSfoo! == :reflection! || LSfoo! == :shuffle!
+    if LSfoo! == :insertion! ||LSfoo! == :swap! || LSfoo! == :reflection! || LSfoo! == :shuffle!
         return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
     end
     return false
@@ -182,29 +182,6 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
         end
         # Si ça n'ameliore pas alors on fait rien
         if !cond
-            aa =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
-            seq = [i for i in k:l-1]
-            prepend!(seq,l)
-            tmp_tab_violation=deepcopy(tab_violation)
-            update_tab_violation_fi(sequence_courante,ratio_option,tmp_tab_violation,Hprio,pbl,k,l)
-            splice!(sequence_courante,(k):(l),sequence_courante[seq])
-            a =evaluation(sequence_courante,tmp_tab_violation,ratio_option,Hprio)
-            if a[2]<aa[2]||(a[2]==aa[2]&& a[1]<aa[1])
-                #println(tmp_Hprio)
-                #println(tmp_color)
-                #println(aa)
-                #println(a)
-
-                #println("faux negatif")
-                #=for i in k-10:l+10
-                    println(sequence_courante[i])
-                end
-                println("k : ", k," l : ",l)
-                return tamerelachienne=#
-            end
-            seq = [i+1 for i in k:l-1]
-            append!(seq,k)
-            splice!(sequence_courante,(k):(l),sequence_courante[seq])
             return false
         end
     end
@@ -219,26 +196,26 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
         ###println(k)
         ###println(l)
     end
-    aa =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
+
     seq = [i for i in k:l-1]
     prepend!(seq,l)
     update_tab_violation_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l),sequence_courante[seq])
     # Mise à jour du tableau de violation et pbl :
     update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
-    a =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
-    if (tmp_color<0&& a[1]>aa[1])
+    #=a =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
+    if a[2]>aa[2]
         println(tmp_Hprio)
         println(tmp_color)
         println(aa)
         println(a)
         println("faux positif")
-        for i in k-1:l+1
+        for i in k-10:l+10
             println(sequence_courante[i])
         end
         println("k : ", k," l : ",l)
         return tamerepute
-    end
+    end=#
     return true
     nothing
 end
@@ -252,20 +229,15 @@ end
 # @param l : l'indice de l (avec k<l)
 # @return ::Int : la dif de Hprio violé
 function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
-    if k>l
-        tmp = k
-        k=l
-        l=tmp
-    end
-    #println("______________________")
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
     for i in 1:Hprio
-        #=if k+ratio_option[i][2]-1<l
-            tmp_viol += tab_violation[i][k+ratio_option[i][2]-1]-tab_violation[i][l]
-        end=#
-        for j in k:min(l-1,k+ratio_option[i][2]-1)
 
+        if k+ratio_option[i][2]-1<l# && tab_violation[i][l]>=0
+            tmp_viol += max(0,tab_violation[i][k+ratio_option[i][2]-1])-max(0,tab_violation[i][l])
+        end
+
+        for j in k:min(l-1,k+ratio_option[i][2]-1)
             if sequence_courante[l][i+2]!=sequence_courante[j][i+2]
                 if sequence_courante[l][i+2]==1
                     if tab_violation[i][j]>=0
@@ -281,7 +253,6 @@ function eval_Hprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Ar
         end
         #println("l")
         for j in l+1:min(sz,l+ratio_option[i][2]-1)
-
             if j-ratio_option[i][2]+1>k
                 if sequence_courante[l][i+2]!=sequence_courante[j-ratio_option[i][2]][i+2]
                     if sequence_courante[l][i+2]==1
@@ -310,11 +281,6 @@ end
 # @param l : l'indice de l (avec k<l)
 # @return ::Int : la dif de Hprio violé
 function eval_Hprio_bi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
-    if k>l
-        tmp = k
-        k=l
-        l=tmp
-    end
 
     sz = size(sequence_courante)[1]
     tmp_viol=0
@@ -460,42 +426,46 @@ end
 # @param l : l'indice de l (avec k<l)
 # @return Int : le nombre de ENP de difference
 function eval_Lprio_fi(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
-    if k>l
-        tmp = k
-        k=l
-        l=tmp
-    end
-
     sz = size(sequence_courante)[1]
     tmp_viol=0 ##sorry pour ce nom xD
-    for i in Hprio+1:size(ratio_option)[1]
+    for i in 1+Hprio:size(ratio_option)[1]
 
-        for j in k:min(l,k+ratio_option[i][2]-1)
-            if sequence_courante[l][i+2]==1 && sequence_courante[j][i+2]==0
-                if tab_violation[i][j]>=0
-                    tmp_viol+=1
-                end
-            elseif sequence_courante[l][i+2]==0 && sequence_courante[j][i+2]==1
-                if tab_violation[i][j]>0
-                    tmp_viol-=1
-                end
-            end
+        if k+ratio_option[i][2]-1<l# && tab_violation[i][l]>=0
+            tmp_viol += max(0,tab_violation[i][k+ratio_option[i][2]-1])-max(0,tab_violation[i][l])
         end
 
-        for j in l+1:min(sz,l+ratio_option[i][2]-1)
-            if j-ratio_option[i][2]+1>k
-                if sequence_courante[l][i+2]==1 && sequence_courante[j-ratio_option[i][2]][i+2]==0
-                    if tab_violation[i][j]>0
-                        tmp_viol-=1
-                    end
-                elseif sequence_courante[l][i+2]==0 && sequence_courante[j-ratio_option[i][2]][i+2]==1
+        for j in k:min(l-1,k+ratio_option[i][2]-1)
+            if sequence_courante[l][i+2]!=sequence_courante[j][i+2]
+                if sequence_courante[l][i+2]==1
                     if tab_violation[i][j]>=0
                         tmp_viol+=1
                     end
                 end
+                if sequence_courante[l][i+2]==0
+                     if tab_violation[i][j]>0
+                         tmp_viol-=1
+                     end
+                end
+            end
+        end
+        #println("l")
+        for j in l+1:min(sz,l+ratio_option[i][2]-1)
+            if j-ratio_option[i][2]+1>k
+                if sequence_courante[l][i+2]!=sequence_courante[j-ratio_option[i][2]][i+2]
+                    if sequence_courante[l][i+2]==1
+                        if tab_violation[i][j]>0
+                            tmp_viol-=1
+                        end
+                    elseif sequence_courante[l][i+2]==0
+                        if tab_violation[i][j]>=0
+                            tmp_viol+=1
+                        end
+                    end
+                end
             end
         end
     end
+    #println(tmp_viol)
     return tmp_viol
 end
 
