@@ -2,11 +2,11 @@
 
 try
     mutable struct Sommet
-       pred::Array{Sommet}
+      pred::Array{Sommet}
       succ::Array{Sommet}
-        val::T where T
+      val::T where T
       Sommet(T::Type = Int32) = new(Array{Sommet}(undef,0), Array{Sommet}(undef,0), zero(T))
-       Sommet(val::T = Int32(0)) where T = new(Array{Sommet}(undef,0), Array{Sommet}(undef,0), val)
+      Sommet(val::T = Int32(0)) where T = new(Array{Sommet}(undef,0), Array{Sommet}(undef,0), val)
       Sommet(pred::Array{Sommet} = Array{Sommet}(undef,0), succ::Array{Sommet} = Array{Sommet}(undef,0), val::T = Int32(0)) where T = new(pred, succ, val)
     end
 catch
