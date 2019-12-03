@@ -50,21 +50,19 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         println("Budjet de calcule pour la phase initiale commune : ", temps_init, " secondes")
         println("Budjet de calcule pour chacune des 3 phase 1 : ", temps_phase1, " secondes")
         println("Budjet de calcule pour chacune des 6 phase suivantes : ", temps_phaseAutres, " secondes")
-        println("Budjet de calcule pour chacune des ", nbSol-6, " solutions non elites : ", temps_popNonElite, " secondes")
+        println("Budjet de calcule pour chacune des ", nbSol-7, " solutions non elites : ", temps_popNonElite, " secondes")
         println("\n\n\n")
     end
 
-    # Realisation des amélioration selon EP :
-    #ameliorationEP(temps_phase1)
+    # TODO : add les 7 sol elites dans la pop
 
-    # Réalisation des amelioration selon RAF :
-    #ameliorationRAF(temps_phase1)
+    # Création des nbSol
+    for i in 8:nbSol
+        # Création de l'odre des obj pour cette instance :
+        obj = shuffle(MersenneTwister(1234), Vector(1:3))
 
-    # Realisation des amelioration selon ENP :
-    #ameliorationENP(temps_phase1)
-
-    for i in 1:nbSol
-        push!(population, [copy(sequence_meilleure), copy(tab_violation), [copy(score_meilleur)]])
+        # Ajout de l'elmt dans la pop
+        push!(population, VFLS_genetic(sequence_meilleure, tab_violation, score_meilleur, obj, inst, temps_popNonElite))
     end
 
     return population, inst
