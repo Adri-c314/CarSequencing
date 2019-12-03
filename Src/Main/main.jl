@@ -20,7 +20,7 @@ Random.seed!(10)
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function main(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 60.0)
+function main(ir::Array{Tuple{String,String},1} = [("A", "024_38_3_EP_ENP_RAF")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -55,7 +55,7 @@ function main(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],
                 end
                 txt = string(txt,"===================================================\n\n")
                 txt = string(txt, seqToCSV(sol))
-                writedlm(string(path,i[2],"_",length_windows,".txt"), score)
+                writedlm(string(path,i[1],"_",i[2],".txt"), score)
             end
             if verbose
                 println(string("==================================================="))

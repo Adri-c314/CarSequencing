@@ -123,7 +123,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
 
 
-
+            #=
             a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
 
             for o in 1:size(b)[1]
@@ -133,6 +133,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
                     end
                 end
             end
+            =#
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
             if verbose
                 if (time()-debut)>(n/50)*temps_max*(timeOPT[Phase]/100)
