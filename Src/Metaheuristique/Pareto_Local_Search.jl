@@ -2,7 +2,7 @@
 # Necessite une population de base pour commencer (par exemple celle du genetique).
 
 # Pareto Local Search
-function PLS(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_moove::Flaot64 = temps_max/1000., verbose::Bool = true)
+function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_moove::Float64 = temps_max/1000., verbose::Bool = true)
     println("   ------------------------------------")
     println("   Lancement de la Pareto Local Search pour : ", temps_max, " s")
     debut = time()
@@ -34,7 +34,7 @@ function PLS(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_m
     end
 end
 
-function recherche_locale!(y::Tuple{Array{U,1}, Array{T,1}, Q}, inst::Instance, nb::Int, nb_effective::Int, temps_1_moove::Flaot64)  where T <: Real where U where Q
+function recherche_locale!(y::Tuple{Array{U,1}, Array{T,1}, Q}, inst::Instance, nb::Int, nb_effective::Int, temps_1_moove::Float64)  where T <: Real where U where Q
     Phase = rand(1:3)
     obj = [rand(1:3) for i in 1:3]
     timeOPT, opt = phases_init(obj)
@@ -44,4 +44,8 @@ function recherche_locale!(y::Tuple{Array{U,1}, Array{T,1}, Q}, inst::Instance, 
         effect = global_mouvement!(f_mouv, y_tmp[3], k, l, inst.ratio,  y_tmp[4], inst.col_avant, inst.Hprio, obj, inst.pbl, f_rand)
         compteurMvt!(f_mouv, nb,nb_effectiv,effect)
     end
+end
+
+function convert_genetic_PLS(y::Array{T,1}) where T
+    return (y[1], y[3], y[2])
 end
