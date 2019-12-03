@@ -68,8 +68,9 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
 
     tmpcol = nbcol_avant
     tmpi = col
+    debb = true
     while sum(color)!=0 && tmpplace != size(instance)[1]+1
-        if tmpplace==1
+        if tmpplace==1 && debb
             if tmpcol>=pbl
                 tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
                 tmpcol=0
@@ -116,8 +117,6 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
         tmpduri=instance[1]
         for ii in 1:sz
             car = instance[ii]
-        #for car in instance
-            ## avec dur
             if car[1]==0 && car[2]==tmpi && color[tmpi]>0
                 for i in 1:Hprio
                     pi[i][1]+=car[2+i]
@@ -135,6 +134,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
                 end
             end
         end
+
         if  tmpcol>=pbl
         elseif tmpduri[1]==0 && tmpduri[2]==tmpi && color[tmpi]>0
             tmpduri[1]=tmpplace
@@ -147,6 +147,8 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
                 pi[i][1]+=tmpduri[2+i]
                 pi[i][2]+=1
             end
+        else
+            debb=false
         end
     end
     return tri_car(instance)

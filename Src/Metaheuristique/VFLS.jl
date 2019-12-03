@@ -122,6 +122,18 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, f_rand)
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
 
+
+            #=
+            a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
+
+            for o in 1:size(b)[1]
+                for oo in 1:size(b[o])[1]
+                    if b[o][oo]!=tab_violation[o][oo]
+                        println("pas bo")
+                    end
+                end
+            end
+            =#
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
             if verbose
                 if (time()-debut)>(n/50)*temps_max*(timeOPT[Phase]/100)
@@ -170,6 +182,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     # Re evaluation en fin d'exection :
     a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
     println(a)
+
     for car in sequence_meilleure
         #println(car)
     end
