@@ -436,7 +436,7 @@ end
 # @param pareto : l'archive de Pareto
 # @param file_name : nom du fichier (de l'instance par exemple)
 # @param directory : dossier ou est enregistrer le graphique
-function plot_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; xlabel::String = "RAF", ylabel::String = "EP", zlabel::String = "ENP", directory::String = "./Output/plots/", file_name::String = "instance") where U where Q where T <: Number
+function plot_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; xlabel::String = "RAF", ylabel::String = "EP", zlabel::String = "ENP", directory::String = "./Output/plots/", file_name::String = "instance", verbose::Bool = true) where U where Q where T <: Number
     if !isempty(pareto)
         try
             mkdir(directory)
@@ -449,8 +449,10 @@ function plot_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; xlabel:
         scatter(x, y, z, xlabel = xlabel, ylabel = ylabel, zlabel = zlabel)
         nb_plots = length(readdir(directory))
         savefig(directory * "/" * file_name * ".png")
-        println("   ----------------------------------")
-        println("   Enregistrement du plot de Pareto dans : ", directory * "/" * file_name * ".png" )
+        if verbose
+            println("   ----------------------------------")
+            println("   Enregistrement du plot de Pareto dans : ", directory * "/" * file_name * ".png" )
+        end
     end
 end
 
@@ -474,7 +476,7 @@ end
 # @param pareto : l'archive de Pareto
 # @param file_name : nom du fichier (de l'instance par exemple)
 # @param directory : dossier ou est enregistrer le .csv
-function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; file_name::String = "instance", directory::String = "./Output/CSV") where U where Q where T <: Number
+function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; file_name::String = "instance", directory::String = "./Output/CSV", verbose::Bool = true) where U where Q where T <: Number
     if !isempty(pareto)
         try
             mkdir(directory)
@@ -484,8 +486,10 @@ function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; file_nam
         df = DataFrame(pareto)
         names!(df, [:Solution, :Obj, :Ctr])
         CSV.write(directory * "/" * file_name * ".csv", df, writeheader=true)
-        println("   ----------------------------------")
-        println("   Enregistrement de l'ensemble de Pareto dans : ", directory * "/" * file_name * ".csv" )
+        if verbose
+            println("   ----------------------------------")
+            println("   Enregistrement de l'ensemble de Pareto dans : ", directory * "/" * file_name * ".csv" )
+        end
     end
 end
 
