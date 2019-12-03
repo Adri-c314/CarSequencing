@@ -78,12 +78,6 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             println(string("Valeur sur l'objectif ", j, " : ", score_init[j]))
         end
         println("\n\n\n","3) Période des phases :","\n","   ------------------")
-        for car in sequence_meilleure
-            if (car[szcar-1]-car[szcar-2]+1)>pbl
-                println(car)
-                println(car[szcar-1]-car[szcar-2]+1)
-            end
-        end
         println(obj)
         println(timeOPT)
     end
@@ -95,11 +89,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         txt = string(txt, "\n\n\n","3) Période des phases :","\n","   ------------------")
     end
 
-
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
+    a =evaluation(sequence_meilleure,tab_violation,ratio_option, col_avant,Hprio)
     println("score : ", a,"\n\n")
     @time for Phase in 1:3
         debut = time()
@@ -169,7 +162,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
             println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
             println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
-            a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
+            a =evaluation(sequence_meilleure,tab_violation,ratio_option, col_avant,Hprio)
             println("score : ", a,"\n\n")
         end
 
@@ -183,16 +176,8 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
     println(a)
 
-    for car in sequence_meilleure
-        #println(car)
-    end
-    for car in tab_violation
-        #println(car)
-    end
     println("___________________________________________")
-    for car in b
-        #println(car)
-    end
+
     return a, sequence_meilleure, txt
 end
 
@@ -244,8 +229,8 @@ end
 # @param ratio : idem
 # @param Hprio : Le nombre de hprio
 # @return ::Array{Int,1} : [nombre de couleurs fail, H prio fail,L prio fail]
-function evaluation(instance::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int)
-    col = instance[1][2]
+function evaluation(instance::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1}, col_avant,Hprio::Int)
+    col = col_avant[2]
     sz =size(instance)[1]
     nbcol = 0
     Hpriofail=0

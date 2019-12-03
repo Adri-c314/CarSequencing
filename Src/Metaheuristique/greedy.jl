@@ -69,7 +69,8 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
     tmpcol = nbcol_avant
     tmpi = col
     debb = true
-    while sum(color)!=0 && tmpplace != size(instance)[1]+1
+    while sum(color)!=0 && tmpplace <= size(instance)[1]
+
         if tmpplace==1 && debb
             if tmpcol>=pbl
                 tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
@@ -81,18 +82,27 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
                     mm = tmpplace+color[tmpi]-1
                 end
                 tmpfincol=mm
-            else
-
+            elseif tmpi>size(color)[1]
+                tmpi = argmax(color)[2]
+                tmpcol=0
                 tmpdebcol=tmpplace
+                if color[tmpi]>pbl
+                    mm = tmpplace+pbl-1
+                else
+                    mm = tmpplace+color[tmpi]-1
+                end
+                tmpfincol=mm
+            else
+                tmpdebcol=tmpplace
+                println(tmpcol)
                 if color[tmpi]>pbl-tmpcol
                     mm = tmpplace+pbl-tmpcol-1
                 else
                     mm = tmpplace+color[tmpi]-1
                 end
                 tmpfincol=mm
-                tmpcol=0
             end
-        elseif tmpcol==pbl && color[tmpi]!=0
+        elseif tmpcol>=pbl && color[tmpi]!=0
             tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
             tmpcol=0
             tmpdebcol=tmpplace
@@ -114,7 +124,27 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
             tmpfincol=mm
         end
         tmpdur=-1
-        tmpduri=instance[1]
+        ttt=1
+        if tmpcol<pbl
+            while instance[ttt][1]!=0
+
+                ttt+=1
+            end
+        else
+            ok =true
+            while ok
+                while instance[ttt][1]!=0
+
+                    ttt+=1
+                end
+                if instance[ttt][2]!=color
+                    ok = false
+                else
+                    ttt+=1
+                end
+            end
+        end
+        tmpduri = instance[ttt]
         for ii in 1:sz
             car = instance[ii]
             if car[1]==0 && car[2]==tmpi && color[tmpi]>0
@@ -166,8 +196,8 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
     szcar = size(instance[1])[1]
     sz =size(instance)[1]
 
-    pi = [Int[0,0] for i in 1:Hprio]
-    PI = [Int[0,sz] for i in 1:Hprio]
+    pi = [Int[0,0] for i in 1:size(ratio)[1]]
+    PI = [Int[0,sz] for i in 1:size(ratio)[1]]
 
     tmpdebcol=1
     for car in instance
@@ -193,26 +223,25 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
     end
     global length_windows
     pbl= nbcol_avant
-    for i in 1:size(instance)[1]
-        tmpdur=-1
-        tmpduri=instance[1]
-        for ii in 1:min(size(instance)[1],Int32(floor(sz/length_windows+tmpplace)))
+    tmpduri=instance[1]
+    while tmpplace<=sz
+        tmpdur=-10000
+        for ii in 1:size(instance)[1]
             car = instance[ii]
-        #for car in instance
             if car[1]==0
-                for ii in 1:Hprio
+                for ii in 1:size(ratio)[1]
                     pi[ii][1]+=car[2+ii]
                     pi[ii][2]+=1
                 end
                 tmpdurdur = dur(ratio,PI,pi,Hprio)
-                if tmpdurdur>tmpdur && (tmppbl!=pbl ||  car[2]!=color)
+                if  tmpdurdur>tmpdur && (tmppbl<pbl ||  car[2]!=color)
                     tmpduri=car
                     tmpdur=tmpdurdur
-                elseif tmpdurdur==tmpdur && (car[2]!=color || tmppbl!=pbl)
+                elseif tmpdurdur==tmpdur && (car[2]!=color || tmppbl<=pbl)
                     tmpduri=car
                     tmpdur=tmpdurdur
                 end
-                for ii in 1:Hprio
+                for ii in 1:size(ratio)[1]
                     pi[ii][1]-=car[2+ii]
                     pi[ii][2]-=1
                 end
@@ -230,6 +259,26 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
         tmpduri[szcar-2]=tmpdebcol
         tmpplace+=1
         color=tmpduri[2]
+        for ii in 1:size(ratio)[1]
+            pi[ii][1]-=tmpduri[2+ii]
+            pi[ii][2]-=1
+        end
+    end
+    for ii in 1:size(instance)[1]
+        if instance[ii][1]==0
+            if tmpplace>1 && color != instance[ii][2]
+                tmpdebcol = tmpplace
+            end
+            if color == instance[ii][2]
+                tmppbl +=1
+            else
+                tmppbl = 1
+            end
+            instance[ii][1]=tmpplace
+            instance[ii][szcar-2]=tmpdebcol
+            tmpplace+=1
+            color=instance[ii][2]
+        end
     end
 
     instance =tri_car(instance)
@@ -245,7 +294,6 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
         instance[tmpi][szcar-1] = tmpfincol
         tmpi-=1
     end
-
     return instance
 end
 

@@ -24,10 +24,9 @@
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
 function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
-    if LSfoo! == :insertion! ||LSfoo! == :swap! || LSfoo! == :reflection! || LSfoo! == :shuffle!
-        return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
-    end
-    return false
+
+    return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
+
     nothing
 end
 
@@ -59,7 +58,7 @@ function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ra
     end
     if k>20 && k!=l && l-k>1 && l<size(sequence_courante)[1]-20
 
-        return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
+        return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, rand_mov)
         if rand(2:2) == 1
             #return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
         else
@@ -84,7 +83,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
     cond = true
@@ -153,7 +152,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
     cond = true
@@ -203,19 +202,6 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     splice!(sequence_courante,(k):(l),sequence_courante[seq])
     # Mise à jour du tableau de violation et pbl :
     update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
-    #=a =evaluation(sequence_courante,tab_violation,ratio_option,Hprio)
-    if a[2]>aa[2]
-        println(tmp_Hprio)
-        println(tmp_color)
-        println(aa)
-        println(a)
-        println("faux positif")
-        for i in k-10:l+10
-            println(sequence_courante[i])
-        end
-        println("k : ", k," l : ",l)
-        return tamerepute
-    end=#
     return true
     nothing
 end
@@ -1015,8 +1001,8 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, r
     update_tab_violation_reflection(sequence_courante,ratio_option,tab_violation,tmp,Hprio,pbl,k,l)
     reverse!(sequence_courante,k,l)
     update_col_and_pbl_reflection(sequence_courante,ratio_option,pbl,k,l)
-    return true
 
+    return true
     nothing # Pas de return pour eviter les copies de memoire.
 end
 
@@ -1353,6 +1339,7 @@ end
 function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
+    sz =size(sequence_courante)[1]
     cond = true
     tmp_color=0
     tmp_Hprio=0
@@ -1387,8 +1374,6 @@ function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_o
         end
     end
     # Sinon on realise le mouvement de swap :
-
-    #aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
     tmp=copy(sequence_courante[k])
     sequence_courante[k]=sequence_courante[l]
     sequence_courante[l]=tmp
@@ -1465,6 +1450,13 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::
             if sequence_courante[l][2]==sequence_courante[k-1][2]
                 tmp_color-=1
             elseif sequence_courante[k][2]==sequence_courante[k-1][2]
+                tmp_color+=1
+            end
+        else
+            if sequence_courante[l][2]==col_avant[2]
+                tmp_color-=1
+            end
+            if sequence_courante[k][2]==col_avant[2]
                 tmp_color+=1
             end
         end
@@ -1624,9 +1616,11 @@ function update_tab_violation_and_pbl_swap!(sequence_courante::Array{Array{Int,1
                     sequence_courante[i][szcar-1] = sequence_courante[k+1][szcar-1]
                 end
             else
-                for i in sequence_courante[k-1][szcar-2]:k
-                    sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
-                    sequence_courante[i][szcar-1] = k
+                if k>1
+                    for i in  sequence_courante[k-1][szcar-2]:k
+                        sequence_courante[i][szcar-2] = sequence_courante[k-1][szcar-2]
+                        sequence_courante[i][szcar-1] = k
+                    end
                 end
                 if sequence_courante[l][2]==sequence_courante[k+1][2]
                     for i in k+1:sequence_courante[k+1][szcar-1]
@@ -1862,55 +1856,10 @@ function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, rati
 
     end
 
-    #aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
 
     update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
     splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
     update_col_and_pbl_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
-#=
-        col = sequence_courante[1][2]
-        deb = sequence_courante[1][szcar-2]
-        fin = sequence_courante[1][szcar-1]
-        for i in 1:1:size(sequence_courante)[1]
-
-            if col !=  sequence_courante[i][2]
-                col = sequence_courante[i][2]
-                if fin+1 != sequence_courante[i][szcar-2]
-                    for car in sequence_courante
-                        println(car)
-                    end
-                    println("k : ",k, " l : ", l)
-                    println(sequence_courante[k])
-                    println(sequence_courante[l])
-                    println(i)
-                    return FAUX
-                end
-                deb = sequence_courante[i][szcar-2]
-                fin = sequence_courante[i][szcar-1]
-            else
-                if fin != sequence_courante[i][szcar-1] || deb != sequence_courante[i][szcar-2]
-
-                    for car in sequence_courante
-                        println(car)
-                    end
-                    println("k : ",k, " l : ", l)
-                    println(sequence_courante[k])
-                    println(sequence_courante[l])
-                    return FAUXXXXX
-                end
-            end
-
-        end
-    #a , b =evaluation_init(sequence_courante,ratio_option,Hprio)
-=#
-    #=
-    if (a[1]==aa[1]&&a[2]==aa[2]&& a[3]>aa[3])
-        ##println(tmp_Hprio)
-        ##println(aa)
-        ##println(a)
-        return shuffle
-    end=#
-
     return true
 end
 
@@ -1971,7 +1920,6 @@ function update_col_and_pbl_shuffle(sequence_courante::Array{Array{Int,1},1},rat
             sequence_courante[i][szcar-1]=sequence_courante[k+l][szcar-1]
         end
     end
-
 end
 
 # Fonction qui reevalue les color et le tab_violation de la new sol
