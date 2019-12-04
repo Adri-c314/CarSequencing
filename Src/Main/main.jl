@@ -163,6 +163,6 @@ function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP"
         PLS!(NDtree, inst, temps_global, temps_moove, verbose)
         plot_pareto(NDtree, file_name =  "PLS_" * string(temps_max) * "_s_" * inst.name, verbose = verbose)
         CSV_pareto(NDtree, file_name = "PLS_" * string(temps_max) * "_s_" * inst.name, verbose = verbose)
-        println("Hypervolume : " hypervolume(NDtree))
+        println("Hypervolume de l'instance ", ir, " : " hypervolume(NDtree))
     end
 end
