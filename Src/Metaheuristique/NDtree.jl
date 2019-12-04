@@ -1,10 +1,11 @@
 # NDtree, sert a stocker l'ensemble de Pareto
+#
 # Cas d'utilisation :
 #
 # 1) Instanciation :
 # NDtree = Sommet()
 #
-# 2) Tentative d'insertion d'une nouvelle solution y::Tuple{Array{Array{Int32,1},1}, Array{Int32,1}}. Exemple : y = (sequence des vehilcules, valeurs des objectifs).
+# 2) Tentative d'insertion d'une nouvelle solution y::Tuple{Array{Array{Int32,1},1}, Array{Int32,1}, Q}. Exemple : y = (sequence des vehilcules, valeurs des objectifs, table_violation).
 # maj!(NDtree, y) # Retourne un boolean qui dit si la solution est efficasse et a ete inseree.
 #
 # 3) Lecture de toutes les solutions inserees
@@ -491,6 +492,10 @@ function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; file_nam
             println("   Enregistrement de l'ensemble de Pareto dans : ", directory * "/" * file_name * ".csv" )
         end
     end
+end
+
+function hypervolume(NDtree::Sommet)
+    solutions = get_solutions(NDtree)
 end
 
 #test_domination()
