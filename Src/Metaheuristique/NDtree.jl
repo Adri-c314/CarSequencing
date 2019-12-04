@@ -5,7 +5,9 @@
 # 1) Instanciation :
 # NDtree = Sommet()
 #
-# 2) Tentative d'insertion d'une nouvelle solution y::Tuple{Array{Array{Int32,1},1}, Array{Int32,1}, Q}. Exemple : y = (sequence des vehilcules, [RAF, EP, ENP], table_violation).
+# 2) Tentative d'insertion d'une nouvelle solution y::Tuple{Array{Array{Int32,1},1}, Array{Int32,1}, Q}.
+#    Exemple de y : (sequence des vehilcules, [RAF, EP, ENP], table_violation).
+#    (Bien conserver cet ordre pour les objectifs.)
 # maj!(NDtree, y) # Retourne un boolean qui dit si la solution est efficasse et a ete inseree.
 #
 # 3) Lecture de toutes les solutions inserees
@@ -415,6 +417,8 @@ function test_NDtree()
     end
     CSV_pareto(pareto)
     plot_pareto(pareto)
+
+    hyperv = hypervolume(NDtree)
 end
 
 try
@@ -494,8 +498,36 @@ function CSV_pareto(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1} ; file_nam
     end
 end
 
-function hypervolume(NDtree::Sommet)
+function hypervolume(NDtree::Sommet ; verbose::Bool = true)
     solutions = get_solutions(NDtree)
+    maxRAF = maximum([y[2][1] for y in solutions])
+    maxEP = maximum([y[2][2] for y in solutions])
+    maxENP = maximum([y[2][3] for y in solutions])
+    hyperv = 0
+    for i in -1:maxRAF
+        for j in -1:maxEP
+            for k in -1:maxENP
+                local drapeau = false
+                local n = 1
+                local y = (Int32.([]),Int32.([1,1,1]),Int32.([]))
+                while !drapeau && n <= length(solutions)
+                    y[2][1] = Int32(i)
+                    y[2][1] = Int32(j)
+                    y[2][1] = Int32(k)
+                    drapeau = domine(y, solutions[n])
+                    if drapeau
+                        hyperv += 1
+                    end
+                    n += 1
+                end
+            end
+        end
+    end
+    if verbose
+        println("   ----------------------------------")
+        println("   L'hypervolume du NDtree vaut : ", hyperv)
+    end
+    return hyperv
 end
 
 #test_domination()
