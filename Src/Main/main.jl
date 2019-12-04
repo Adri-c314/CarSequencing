@@ -144,6 +144,15 @@ end
 
 function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 1., temps_phase1::Float64 = 3., temps_phaseAutres::Float64 = 3., temps_popNonElite::Float64 = 3., temps_global::Float64 = 5., temps_mutation::Float64 = 0.1, temps_max::Float64 = 3., temps_moove::Float64 = 0.001, verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
+        if verbose
+            println(string(
+                "===================================================\n",
+                "Etude de l'instance : ", i[1], "\n",
+                "Reference du dossier : ", i[2], "\n",
+                "A la date du : ", Dates.now(), "\n",
+                "===================================================\n\n"
+            ))
+        end
         datas = lectureCSV(i[1], i[2])
         solutions, inst = generate(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, verbose)
         NDtree = Sommet()
@@ -154,5 +163,6 @@ function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP"
         PLS!(NDtree, inst, temps_global, temps_moove, verbose)
         plot_pareto(NDtree, file_name =  "PLS_" * string(temps_max) * "_s_" * inst.name, verbose = verbose)
         CSV_pareto(NDtree, file_name = "PLS_" * string(temps_max) * "_s_" * inst.name, verbose = verbose)
+        println("Hypervolume : " hypervolume(NDtree))
     end
 end
