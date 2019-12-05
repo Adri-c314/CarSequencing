@@ -42,7 +42,7 @@ function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real 
     return false
 end
 
-function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{V,1}, Array{W,1}, Q}) where U where V where Q where T <: Real where W <: Real
+function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{V,1}, Array{W,1}, R}) where U where V where Q where R where T <: Real where W <: Real
     domination = true
     forte = false
     for i in 1:length(y1[2])
@@ -52,7 +52,7 @@ function domine_fortement(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{
     return  domination && forte
 end
 
-function domine(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{V,1}, Array{W,1}, Q}) where U where V where Q where T <: Real where W <: Real
+function domine(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{V,1}, Array{W,1}, R}) where U where V where Q where R where T <: Real where W <: Real
     domination = true
     for i in 1:length(y1[2])
         domination &= y1[2][i] <= y2[2][i]
