@@ -42,7 +42,7 @@
 # @return : La meilleure sequence
 function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
     # compute initial sequence :
-    sequence_meilleure,sequence_avant, score_init, tab_violation,col_avant , ratio_option, Hprio, obj, pbl = compute_initial_sequence(datas)
+    sequence_meilleure,sequence_avant, score_init, tab_violation , ratio_option, Hprio, obj, pbl = compute_initial_sequence(datas)
     sz = size(sequence_meilleure)[1]
     szcar = size(sequence_meilleure[1])[1]
     timeOPT, opt = phases_init(obj)
@@ -96,7 +96,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    a =evaluation(sequence_meilleure,tab_violation,ratio_option, col_avant,Hprio)
+    a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
     println("score : ", a,"\n\n")
     @time for Phase in 1:3
         debut = time()
@@ -116,7 +116,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
 
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
-            effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, f_rand)
+            effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation, Hprio, obj, pbl, f_rand)
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
 
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
@@ -159,7 +159,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
             println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
             println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
             println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
-            a =evaluation(sequence_meilleure,tab_violation,ratio_option, col_avant,Hprio)
+            a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
             println("score : ", a,"\n\n")
         end
 
@@ -171,7 +171,6 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     for car in sequence_meilleure
         println(car)
     end
-    println(col_avant)
     # Re evaluation en fin d'exection :
     a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
     println(a)
@@ -229,8 +228,8 @@ end
 # @param ratio : idem
 # @param Hprio : Le nombre de hprio
 # @return ::Array{Int,1} : [nombre de couleurs fail, H prio fail,L prio fail]
-function evaluation(instance::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1}, col_avant,Hprio::Int)
-    col = col_avant[2]
+function evaluation(instance::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int)
+    col = instance[1]
     sz =size(instance)[1]
     nbcol = 0
     Hpriofail=0

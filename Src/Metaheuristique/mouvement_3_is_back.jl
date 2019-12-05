@@ -1,15 +1,15 @@
 
 
 
-function global_mouvement_3!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function global_mouvement_3!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     if    LSfoo! == :reflection!
-        return @eval reflection_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
+        return @eval reflection_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
     elseif LSfoo! == :shuffle!
-        return @eval shuffle_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
+        return @eval shuffle_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
     elseif LSfoo! == :swap!
-        return @eval swap_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
+        return @eval swap_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
     elseif LSfoo! == :insertion! && k>20 && l-k>1 && l<size(sequence_courante)[1]-20
-        return @eval insertion_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
+        return @eval insertion_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
     end
 end
 
@@ -26,14 +26,14 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     sz = size(sequence_courante)[1]
     cond = false
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
     if !cond
-        tmp_color = eval_couleur_reflection(sequence_courante,col_avant,pbl,k,l)
+        tmp_color = eval_couleur_reflection(sequence_courante,pbl,k,l)
         cond = tmp_color<0
     end
     if !cond
@@ -70,7 +70,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
     cond = true
@@ -78,7 +78,7 @@ function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio
     tmp_Hprio=0
     tmp_Lprio=0
     if !cond
-        tmp_color = eval_couleur_swap(sequence_courante,col_avant, pbl, k, l)
+        tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
         cond = tmp_color<0
     end
     if !cond
@@ -113,7 +113,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     sz = size(sequence_courante)[1]
     if pbl >10
         l = rand(10:15,1)[1]
@@ -171,7 +171,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     if k > l # Gestion du cas ou s'est inversé. Cette solution n'est surement pas top
         tmp = l
         l = k

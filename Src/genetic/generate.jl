@@ -30,8 +30,8 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
     population = Array{Array{Array{Array{Int,1},1},1},1}()
 
     # création de la sequence initial commune
-    sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, ratio, Hprio, obj, pbl = initGenerate(datas, temps_init, verbose, txtoutput)
-    inst = Instance(sequence_j_avant, col_avant, ratio, Hprio, obj, pbl)
+    sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, ratio, Hprio, obj, pbl = initGenerate(datas, temps_init, verbose, txtoutput)
+    inst = Instance(sequence_j_avant, ratio, Hprio, obj, pbl)
     sz = size(sequence_meilleure)[1]
 
     if verbose
@@ -83,9 +83,9 @@ end
 # @return ::Array{Int,1} : le tableau des objectifs
 # @return ::Int : PAINT_BATCH_LIMIT
 function initGenerate(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
-        sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, prio, Hprio, obj, pbl = compute_initial_sequence(datas)
+        sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl = compute_initial_sequence(datas)
         # TODO : Amelioration de cette solution initiale ?
-        return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, prio, Hprio, obj, pbl
+        return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl
 end
 
 

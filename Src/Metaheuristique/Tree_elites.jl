@@ -1,15 +1,52 @@
-function IniNDtree(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
+# Fichier contenant la fonction VFLS, fonction principale de l'heuristique
+# @author Oryan Rampon
+# @author Corentin Pelhatre
+# @author Mathis Ocquident
+# @author Thaddeus Leonard
+# @author Adrien Cassaigne
+# @author Xavier Pillet
+# @date 01/11/2019
+# @version 2
+
+
+
+#=
+## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
+##            les voitures avec [2]= leurs couleurs
+##            les voitures avec [3:3+Hprio]= leurs Hprio (ca serait pas plutot [3:3+Hprio-1] ?)
+##            les voitures avec [3+Hprio:]= leurs Lprio
+##                              [size()[1]-2] = le debut de leur sequence de couleur
+##                              [size()[1]-1] = la fin de leur sequence de couleur
+##                              [size()[1]] : l'ordre initial
+## Ratio x/y: Les ratio avec [1] = x
+##            Les ratio avec [2] = y
+## pbl      : Le paint batch limit
+## obj      : Les obj des l'ordre
+## Hprio    : le nombre de Hprio
+=#
+
+
+
+# Constantes utile pour fixer les types/opt :
+#const R = 1.05 # Macro-parametre : ratio de deterioration de solution accepte pour la recherche locale
+#const OPT = (:OptA, :OptB, :OptC) #Macro pour identifier les algos OptA, OptB et OptC
+#const ID_LS = (:swap!, :insertion!, :reflection!, :shuffle!) #Macro pour identifier les fonctions de LS
+
+
+
+# Fonction principale de l'heuristique (VFLS)
+# @param datas : Le jeux de données lu
+# @param temps_max : Temps en milliseconde...
+# @return : La meilleure sequence
+function Tree_elites(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
     # compute initial sequence :
-    sequence_meilleure,sequence_avant, score_init, tab_violation  , ratio_option, Hprio, obj, pbl = compute_initial_sequence_2(datas)
+    sequence_meilleure,sequence_avant, score_init, tab_violation , ratio_option, Hprio, obj, pbl = compute_initial_sequence_2(datas)
     sz = size(sequence_meilleure)[1]
     szcar = size(sequence_meilleure[1])[1]
     println(obj)
     timeOPT, opt = phases_init(obj)
 
 
-    a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
-    NDtree = Sommet()
-    maj!(NDtree, (sequence_meilleure,a,tab_violation))
 
     # affichage initial :
     if verbose
@@ -48,11 +85,10 @@ function IniNDtree(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose
         end
         txt = string(txt, "\n\n\n","3) Période des phases :","\n","   ------------------")
     end
-    temps_max=200
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    temps_max=100
+    temps_max=600
     obj = [1,2,3]
     println(timeOPT)
     @time for Phase in 1:3
@@ -146,7 +182,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose
                 println(sequence_meilleure[k])
                 println(sequence_meilleure[l])
                 println(i)
-                         
+
                 return FAUX
             end
             deb = sequence_meilleure[i][szcar-2]
@@ -179,8 +215,6 @@ function IniNDtree(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose
     tab_violation_best =  deepcopy(tab_violation)
 
 
-
-
     OBJ = [[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     for objectif in OBJ
         obj = objectif
@@ -210,10 +244,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose
                 k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
                 effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand)
                 compteurMvt!(f_mouv, nb,nb_effectiv,effect)
-                if effect
-                    a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
-                    maj!(NDtree, (sequence_meilleure,a,tab_violation))
-                end
+
                 # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
                 if verbose
                     if (time()-debut)>(n/50)*temps_max*(timeOPT[Phase]/100)
@@ -316,10 +347,5 @@ function IniNDtree(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose
     end
     a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
     println(a)
-
-    pareto_tmp = get_solutions(NDtree)
-
-    println(size(pareto_tmp)[1])
-    plot_pareto(pareto_tmp)
     return a, sequence_meilleure, txt
 end

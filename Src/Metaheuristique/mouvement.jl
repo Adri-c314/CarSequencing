@@ -23,9 +23,9 @@
 # @param sz : le nombre de vehicules
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function global_mouvement!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
 
-        return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $col_avant, $Hprio, $obj, $pbl, :rand_mov)
+        return @eval $LSfoo!($sequence_courante, $k, $l, $ratio_option, $tab_violation, $Hprio, $obj, $pbl, :rand_mov)
 
     nothing
 end
@@ -49,7 +49,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
 
     if k>l
         tmpl = l
@@ -58,7 +58,7 @@ function insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ra
     end
     if k>20 && k!=l && l-k>1 && l<size(sequence_courante)[1]-20
 
-        return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, rand_mov)
+        return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
         if rand(2:2) == 1
             #return fw_insertion!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, rand_mov)
         else
@@ -83,7 +83,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function bw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
     cond = true
@@ -152,7 +152,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
     cond = true
@@ -948,9 +948,9 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     if l-k<=1
-        return swap!(sequence_courante, k, l, ratio_option, tab_violation, col_avant, Hprio, obj, pbl, :rand_mov)
+        return swap!(sequence_courante, k, l, ratio_option, tab_violation, Hprio, obj, pbl, :rand_mov)
     end
 
     szcar = size(sequence_courante[1])[1]
@@ -959,13 +959,13 @@ function reflection!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, r
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
-    cond = eval_pbl_reflection(sequence_courante,col_avant,pbl,k,l)
+    cond = eval_pbl_reflection(sequence_courante ,pbl,k,l)
     if !cond
         return false
     end
     for o in obj
         if     o==1
-            tmp_color = eval_couleur_reflection(sequence_courante,col_avant,pbl,k,l)
+            tmp_color = eval_couleur_reflection(sequence_courante ,pbl,k,l)
             cond = tmp_color<=0
             if tmp_color<0
                 break
@@ -1072,7 +1072,7 @@ end
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
-function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32},pbl::Int,k::Int,l::Int)
+function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1} ,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
@@ -1093,13 +1093,6 @@ function eval_couleur_reflection(sequence_courante::Array{Array{Int,1},1},col_av
         elseif sequence_courante[k][2]==sequence_courante[k-1][2]
             tmp_color+=1
         end
-    else
-        if sequence_courante[l][2]==col_avant[2]
-            tmp_color-=1
-        end
-        if sequence_courante[k][2]==col_avant[2]
-            tmp_color+=1
-        end
     end
     return tmp_color
 end
@@ -1109,7 +1102,7 @@ end
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
-function eval_pbl_reflection(sequence_courante::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32},pbl::Int,k::Int,l::Int)
+function eval_pbl_reflection(sequence_courante::Array{Array{Int,1},1} ,pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     ## on test le new pbl c'est important
@@ -1134,12 +1127,6 @@ function eval_pbl_reflection(sequence_courante::Array{Array{Int,1},1},col_avant:
         if k>1
             if sequence_courante[l][2]==sequence_courante[k-1][2]
                 if (k-1-sequence_courante[k-1][szcar-2]+1)+(l-sequence_courante[l][szcar-2]+1)>pbl
-                    return false
-                end
-            end
-        else
-            if sequence_courante[l][2]==col_avant[2]
-                if (col_avant[1])+(l-sequence_courante[l][szcar-2]+1)>pbl
                     return false
                 end
             end
@@ -1327,7 +1314,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
     sz =size(sequence_courante)[1]
@@ -1335,13 +1322,13 @@ function swap!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_o
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
-    cond = eval_pbl_swap(sequence_courante, col_avant, pbl, k, l)
+    cond = eval_pbl_swap(sequence_courante, pbl, k, l)
     if !cond
         return false
     end
     for o in obj
         if o==1 #&& (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
-            tmp_color = eval_couleur_swap(sequence_courante, col_avant, pbl, k, l)
+            tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
             cond = tmp_color<=0
             if tmp_color<0
                 break
@@ -1382,7 +1369,7 @@ end
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @return Bool : si c'est autorisé comme changement
-function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::Tuple{Int32,Int32}, pbl::Int, k::Int, l::Int)
+function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::Int, l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     tmp_color=0
@@ -1418,13 +1405,6 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::
             elseif sequence_courante[k][2]==sequence_courante[k-1][2]
                 tmp_color+=1
             end
-        else
-            if sequence_courante[l][2]==col_avant[2]
-                tmp_color-=1
-            end
-            if sequence_courante[k][2]==col_avant[2]
-                tmp_color+=1
-            end
         end
 
 
@@ -1443,13 +1423,6 @@ function eval_couleur_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::
             elseif sequence_courante[k][2]==sequence_courante[k-1][2]
                 tmp_color+=1
             end
-        else
-            if sequence_courante[l][2]==col_avant[2]
-                tmp_color-=1
-            end
-            if sequence_courante[k][2]==col_avant[2]
-                tmp_color+=1
-            end
         end
 
     end
@@ -1462,7 +1435,7 @@ end
 # @param pbl : paint batch limit
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
-function eval_pbl_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::Tuple{Int32,Int32},pbl::Int,k::Int,l::Int)
+function eval_pbl_swap(sequence_courante::Array{Array{Int,1},1},pbl::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
     szcar =size(sequence_courante[1])[1]
     ## on test le new pbl c'est important
@@ -1501,17 +1474,6 @@ function eval_pbl_swap(sequence_courante::Array{Array{Int,1},1}, col_avant::Tupl
             end
             if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==sequence_courante[k-1][2]
                 if sequence_courante[k+1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
-                    return false
-                end
-            end
-        else
-            if sequence_courante[l][2]==col_avant[2]
-                if col_avant[1]+1+1>pbl
-                    return false
-                end
-            end
-            if sequence_courante[l][2]==sequence_courante[k+1][2]&& sequence_courante[l][2]==col_avant[2]
-                if col_avant[1]+sequence_courante[k+1][szcar-1]-k+1+1>pbl
                     return false
                 end
             end
@@ -1795,7 +1757,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32}, Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function shuffle!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     sz = size(sequence_courante)[1]
     szcar = size(sequence_courante[1])[1]
     if pbl>15
