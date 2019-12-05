@@ -30,6 +30,14 @@ function compute_initial_sequence(datas::NTuple{4,DataFrame})
     return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, prio, Hprio, obj, pbl
 end
 
+function compute_initial_sequence_2(datas::NTuple{4,DataFrame})
+    sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int, sequence_j_avant::Array{Array{Int,1},1} = init_sequence(datas)
+    sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
+    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
+    sequence_meilleure = sequence_courrante
+    score_meilleur = score_courrant
+    return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, prio, Hprio, obj, pbl
+end
 
 
 # Fonction d'initialisation de la premiere sequence à partir des données d'entrée

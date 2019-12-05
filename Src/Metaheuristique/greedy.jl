@@ -69,10 +69,13 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
     tmpcol = nbcol_avant
     tmpi = col
     debb = true
+    tmpplace=1
+    println(tmpi)
     while sum(color)!=0 && tmpplace <= size(instance)[1]
 
         if tmpplace==1 && debb
             if tmpcol>=pbl
+                println("la")
                 tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
                 tmpcol=0
                 tmpdebcol=tmpplace
@@ -82,7 +85,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
                     mm = tmpplace+color[tmpi]-1
                 end
                 tmpfincol=mm
-            elseif tmpi>size(color)[1]
+            elseif tmpi>length(color)
                 tmpi = argmax(color)[2]
                 tmpcol=0
                 tmpdebcol=tmpplace
@@ -94,7 +97,6 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
                 tmpfincol=mm
             else
                 tmpdebcol=tmpplace
-                println(tmpcol)
                 if color[tmpi]>pbl-tmpcol
                     mm = tmpplace+pbl-tmpcol-1
                 else
@@ -266,18 +268,10 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
     end
     for ii in 1:size(instance)[1]
         if instance[ii][1]==0
-            if tmpplace>1 && color != instance[ii][2]
-                tmpdebcol = tmpplace
+            for iii in 1:size(instance)[1]
+                instance[iii][1]=0
             end
-            if color == instance[ii][2]
-                tmppbl +=1
-            else
-                tmppbl = 1
-            end
-            instance[ii][1]=tmpplace
-            instance[ii][szcar-2]=tmpdebcol
-            tmpplace+=1
-            color=instance[ii][2]
+            return GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
         end
     end
 
@@ -315,7 +309,7 @@ end
 # @return ::Int : Une vaste fumisterie
 function argmax2(tmp::Array{Int,2},nope::Int)
     tmpii=1
-    tmpmax=tmp[1]
+    tmpmax=-1
 
     for i in 1:length(tmp)
         if tmpmax<tmp[i] && i!= nope
@@ -323,8 +317,8 @@ function argmax2(tmp::Array{Int,2},nope::Int)
             tmpii=i
         end
     end
-
     return tmpii
+
 end
 
 
