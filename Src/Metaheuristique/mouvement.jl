@@ -159,6 +159,10 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
+    cond = eval_pbl_fi_insertion(sequence_courante ,pbl,k,l)
+    if !cond
+        return false
+    end
     for o in obj
         if o==1 #&& (rand_mov!=:border_block_two! ||rand_mov!=:same_color!||rand_mov!=:violation_same_color!)
             tmp_color = eval_couleur_fi(sequence_courante, pbl, k, l)
@@ -198,6 +202,38 @@ function fw_insertion!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
     return true
     nothing
+end
+
+function eval_pbl_fi_insertion(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::Int, l::Int)
+    if k>l
+        tmp = k
+        k=l
+        l=tmp
+    end
+
+    sz = size(sequence_courante)[1]
+    szcar =size(sequence_courante[1])[1]
+    tmp_color=0
+
+    #Les purges qui change en k
+    if sequence_courante[l][2]==sequence_courante[k][2]
+        if sequence_courante[k][szcar-1]-sequence_courante[k][szcar-2]+1+1>pbl
+            return false
+        end
+    else
+        if k>1 && sequence_courante[l][2]==sequence_courante[k-1][2]
+            if sequence_courante[k-1][szcar-1]-sequence_courante[k-1][szcar-2]+1+1>pbl
+                return false
+            end
+        end
+    end
+    if l<sz && sequence_courante[l-1][2]==sequence_courante[l+1][2]
+        if sequence_courante[l+1][szcar-1]-sequence_courante[l-1][szcar-2]>pbl
+            return false
+        end
+    end
+
+    return true
 end
 
 # Fonction qui evalue le nombre de Hprio violer pour la forward insertion
