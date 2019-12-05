@@ -94,7 +94,7 @@ function maj_sommet!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <
             end
             DEBBUG ? println("Le sommet ne contient plus qu'un successeur, il est remplace par celui-ci : ", som.succ) : nothing
             if length(som.succ) == 1
-                remplace_som!(som, som_tmp)
+                remplace_som!(som, som.succ[1])
             end
         end
     end
