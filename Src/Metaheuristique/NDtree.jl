@@ -9,6 +9,7 @@
 #    Exemple de y : (sequence des vehilcules, [RAF, EP, ENP], table_violation).
 #    (Bien conserver cet ordre pour les objectifs.)
 # maj!(NDtree, y) # Retourne un boolean qui dit si la solution est efficasse et a ete inseree.
+#    NB : Les y sont stockes par reference et pas deepcopies.
 #
 # 3) Lecture de toutes les solutions inserees
 # solutions = get_solutions(NDtree)
@@ -185,8 +186,8 @@ function profondeur(som::Sommet, solutions::Array{T,1}) where T
     end
 end
 
-function get_solutions(som::Sommet) where T
-    solutions = Array{Tuple{Array{Int32,1}, Array{Int32,1}, Any},1}(undef,0)
+function get_solutions(som::Sommet)
+    solutions = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
     if isempty(som.succ)
         append!(solutions, som.val[3])
     else
