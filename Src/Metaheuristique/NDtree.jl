@@ -20,6 +20,9 @@
 # 5) Enregistre les solutions dans un CSV
 # CSV_pareto(solutions ; file_name = "instance") # Enregistre dans "./Output/CSV"
 #
+# 6) Nadir et ideal global
+# nadir = nadir_global(NDtree)
+# ideal = ideal_global(NDtree)
 
 # Le code est suffisament claire pour pouvoir etre compris avec l'article d'Andrzej Jaszkiewicz et de Thibaut Lust : "ND-Tree-based update: a Fast Algorithm for the Dynamic Non-Dominance Problem", 07/11/2017.
 
@@ -395,6 +398,11 @@ function test_NDtree()
     @assert !drapeau
 
     @time solutions = get_solutions(NDtree)
+    println("Pareto : ", solutions)
+    println("Nadir global : ", nadir_global(NDtree))
+    println("Ideal global : ", ideal_global(NDtree))
+
+
 
     pareto = get_solutions(NDtree)
 
@@ -531,5 +539,22 @@ function hypervolume(NDtree::Sommet ; verbose::Bool = true)
     return hyperv
 end
 
+function nadir_global(NDtree::Sommet)
+    pareto = get_solutions(NDtree)
+    if isempty(pareto)
+        return Int32.([2^31-1, 2^31-1, 2^31-1])
+    else
+        return [maximum([y[2][i] for y in pareto ]) for i in 1:length(pareto[1][2]) ]
+    end
+end
+
+function ideal_global(NDtree::Sommet)
+    pareto = get_solutions(NDtree)
+    if isempty(pareto)
+        return Int32.([2^31-1, 2^31-1, 2^31-1])
+    else
+        return [minimum([y[2][i] for y in pareto ]) for i in 1:length(pareto[1][2]) ]
+    end
+end
 #test_domination()
 #test_NDtree()
