@@ -192,12 +192,9 @@ end
 # @param verbose : si la fonction va faire de l'affichage pendant son execution
 # @param txtoutput : permet une sortie dans un fichier externe
 function VFLS_genetic(sol::Array{Array{Int,1},1}, viol::Array{Array{Int,1},1}, score::Array{Int,1}, obj::Array{Int, 1}, inst::Instance, temps_solNonElite::Float64 = 0.1, verbose::Bool = false, txtoutput::Bool = false)
-
-    # Initialisation
-    sequence_meilleure = copy(sol)
-    tab_violation = copy(viol)
-    score_init = copy(score)
-
+    sequence_meilleure = deepcopy(sol)
+    tab_violation = deepcopy(viol)
+    score_init = deepcopy(score)
     sz = size(sequence_meilleure)[1]
     szcar = size(sequence_meilleure[1])[1]
     timeOPT, opt = phases_init(obj)
@@ -222,8 +219,6 @@ function VFLS_genetic(sol::Array{Array{Int,1},1}, viol::Array{Array{Int,1},1}, s
                 "Nombre de vehicules : ", sz, "\n",
                 "\n\n\n")
     end
-
-
 
     # affichage initial sequence :
     if verbose

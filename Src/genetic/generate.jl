@@ -25,7 +25,7 @@
 # return[x][2] : Array{Array{Int,1},1} le tab violation associé à la sequence x
 # return[x][3][1] : Array{Int,1} le score sur les 3 obj
 # @return ::Instance : l'instance de pb étudié cf fichier instance.jl
-function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, temps_phase1::Float64, temps_phaseAutres::Float64, temps_popNonElite::Float64, verbose::Bool=true, txtoutput::Bool=true)
+function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, temps_firstind::Float64, temps_elites::Float64, temps_popNonElite::Float64, verbose::Bool=true, txtoutput::Bool=true)
     # Initialisation de la population
     population = Array{Array{Array{Array{Int,1},1},1},1}()
 
@@ -48,14 +48,14 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         println("   ----------------------------------")
         println("Taille de la population :", nbSol)
         println("Budjet de calcule pour la phase initiale commune : ", temps_init, " secondes")
-        println("Budjet de calcule pour chacune des 3 phase 1 : ", temps_phase1, " secondes")
-        println("Budjet de calcule pour chacune des 6 phase suivantes : ", temps_phaseAutres, " secondes")
+        println("Budjet de calcule pour creer le 1er ind elites : ", temps_firstind, " secondes")
+        println("Budjet de calcule pour creer 1 des 5 autres ind elites : ", temps_elites, " secondes")
         println("Budjet de calcule pour chacune des ", nbSol-6, " solutions non elites : ", temps_popNonElite, " secondes")
         println("\n\n\n")
     end
 
-    # TODO : me push ici dans population les 6 sol elites
-
+    elites = pop_elites(temps_firstind, temps_elites,deepcopy(sequence_meilleure),ratio,deepcopy(tab_violation), Hprio, pbl)
+    println(size(elites))
     # Création des nbSol
     for i in 7:nbSol
         # Création de l'odre des obj pour cette instance :

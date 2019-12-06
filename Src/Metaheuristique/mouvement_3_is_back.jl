@@ -11,6 +11,7 @@ function global_mouvement_3!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,
     elseif LSfoo! == :insertion! && k>20 && l-k>1 && l<size(sequence_courante)[1]-20
         return @eval insertion_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
     end
+    return false
 end
 
 
@@ -35,6 +36,9 @@ function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     if !cond
         tmp_color = eval_couleur_reflection(sequence_courante,pbl,k,l)
         cond = tmp_color<0
+        if tmp_color>40
+            return false
+        end
     end
     if !cond
         tmp_Hprio = eval_Hprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
@@ -73,13 +77,16 @@ end
 function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
-    cond = true
+    cond = false
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
     if !cond
         tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
         cond = tmp_color<0
+        if tmp_color>40
+            return false
+        end
     end
     if !cond
         tmp_Hprio = eval_Hprio_swap(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
@@ -131,14 +138,16 @@ function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ra
         seq[i]+=k-1
     end
 
-    cond_no = true
-    cond_ui =false
     #aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
     tmp_Hprio = 0
     tmp_Lprio =0
+    cond = false
     if !cond
         tmp_color = eval_couleur_shuffle(sequence_courante,seq,pbl,k,l)
         cond = tmp_color<0
+        if tmp_color>40
+            return false
+        end
     end
     if !cond
         tmp_Hprio = eval_Hprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
@@ -178,13 +187,16 @@ function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, 
         k = tmp
     end
     szcar =size(sequence_courante[1])[1]
-    cond = true
+    cond = false
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
     if !cond
         tmp_color = eval_couleur_fi(sequence_courante, pbl, k, l)
         cond = tmp_color<0
+        if tmp_color>40
+            return false
+        end
     end
     if !cond
         tmp_Hprio = eval_Hprio_fi(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
