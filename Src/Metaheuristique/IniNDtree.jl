@@ -12,7 +12,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     NDtree = Sommet()
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     debutall = time()
-    temps_all = 3600
+    temps_all = 4500
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
@@ -246,6 +246,8 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     for i in pareto_tmp
         println(i[2])
     end
-    plot_pareto(pareto_tmp)
+    hyperv = hypervolume(NDtree)
+    println("hyper : ", hyperv)
+    println("nadir : ",nadir_global(NDtree))
     return a, sequence_meilleure, txt
 end
