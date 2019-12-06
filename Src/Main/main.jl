@@ -161,7 +161,7 @@ end
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
+function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -187,7 +187,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
             datas = lectureCSV(i[1], i[2])
             path = "..\\..\\output\\"
             # Lancement de la VFLS
-            score, sol, tmp = IniNDtree(datas, temps_max, verbose, txtoutput)
+            @time score, sol, tmp = IniNDtree(datas, verbose, txtoutput)
             # Gestion affichage :
             if txtoutput
                 txt = string(txt, "\n", tmp, "===================================================\n")

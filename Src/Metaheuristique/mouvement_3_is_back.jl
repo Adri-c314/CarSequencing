@@ -1,15 +1,15 @@
 
 
 
-function global_mouvement_3!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function global_mouvement_3!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol,score::Array{Int,1},score_nadir::Array{Int,1})
     if    LSfoo! == :reflection!
-        return @eval reflection_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
+        return @eval reflection_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
     elseif LSfoo! == :shuffle!
-        return @eval shuffle_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
+        return @eval shuffle_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
     elseif LSfoo! == :swap!
-        return @eval swap_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
+        return @eval swap_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
     elseif LSfoo! == :insertion! && k>20 && l-k>1 && l<size(sequence_courante)[1]-20
-        return @eval insertion_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov)
+        return @eval insertion_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
     end
     return false
 end
@@ -27,28 +27,30 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol,score::Array{Int,1},score_nadir::Array{Int,1})
     sz = size(sequence_courante)[1]
     cond = false
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
+    cond = eval_pbl_reflection(sequence_courante ,pbl,k,l)
     if !cond
-        tmp_color = eval_couleur_reflection(sequence_courante,pbl,k,l)
-        cond = tmp_color<0
-        if tmp_color>40
-            return false
-        end
+        return false
     end
-    if !cond
-        tmp_Hprio = eval_Hprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-        cond = tmp_Hprio<0
+    cond = false
+    tmp_color = eval_couleur_reflection(sequence_courante,pbl,k,l)
+    if score[1]+tmp_color>score_nadir[1]
+        return false
     end
-    if !cond
-        tmp_Lprio = eval_Lprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-        cond = tmp_Lprio<0
+    tmp_Hprio = eval_Hprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+    if score[2]+tmp_Hprio>score_nadir[2]
+        return false
     end
-
+    tmp_Lprio = eval_Lprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+    if score[3]+tmp_Lprio>score_nadir[3]
+        return false
+    end
+    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
     if cond
         tmp = [i for i in (k):(l)]
         tmp =reverse(tmp)
@@ -74,29 +76,32 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol,score::Array{Int,1},score_nadir::Array{Int,1})
     # Realisation du benefice ou non du mvt
     szcar =size(sequence_courante[1])[1]
     cond = false
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
+    cond = eval_pbl_swap(sequence_courante, pbl, k, l)
     if !cond
-        tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
-        cond = tmp_color<0
-        if tmp_color>40
-            return false
-        end
+        return false
     end
-    if !cond
-        tmp_Hprio = eval_Hprio_swap(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
-        cond = tmp_Hprio<0
+    cond = false
+    tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
+    if score[1]+tmp_color>score_nadir[1]
+        return false
     end
-    if !cond
-        tmp_Lprio = eval_Lprio_swap(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-        cond = tmp_Lprio<0
+    tmp_Hprio = eval_Hprio_swap(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
+    if score[2]+tmp_Hprio>score_nadir[2]
+        return false
+    end
+    tmp_Lprio = eval_Lprio_swap(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+    if score[3]+tmp_Lprio>score_nadir[3]
+        return false
     end
 
+    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
     if cond
         tmp=copy(sequence_courante[k])
         sequence_courante[k]=sequence_courante[l]
@@ -120,7 +125,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol,score::Array{Int,1},score_nadir::Array{Int,1})
     sz = size(sequence_courante)[1]
     if pbl >10
         l = rand(10:15,1)[1]
@@ -137,27 +142,27 @@ function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ra
     for i in 1:l
         seq[i]+=k-1
     end
-
-    #aa , b =evaluation_init(sequence_courante,ratio_option,Hprio)
+    cond = eval_pbl_shuffle(sequence_courante,seq,pbl,k,l)
+    if !cond
+        return false
+    end
     tmp_Hprio = 0
     tmp_Lprio =0
     cond = false
-    if !cond
-        tmp_color = eval_couleur_shuffle(sequence_courante,seq,pbl,k,l)
-        cond = tmp_color<0
-        if tmp_color>40
-            return false
-        end
+    tmp_color = eval_couleur_shuffle(sequence_courante,seq,pbl,k,l)
+    if score[1]+tmp_color>score_nadir[1]
+        return false
     end
-    if !cond
-        tmp_Hprio = eval_Hprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
-        cond = tmp_Hprio<0
+    tmp_Hprio = eval_Hprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
+    if score[2]+tmp_Hprio>score_nadir[2]
+        return false
     end
-    if !cond
-        tmp_Lprio = eval_Lprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
-        cond = tmp_Lprio<0
+    tmp_Lprio = eval_Lprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
+    if score[3]+tmp_Lprio>score_nadir[3]
+        return false
     end
 
+    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
     if cond
         update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
         splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
@@ -180,7 +185,7 @@ end
 # @param rand_mov : le Symbol de la fonction utilisé pour trouvé k et l
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify sequence_courante : la sequence courante est mise à jour
-function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol)
+function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol,score::Array{Int,1},score_nadir::Array{Int,1})
     if k > l # Gestion du cas ou s'est inversé. Cette solution n'est surement pas top
         tmp = l
         l = k
@@ -191,22 +196,24 @@ function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, 
     tmp_color=0
     tmp_Hprio=0
     tmp_Lprio=0
+    cond = eval_pbl_fi_insertion(sequence_courante ,pbl,k,l)
     if !cond
-        tmp_color = eval_couleur_fi(sequence_courante, pbl, k, l)
-        cond = tmp_color<0
-        if tmp_color>40
-            return false
-        end
+        return false
     end
-    if !cond
-        tmp_Hprio = eval_Hprio_fi(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
-        cond = tmp_Hprio<0
+    tmp_color = eval_couleur_fi(sequence_courante, pbl, k, l)
+    if score[1]+tmp_color>score_nadir[1]
+        return false
     end
-    if !cond
-        tmp_Lprio = eval_Lprio_fi(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-        cond = tmp_Lprio<0
+    tmp_Hprio = eval_Hprio_fi(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
+    if score[2]+tmp_Hprio>score_nadir[2]
+        return false
+    end
+    tmp_Lprio = eval_Lprio_fi(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+    if score[3]+tmp_Lprio>score_nadir[3]
+        return false
     end
 
+    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
     if cond
         seq = [i for i in k:l-1]
         prepend!(seq,l)
