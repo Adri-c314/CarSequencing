@@ -128,6 +128,7 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
 end
 
 
+
 function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 1., temps_phase1::Float64 = 3., temps_phaseAutres::Float64 = 3., temps_popNonElite::Float64 = 3., temps_global::Float64 = 5., temps_mutation::Float64 = 0.1, temps_max::Float64 = 3., temps_moove::Float64 = 0.001, verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         if verbose
@@ -152,6 +153,7 @@ function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP"
         println("Hypervolume de l'instance ", ir, " : ", hypervolume(NDtree))
     end
 end
+
 
 
 # Fonction mainTestPLS

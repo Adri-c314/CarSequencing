@@ -54,7 +54,7 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         println("\n\n\n")
     end
 
-
+    # TODO : me push ici dans population les 6 sol elites
 
     # Création des nbSol
     for i in 7:nbSol
@@ -88,20 +88,4 @@ function initGenerate(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verb
         sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl = compute_initial_sequence(datas)
         # TODO : Amelioration de cette solution initiale ?
         return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl
-end
-
-
-
-# Fonction qui réalise une fonction similaire à la phase 1 initiale suivant EP
-# @param temps_phase1
-function ameliorationEP(temps_phase1::Float64)
-
-end
-
-
-
-# Fonction qui réalise une fonction similaire à la phase 1 initiale suivant RAF
-# @param temps_phase1
-function ameliorationRAF(temps_phase1::Float64)
-
 end
