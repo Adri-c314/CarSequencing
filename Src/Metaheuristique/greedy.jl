@@ -52,57 +52,12 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
     else
         mm = tmpplace+color[tmpi]-1
     end
-
     tmpfincol=mm
-    sz_avant =size(sequence_j_avant)[1]
-    tmpavant = sz_avant
-    nbcol_avant=0
-    col = sequence_j_avant[tmpavant][2]
-    for i in 1:sz_avant
-        if sequence_j_avant[tmpavant][2]!=col
-            break
-        end
-        nbcol_avant+=1
-        tmpavant-=1
-    end
 
-    tmpcol = nbcol_avant
-    tmpi = col
-    debb = true
+
     while sum(color)!=0 && tmpplace <= size(instance)[1]
 
-        if tmpplace==1 && debb
-            if tmpcol>=pbl
-                tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
-                tmpcol=0
-                tmpdebcol=tmpplace
-                if color[tmpi]>pbl
-                    mm = tmpplace+pbl-1
-                else
-                    mm = tmpplace+color[tmpi]-1
-                end
-                tmpfincol=mm
-            elseif tmpi>size(color)[1]
-                tmpi = argmax(color)[2]
-                tmpcol=0
-                tmpdebcol=tmpplace
-                if color[tmpi]>pbl
-                    mm = tmpplace+pbl-1
-                else
-                    mm = tmpplace+color[tmpi]-1
-                end
-                tmpfincol=mm
-            else
-                tmpdebcol=tmpplace
-                println(tmpcol)
-                if color[tmpi]>pbl-tmpcol
-                    mm = tmpplace+pbl-tmpcol-1
-                else
-                    mm = tmpplace+color[tmpi]-1
-                end
-                tmpfincol=mm
-            end
-        elseif tmpcol>=pbl && color[tmpi]!=0
+        if tmpcol>=pbl && color[tmpi]!=0
             tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
             tmpcol=0
             tmpdebcol=tmpplace
@@ -145,6 +100,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
             end
         end
         tmpduri = instance[ttt]
+        println(tmpi)
         for ii in 1:sz
             car = instance[ii]
             if car[1]==0 && car[2]==tmpi && color[tmpi]>0
@@ -212,17 +168,7 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
 
     sz_avant =size(sequence_j_avant)[1]
     tmpavant = sz_avant
-    nbcol_avant=0
-    color = sequence_j_avant[tmpavant][2]
-    for i in 1:sz_avant
-        if sequence_j_avant[tmpavant][2]!=color
-            break
-        end
-        nbcol_avant+=1
-        tmpavant-=1
-    end
-    global length_windows
-    pbl= nbcol_avant
+    pbl= 0
     tmpduri=instance[1]
     while tmpplace<=sz
         tmpdur=-10000
@@ -266,18 +212,10 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
     end
     for ii in 1:size(instance)[1]
         if instance[ii][1]==0
-            if tmpplace>1 && color != instance[ii][2]
-                tmpdebcol = tmpplace
+            for iii in 1:size(instance)[1]
+                instance[iii][1]=0
             end
-            if color == instance[ii][2]
-                tmppbl +=1
-            else
-                tmppbl = 1
-            end
-            instance[ii][1]=tmpplace
-            instance[ii][szcar-2]=tmpdebcol
-            tmpplace+=1
-            color=instance[ii][2]
+            return GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
         end
     end
 
@@ -315,7 +253,7 @@ end
 # @return ::Int : Une vaste fumisterie
 function argmax2(tmp::Array{Int,2},nope::Int)
     tmpii=1
-    tmpmax=tmp[1]
+    tmpmax=-1
 
     for i in 1:length(tmp)
         if tmpmax<tmp[i] && i!= nope
@@ -323,8 +261,8 @@ function argmax2(tmp::Array{Int,2},nope::Int)
             tmpii=i
         end
     end
-
     return tmpii
+
 end
 
 

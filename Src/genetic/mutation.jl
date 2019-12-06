@@ -101,7 +101,7 @@ function mutation!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, ins
             f_rand, f_mouv = choisir_klLS(enfant[1], opt, obj, Phase)
             k, l = choose_f_rand(enfant[1], inst.ratio, enfant[2], f_rand, Phase, obj, inst.Hprio)
 
-            effect = global_mouvement!(f_mouv, enfant[1], k, l, inst.ratio, enfant[2], inst.col_avant, inst.Hprio, obj, inst.pbl, f_rand)
+            effect = global_mouvement!(f_mouv, enfant[1], k, l, inst.ratio, enfant[2], inst.Hprio, obj, inst.pbl, f_rand)
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
 
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)

@@ -63,29 +63,31 @@ Base.iszero(som::Sommet) = isempty(som);
 function Base.empty!(som::Sommet)
     empty!(som.pred)
     empty!(som.succ)
-    typeof(som.val) <: Number ? som.val = zero(som.val) : empty!(som.val)
+    typeof(som.val) <: Number ? som.val = zero(som.val) : som.val = empty(som.val)
 end
 
 function remplace_elem_tableau!(tableau::Array{T}, elem1::T, elem2::T) where T
     drapeau = true
     i = 1
     while drapeau
-        drapeau = talbeau[i] != elem1
-        drapeau ? nothing : tableau[i] == elem2
+        drapeau = tableau[i] != elem1
+        drapeau ? nothing : tableau[i] = elem2
+        i += 1
     end
 end
 
+# Remplace le sommet 1 par le sommet 2.
 function remplace_som!(som1::Sommet, som2::Sommet)
     som1.val = som2.val
     som1.succ = som2.succ
     for suc in som2.succ
-        remplace_elem_tableau!(suc.pred, som1)
+        remplace_elem_tableau!(suc.pred, som2, som1)
     end
     lambda = s::Sommet -> s != som2
     for pre in som2.pred
         filter!(lambda, pre.succ)
     end
-    empty!(som2)
+    #empty!(som2)
 end
 
 function test_Sommet()
@@ -179,11 +181,24 @@ function test_Sommet()
     @time aj_suc!(racine,s1)
     @time aj_suc!(racine,s3)
     @time aj_suc!(s1, s2)
-    val = copy(s3.val)
-    succ = copy(s3.succ)
+    @time aj_suc!(s3)
+    @assert !isempty(s1.succ)
+    @assert !isempty(s1.pred)
+    @assert !isempty(s3.pred)
+    @assert !isempty(s3.succ)
+    println("s1 : ")
+    display(s1)
+    println("s3 : ")
+    display(s3)
     remplace_som!(s1, s3)
-    @assert s1.val == val
-    @assert s1.succ == succ
+    println("s1 : ")
+    display(s1)
+    println("s3 : ")
+    display(s3)
+    @assert s1.val == s3.val
+    @assert s1.succ == s3.succ
+    @assert s1.val === s3.val
+    @assert s1.succ === s3.succ
     for suc in s1.succ
         @assert s1 in suc.pred
         @assert !(s3 in suc.pred)
@@ -193,3 +208,5 @@ function test_Sommet()
         @assert !(s3 in pre.succ)
     end
 end
+
+#test_Sommet()

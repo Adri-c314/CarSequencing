@@ -16,20 +16,32 @@
 # @return ::Array{Array{Int,1},1} : la sequence du jour d'avant
 # @return ::Array{Int,1} : Le score courant
 # @return ::Array{Array{Int,1},1} : tab violation
-# @return ::Array{Array{Int,1},1} : col_avant
 # @return ::Array{Array{Int,1},1} : ratio_option le tableau des options
 # @return ::Int : Hprio le nombre d'options prioritaires
 # @return ::Array{Int,1} : le tableau des objectifs
 # @return ::Int : PAINT_BATCH_LIMIT
 function compute_initial_sequence(datas::NTuple{4,DataFrame})
     sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int, sequence_j_avant::Array{Array{Int,1},1} = init_sequence(datas)
+<<<<<<< HEAD
     sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
     score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
+=======
+    obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,sequence_j_avant,prio,pbl,Hprio)
+    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
+>>>>>>> 2029fdbd438c7fe7fc8b8e038f069c0f6eb32cdd
     sequence_meilleure = sequence_courrante
     score_meilleur = score_courrant
-    return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, col_avant, prio, Hprio, obj, pbl
+    return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl
 end
 
+function compute_initial_sequence_2(datas::NTuple{4,DataFrame})
+    sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int, sequence_j_avant::Array{Array{Int,1},1} = init_sequence(datas)
+    sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
+    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
+    sequence_meilleure = sequence_courrante
+    score_meilleur = score_courrant
+    return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl
+end
 
 
 # Fonction d'initialisation de la premiere sequence à partir des données d'entrée
@@ -137,21 +149,11 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
     Lpriofail=0
     maxprio =0
     tmpavant = sz_avant
-    nbcol_avant=0
-    col = sequence_j_avant[tmpavant][2]
-    for i in 1:sz_avant
-        if sequence_j_avant[tmpavant][2]!=col
-            break
-        end
-        nbcol_avant+=1
-        tmpavant-=1
-    end
-    col_avant =(nbcol_avant,col)
-
     ra = [[-ratio[i][1] for j in 1:size(instance)[1]] for i in 1:size(ratio)[1]]
     tab_violation = ra
     evalrat = [zeros(ratio[i][2]) for i in 1:size(ratio)[1]]
     tmpi=1
+
     for n in sequence_j_avant
         tmprio = 1
         for eval in evalrat
@@ -168,10 +170,14 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
         tmpi+=1
     end
     tmpi=1
+    col = 0
+
     for n in instance
         tmprio = 1
-        if n[2]!= col
+        if n[2]!= col && col !=0
             nbcol+=1
+            col=n[2]
+        elseif col ==0
             col=n[2]
         end
         for eval in evalrat
@@ -199,7 +205,7 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
         end
         tmpi+=1
     end
-    return [nbcol,Hpriofail,Lpriofail], tab_violation, col_avant
+    return [nbcol,Hpriofail,Lpriofail], tab_violation
 end
 
 
