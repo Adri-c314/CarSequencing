@@ -61,6 +61,8 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         # Création de l'odre des obj pour cette instance :
         obj = shuffle(MersenneTwister(1234), Vector(1:3))
 
+        println("bite n°", i)
+
         # Ajout de l'elmt dans la pop
         push!(population, VFLS_genetic(sequence_meilleure, tab_violation, score_meilleur, obj, inst, temps_popNonElite))
     end

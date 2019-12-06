@@ -100,7 +100,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
             end
         end
         tmpduri = instance[ttt]
-        
+
         for ii in 1:sz
             car = instance[ii]
             if car[1]==0 && car[2]==tmpi && color[tmpi]>0
@@ -168,7 +168,6 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
 
     sz_avant =size(sequence_j_avant)[1]
     tmpavant = sz_avant
-    pbl= 0
     tmpduri=instance[1]
     while tmpplace<=sz
         tmpdur=-10000
@@ -215,7 +214,7 @@ function GreedyEP(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{
             for iii in 1:size(instance)[1]
                 instance[iii][1]=0
             end
-            return GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
+            return GreedyRAF(instance,sequence_j_avant,ratio,pbl,Hprio)
         end
     end
 

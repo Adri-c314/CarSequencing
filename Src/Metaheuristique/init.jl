@@ -23,7 +23,7 @@
 function compute_initial_sequence(datas::NTuple{4,DataFrame})
     sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int, sequence_j_avant::Array{Array{Int,1},1} = init_sequence(datas)
     obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,sequence_j_avant,prio,pbl,Hprio)
-    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
+    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = sequence_courrante
     score_meilleur = score_courrant
     return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl

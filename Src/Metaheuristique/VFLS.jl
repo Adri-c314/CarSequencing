@@ -272,7 +272,7 @@ function VFLS_genetic(sol::Array{Array{Int,1},1}, viol::Array{Array{Int,1},1}, s
             f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
             k, l = choose_f_rand(sequence_meilleure, inst.ratio, tab_violation, f_rand, Phase, obj, inst.Hprio)
 
-            effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, inst.ratio, tab_violation, inst.col_avant, inst.Hprio, obj, inst.pbl, f_rand)
+            effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, inst.ratio, tab_violation, inst.Hprio, obj, inst.pbl, f_rand)
             compteurMvt!(f_mouv, nb,nb_effectiv,effect)
 
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
