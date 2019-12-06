@@ -11,9 +11,8 @@ include("../Metaheuristique/init.jl")
 include("../Metaheuristique/mouvement.jl")
 include("../Metaheuristique/VFLS.jl")
 include("../Metaheuristique/mouvement_2_Le_Retour.jl")
-#=
-include("../Metaheuristique/Sommet.jl")
-include("../Metaheuristique/NDtree.jl")
+#include("../Metaheuristique/Sommet.jl")
+#include("../Metaheuristique/NDtree.jl")
 
 # Les fichiers liés à l'algorithm genetic
 include("../genetic/crossover.jl")
@@ -21,4 +20,3 @@ include("../genetic/generate.jl")
 include("../genetic/genetic.jl")
 include("../genetic/mutation.jl")
 include("../genetic/majpop.jl")
-=#

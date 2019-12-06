@@ -82,7 +82,7 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         println(timeOPT)
     end
     if txtoutput
-        txt = string(txt, "2) Information sur la sequence initiale :\n","   ------------------------------------")
+        txt = string(txt, "2) Information sur la sequence initiale :\n","   ------------------------------------\n")
         for j in 1:length(score_init)
             txt = string(txt, "Valeur sur l'objectif ", j, " : ", score_init[j], "\n")
         end
@@ -244,7 +244,7 @@ function VFLS_genetic(sol::Array{Array{Int,1},1}, viol::Array{Array{Int,1},1}, s
         println(timeOPT)
     end
     if txtoutput
-        txt = string(txt, "2) Information sur la sequence initiale :\n","   ------------------------------------")
+        txt = string(txt, "2) Information sur la sequence initiale :\n","   ------------------------------------\n")
         for j in 1:length(score_init)
             txt = string(txt, "Valeur sur l'objectif ", j, " : ", score_init[j], "\n")
         end
