@@ -11,20 +11,19 @@
 include("../Util/includes.jl")
 using Dates
 using DelimitedFiles
-global length_windows = 1
-
 using Random
 Random.seed!(10)
+
+global length_windows = 1
+
+
+
 # Fonction main
 # @param ir : L'ensemble des noms d'instances avec la reference a etudié
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-<<<<<<< HEAD
 function main(ir::Array{Tuple{String,String},1} = [("X", "028_CH2_EP_ENP_RAF_S51_J1")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1.0)
-=======
-function main(ir::Array{Tuple{String,String},1} = [("X", "028_ch2_raf_ep_enp_s23_j3")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 600.0)
->>>>>>> 2029fdbd438c7fe7fc8b8e038f069c0f6eb32cdd
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -150,7 +149,7 @@ function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP"
         PLS!(NDtree, inst, temps_global, temps_moove, verbose)
         plot_pareto(NDtree, file_name =  "PLS_" * string(temps_max) * "_s_" * inst.name, verbose = verbose)
         CSV_pareto(NDtree, file_name = "PLS_" * string(temps_max) * "_s_" * inst.name, verbose = verbose)
-        println("Hypervolume de l'instance ", ir, " : " hypervolume(NDtree))
+        println("Hypervolume de l'instance ", ir, " : ", hypervolume(NDtree))
     end
 end
 

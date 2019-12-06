@@ -22,18 +22,25 @@
 # @return ::Int : PAINT_BATCH_LIMIT
 function compute_initial_sequence(datas::NTuple{4,DataFrame})
     sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int, sequence_j_avant::Array{Array{Int,1},1} = init_sequence(datas)
-<<<<<<< HEAD
-    sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
-    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
-=======
     obj[1]==1 ? sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio) : sequence_courrante = GreedyEP(sequence,sequence_j_avant,prio,pbl,Hprio)
-    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
->>>>>>> 2029fdbd438c7fe7fc8b8e038f069c0f6eb32cdd
+    score_courrant::Array{Int,1},tab_violation::Array{Array{Int,1},1},col_avant::Tuple{Int32,Int32} = evaluation_init(sequence_courrante,sequence_j_avant,prio,Hprio) #Score = tableaux des scores des 3 objectifs respectifs.
     sequence_meilleure = sequence_courrante
     score_meilleur = score_courrant
     return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl
 end
 
+
+
+# Fonction de réalisation de l'operation initial de l'algorithm VFLS (POURQUOI 2 ?? Jamais le moindre commentaire...)
+# @param Datas : Tableau de DataFrame bien degueu qu'on s'empresse de nettoyer
+# @return ::Array{Array{Int,1},1} : la sequence apres toute l'initialisation
+# @return ::Array{Array{Int,1},1} : la sequence du jour d'avant
+# @return ::Array{Int,1} : Le score courant
+# @return ::Array{Array{Int,1},1} : tab violation
+# @return ::Array{Array{Int,1},1} : ratio_option le tableau des options
+# @return ::Int : Hprio le nombre d'options prioritaires
+# @return ::Array{Int,1} : le tableau des objectifs
+# @return ::Int : PAINT_BATCH_LIMIT
 function compute_initial_sequence_2(datas::NTuple{4,DataFrame})
     sequence::Array{Array{Int,1},1},prio::Array{Array{Int,1},1},pbl::Int,obj::Array{Int,1},Hprio::Int, sequence_j_avant::Array{Array{Int,1},1} = init_sequence(datas)
     sequence_courrante = GreedyRAF(sequence,sequence_j_avant,prio,pbl,Hprio)
@@ -42,6 +49,7 @@ function compute_initial_sequence_2(datas::NTuple{4,DataFrame})
     score_meilleur = score_courrant
     return sequence_meilleure, sequence_j_avant, score_meilleur, tab_violation, prio, Hprio, obj, pbl
 end
+
 
 
 # Fonction d'initialisation de la premiere sequence à partir des données d'entrée

@@ -182,7 +182,6 @@ end
 
 
 
-<<<<<<< HEAD
 # Fonction qui réalise la VFLS pour la génération de la pop initiale
 # @param sol : la solution à partir de laquelle commencer
 # @param viol : le tab violation associé
@@ -335,8 +334,6 @@ end
 
 
 
-=======
->>>>>>> 2029fdbd438c7fe7fc8b8e038f069c0f6eb32cdd
 # Fonction qui realise une comparaison lexicographique
 # @param score_courrant : Le score courant comparer à
 # @pram score_meilleur : le meilleur score

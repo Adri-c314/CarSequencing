@@ -50,14 +50,14 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         println("Budjet de calcule pour la phase initiale commune : ", temps_init, " secondes")
         println("Budjet de calcule pour chacune des 3 phase 1 : ", temps_phase1, " secondes")
         println("Budjet de calcule pour chacune des 6 phase suivantes : ", temps_phaseAutres, " secondes")
-        println("Budjet de calcule pour chacune des ", nbSol-7, " solutions non elites : ", temps_popNonElite, " secondes")
+        println("Budjet de calcule pour chacune des ", nbSol-6, " solutions non elites : ", temps_popNonElite, " secondes")
         println("\n\n\n")
     end
 
-    # TODO : add les 7 sol elites dans la pop
+
 
     # Création des nbSol
-    for i in 8:nbSol
+    for i in 7:nbSol
         # Création de l'odre des obj pour cette instance :
         obj = shuffle(MersenneTwister(1234), Vector(1:3))
 

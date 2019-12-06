@@ -100,7 +100,7 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
             end
         end
         tmpduri = instance[ttt]
-        println(tmpi)
+        
         for ii in 1:sz
             car = instance[ii]
             if car[1]==0 && car[2]==tmpi && color[tmpi]>0
