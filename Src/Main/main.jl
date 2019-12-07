@@ -260,7 +260,35 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "025_38_1_EP_ENP
             txt = string(txt, scoreToCSV(score))
             ecriture(txt, string(path,i[1],"/",i[2],"nb",size(score)[1],".txt"))
             #writedlm(string(path,i[1],"_",i[2],".txt"), score)
->>>>>>> ab961c172206714c324987fea9836827452b7ec2
     end
 
+end
+
+
+
+function mainTest()
+    i  =("A", "022_3_4_RAF_EP_ENP")
+    ii =("A", "022_3_4_EP_RAF_ENP")
+    datas1 = lectureCSV(i[1], i[2])
+    datas2 = lectureCSV(ii[1], ii[2])
+    sequence_meilleure1,sequence_avant1, score_init1, tab_violation1 , ratio_option, Hprio, obj, pbl1 = compute_initial_sequence(datas1)
+    sequence_meilleure2,sequence_avant2, score_init2, tab_violation2 , ratio_option, Hprio, obj, pbl2 = compute_initial_sequence(datas2)
+    tmpi=1
+    for car in sequence_meilleure1
+        nook = false
+        for car2 in sequence_meilleure2
+            if car[2]==car2[2] && car[3]==car2[3]&& car[4]==car2[4]&& car[5]==car2[5]&& car[6]==car2[6]&& car[7]==car2[7]&& car[8]==car2[8]&& car[9]==car2[9]&& car[10]==car2[10]&& car[11]==car2[11]
+
+                nook = true
+                println("ok : ",tmpi)
+                tmpi+=1
+                break
+            end
+        end
+        if !nook
+        else
+            println(car)
+        end
+    end
+    println(tmpi)
 end
