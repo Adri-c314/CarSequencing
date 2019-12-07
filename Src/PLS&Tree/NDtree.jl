@@ -686,3 +686,50 @@ end
 
 #test_domination()
 #test_NDtree()
+
+# Fonction qui isnere une solution efficasse dans une liste, pour comparer avec le NDtree
+function maj!(liste::Array{Tuple{Array{U,1}, Array{T,1}, Q},1}, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
+    drapeau = true
+    i = 1
+    while drapeau && length(liste) >= i
+        drapeau &= !domine(liste[i], y)
+        i += 1
+    end
+    if drapeau
+        append!(liste, [y])
+        filter!(ys -> !domine_fortement(y, ys), liste)
+    end
+    return drapeau
+end
+
+function test_NDtree2(nb_y::Int = 100 ; d::Int = 2)
+    NDtree = Sommet()
+    random_y = (dim::Int = d) -> (Int32.([]), Int32.([rand(1:nb_y) for i in 1:dim]), Int32.([]))
+    y = random_y()
+    liste = [y]
+    @assert maj!(NDtree,y)
+    for i in 1:nb_y
+        y = random_y()
+        local insertND = maj!(NDtree,y)
+        local insertListe = maj!(liste,y)
+        try
+            @assert insertND == insertListe
+        catch
+            @assert insertND > insertListe
+            println("z(y) : ", y[2], " insere dans NDtree mais pas dans liste.")
+        end
+    end
+    pareto = get_solutions(NDtree)
+    for y in liste
+        @assert y in pareto
+    end
+    try
+        @assert length(pareto) == length(liste)
+    catch
+        @assert length(pareto) > length(liste)
+        println("length(pareto) : ", length(pareto), " > ", "length(liste) : ", length(liste))
+    end
+end
+
+#test_NDtree2(100000, d = 3)
+
