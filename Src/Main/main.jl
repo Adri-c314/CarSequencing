@@ -187,25 +187,14 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "025_38_1_EP_ENP
             datas = lectureCSV(i[1], i[2])
             path = "..\\..\\output\\"
             # Lancement de la VFLS
-            @time score, sol, tmp = IniNDtree(datas, verbose, txtoutput)
-            # Gestion affichage :
-            if txtoutput
-                txt = string(txt, "\n", tmp, "===================================================\n")
-                for j in 1:length(score)
-                    txt = string(txt, "Valeur sur l'objectif ", j, " : ", score[j], "\n")
-                end
-                txt = string(txt,"===================================================\n\n")
-                txt = string(txt, seqToCSV(sol))
-                writedlm(string(path,i[1],"_",i[2],".txt"), score)
-            end
-            if verbose
-                println(string("==================================================="))
-                for j in 1:length(score)
-                    println(string("Valeur sur l'objectif ", j, " : ", score[j]))
-                end
-                println(string("===================================================\n\n"))
-                #println(sol)
-            end
-
+            @time score = IniNDtree(datas, verbose, txtoutput)
+            println(score )
+            println("FIN")
+            path = "../../Output/PLS/"
+            txt = ""
+            txt = string(txt, scoreToCSV(score))
+            ecriture(txt, string(path,i[1],"/",i[2],"nb",size(score)[1],".txt"))
+            #writedlm(string(path,i[1],"_",i[2],".txt"), score)
     end
+
 end

@@ -12,7 +12,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     NDtree = Sommet()
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     debutall = time()
-    temps_all = 4500
+    temps_all = 25000
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
@@ -78,7 +78,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     sequence_best = deepcopy(sequence_meilleure)
     tab_violation_best =  deepcopy(tab_violation)
-    temps_max=200
+    temps_max=300
     OBJ = [[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     for objectif in OBJ
 
@@ -154,7 +154,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     for i in pareto_tmp
         println(i[2])
     end
-    temps_max=10
+    temps_max=20
     score_nadir = nadir_global(NDtree)
     println("Nadir : ",score_nadir)
     for par in pareto_tmp
@@ -237,17 +237,9 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
             end
         end
         pareto_tmp = secondpareto
-        for i in pareto_tmp
-            println(i[2])
-        end
     end
     pareto_tmp = get_solutions(NDtree)
-    println(size(pareto_tmp)[1])
-    for i in pareto_tmp
-        println(i[2])
-    end
-    hyperv = hypervolume(NDtree)
-    println("hyper : ", hyperv)
+    #println("hyper : ", hypervolume(NDtree))
     println("nadir : ",nadir_global(NDtree))
-    return a, sequence_meilleure, txt
+    return [p[2] for p in pareto_tmp]
 end
