@@ -58,6 +58,9 @@ function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
         update_tab_violation_reflection(sequence_courante,ratio_option,tab_violation,tmp,Hprio,pbl,k,l)
         reverse!(sequence_courante,k,l)
         update_col_and_pbl_reflection(sequence_courante,ratio_option,pbl,k,l)
+        score[1]+=tmp_color
+        score[2]+=tmp_Hprio
+        score[3]+=tmp_Lprio        
         return true
     else
         return false
