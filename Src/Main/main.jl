@@ -222,6 +222,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "025_38_1_EP_ENP
             ))
         end
 
+<<<<<<< HEAD
         # Lecture du fichier csv
         datas = lectureCSV(i[1], i[2])
 
@@ -246,5 +247,20 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "025_38_1_EP_ENP
             println(string("===================================================\n\n"))
         end
 
+=======
+            # Lecture du fichier csv
+            datas = lectureCSV(i[1], i[2])
+            path = "..\\..\\output\\"
+            # Lancement de la VFLS
+            @time score = IniNDtree(datas, verbose, txtoutput)
+            println(score )
+            println("FIN")
+            path = "../../Output/PLS/"
+            txt = ""
+            txt = string(txt, scoreToCSV(score))
+            ecriture(txt, string(path,i[1],"/",i[2],"nb",size(score)[1],".txt"))
+            #writedlm(string(path,i[1],"_",i[2],".txt"), score)
+>>>>>>> ab961c172206714c324987fea9836827452b7ec2
     end
+
 end

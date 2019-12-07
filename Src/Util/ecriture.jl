@@ -35,6 +35,18 @@ function seqToCSV(sol::Array{Array{Int,1},1})
     return seqPropreToCSV(nettoyageDeLaMort(sol))
 end
 
+# Fonction qui ecris en csv un array de score
+# @param seq : la sequence
+# @return ::String : le csv lié à la sequence
+function scoreToCSV(score::Array{Array{Int,1},1})
+    txt = ""
+    for i in 1:size(score)[1]
+        txt = string(txt,"[")
+        txt = string(txt, score[i][1],",",score[i][2],",",score[i][3])
+        txt = string(txt,"],")
+    end
+    return txt
+end
 
 
 # Fonction qui permet de sortir la sequence à partir du tableau de solution
