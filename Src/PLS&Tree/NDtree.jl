@@ -23,6 +23,16 @@
 # 6) Nadir et ideal global
 # nadir = nadir_global(NDtree)
 # ideal = ideal_global(NDtree)
+#
+# 7) Recuperer les extremes lexicographiques
+# y_extr = y_extremes(NDtree)
+#
+# 8) Recuperer les solutions plus le nadir global
+# solutions, nadir_global = get_solutions_plus_nadir(NDtree)
+#
+# 9) Recuperer les solutions plus les extremes lexicographiques
+# solutions, extremes = get_solutions_plus_extremes(NDtree)
+#
 
 # Le code est suffisament claire pour pouvoir etre compris avec l'article d'Andrzej Jaszkiewicz et de Thibaut Lust : "ND-Tree-based update: a Fast Algorithm for the Dynamic Non-Dominance Problem", 07/11/2017.
 
@@ -199,6 +209,83 @@ function get_solutions(som::Sommet)
         end
     end
     return solutions
+end
+
+
+function profondeur_nadir(som::Sommet, solutions::Array{T,1}, nadir_::Array{N,1}) where T where N <: Number
+    if isempty(som.succ)
+        append!(solutions, som.val[3])
+        for y in som.val[3]
+            for i in 1:length(y[2])
+                y[2][i] > nadir_[i] ? nadir_[i] = y[2][i] : nothing
+            end
+        end
+    else
+        for suc in som.succ
+            profondeur_nadir(suc, solutions, nadir_)
+        end
+    end
+end
+
+function get_solutions_plus_nadir(som::Sommet ; nb_obj::Int = 3)
+    solutions = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
+    nadir_ = fill(Int32(-1), nb_obj)
+    if isempty(som.succ)
+        append!(solutions, som.val[3])
+        for y in som.val[3]
+            for i in 1:length(y[2])
+                y[2][i] > nadir_[i] ? nadir_[i] = y[2][i] : nothing
+            end
+        end
+    else
+        for suc in som.succ
+            profondeur_nadir(suc, solutions, nadir_)
+        end
+    end
+    return solutions, nadir_
+end
+
+function profondeur_extremes(som::Sommet, solutions::Array{T,1}, extremes::Array{T,1}) where T
+    if isempty(som.succ)
+        append!(solutions, som.val[3])
+        if isempty(extremes)
+            for i in 1:length(som.val[3][1][2])
+                append!(extremes, [som.val[3][1]])
+            end
+        end
+        for y in som.val[3]
+            for i in 1:length(y[2])
+                y[2][i] > extremes[i][2][i] ? extremes[i] = y : nothing
+            end
+        end
+    else
+        for suc in som.succ
+            profondeur_extremes(suc, solutions, extremes)
+        end
+    end
+end
+
+function get_solutions_plus_extremes(som::Sommet ; nb_obj::Int = 3)
+    solutions = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
+    extremes = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
+    if isempty(som.succ)
+        append!(solutions, som.val[3])
+        if isempty(extremes)
+            for i in 1:length(som.val[3][1][2])
+                append!(extremes, [som.val[3][1]])
+            end
+        end
+        for y in som.val[3]
+            for i in 1:length(y[2])
+                y[2][i] > extremes[i][2][i] ? extremes[i] = y : nothing
+            end
+        end
+    else
+        for suc in som.succ
+            profondeur_extremes(suc, solutions, extremes)
+        end
+    end
+    return solutions, extremes
 end
 
 function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
@@ -401,8 +488,30 @@ function test_NDtree()
     println("Pareto : ", solutions)
     println("Nadir global : ", nadir_global(NDtree))
     println("Ideal global : ", ideal_global(NDtree))
+    extremes = y_extremes(NDtree)
+    println("extremes : ", [y[2] for y in extremes])
+    solutions2, extremes2 = get_solutions_plus_extremes(NDtree)
+    try
+        for i in 1:length(extremes[1][2])
+            @assert extremes[i][2][i] in [extremes2[j][2][i] for j in 1:length(extremes2)]
+        end
+    catch
+        println("extremes : ", [y[2] for y in extremes])
+        println("extremes2 : ", [y[2] for y in extremes2])
+        for i in 1:length(extremes[1][2])
+            @assert extremes[i][2][i] in [extremes2[j][2][i] for j in 1:length(extremes2)]
+        end
+    end
 
-
+    @time solutions2, nadir2 = get_solutions_plus_nadir(NDtree)
+    try
+        @assert nadir2 == nadir_global(NDtree)
+    catch
+        println("nadir : ", nadir_global(NDtree))
+        println("nadir2 : ", nadir2)
+        @assert nadir2 == nadir_global(NDtree)
+    end
+    @assert solutions == solutions2
 
     pareto = get_solutions(NDtree)
 
@@ -556,5 +665,24 @@ function ideal_global(NDtree::Sommet)
         return [minimum([y[2][i] for y in pareto ]) for i in 1:length(pareto[1][2]) ]
     end
 end
+
+# @return tableaux des solutions extremes (lexicographiquement)
+function y_extremes(NDtree::Sommet)
+    pareto = get_solutions(NDtree)
+    if isempty(pareto)
+        return []
+    else
+        y_extr = [pareto[1] for i in 1:length(pareto[1][2])]
+        for y in pareto
+            for i in 1:length(y[2])
+                if y_extr[i][2][i] >= y[2][i]
+                    y_extr[i] = y
+                end
+            end
+        end
+        return y_extr
+    end
+end
+
 #test_domination()
 #test_NDtree()
