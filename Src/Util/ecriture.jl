@@ -18,7 +18,7 @@ end
 # Fonction qui gère le path en cross plateforme
 # @param path : l'adresse ou l'on veut ecrire
 # @param onLinux : variable bool de la plateforme
-# @return ::String : le path adapté 
+# @return ::String : le path adapté
 function pathOS(path::String, onLinux::Bool)
     if !onLinux
         return replace(path, "/" => "\\")
@@ -35,18 +35,21 @@ function seqToCSV(sol::Array{Array{Int,1},1})
     return seqPropreToCSV(nettoyageDeLaMort(sol))
 end
 
+
+
 # Fonction qui ecris en csv un array de score
-# @param seq : la sequence
+# @param score : la sequence
 # @return ::String : le csv lié à la sequence
 function scoreToCSV(score::Array{Array{Int,1},1})
     txt = ""
     for i in 1:size(score)[1]
         txt = string(txt,"[")
         txt = string(txt, score[i][1],",",score[i][2],",",score[i][3])
-        txt = string(txt,"],")
+        txt = string(txt,"];")
     end
     return txt
 end
+
 
 
 # Fonction qui permet de sortir la sequence à partir du tableau de solution
