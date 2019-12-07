@@ -25,7 +25,7 @@ global surLinux = true
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function main(ir::Array{Tuple{String,String},1} = [("X", "028_CH2_EP_ENP_RAF_S51_J1")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1.0)
+function main(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_EP_RAF_ENP_ch2")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1.0)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -268,7 +268,7 @@ end
 # @param temps_1_moov : Le temps associé à un unique mouvement (proportion de temps_max)
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
-function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 1., temps_phase1::Float64 = 3., temps_phaseAutres::Float64 = 3., temps_popNonElite::Float64 = 3., temps_global::Float64 = 5., temps_mutation::Float64 = 0.1, temps_max::Float64 = 3., temps_moove::Float64 = 0.001, verbose::Bool = true, txtoutput::Bool = true)
+function mainPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_EP_RAF_ENP_ch2")], nbSol::Int=50, temps_init::Float64 = 1., temps_phase1::Float64 = 3., temps_phaseAutres::Float64 = 3., temps_popNonElite::Float64 = 3., temps_global::Float64 = 5., temps_mutation::Float64 = 0.1, temps_max::Float64 = 3., temps_moove::Float64 = 0.001, verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         if verbose
             println(string(
@@ -327,7 +327,7 @@ end
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "025_38_1_EP_ENP_RAF")],  verbose::Bool = true, txtoutput::Bool = true)
+function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_EP_RAF_ENP_ch2")],  verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
