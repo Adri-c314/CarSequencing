@@ -12,11 +12,11 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     NDtree = Sommet()
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     debutall = time()
-    temps_all = 60
+    temps_all = 300
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    temps_max=6
+    temps_max=60
 
 
     ## first solution
@@ -78,7 +78,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     sequence_best = deepcopy(sequence_meilleure)
     tab_violation_best =  deepcopy(tab_violation)
-    temps_max=3
+    temps_max=20
     OBJ = [[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     for objectif in OBJ
         pareto_tmp = get_solutions(NDtree)
@@ -130,19 +130,6 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
                 # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
             end
 
-            if verbose
-                st_output=string(st_output, "#] ")
-                println(st_output,100,"%")
-                #println("\nPhase ", Phase, " :")
-                println("Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1])
-                println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
-                println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
-                println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
-                a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
-                println("score : ", a,"\n\n")
-            end
-
-
             # Reset de nb
             nb = [0, 0, 0, 0]
             nb_effectiv = [0,0,0,0]
@@ -150,10 +137,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     end
     timeOPT, opt = phases_init([2,1,3])
     pareto_tmp = get_solutions(NDtree)
-    for i in pareto_tmp
-        println(i[2])
-    end
-    temps_max=20
+    temps_max=10
     score_nadir = nadir_global(NDtree)
     println("Nadir : ",score_nadir)
     for par in pareto_tmp
@@ -188,20 +172,16 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
                 break
             end
         end
-        if verbose
-            println("Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1])
-            println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
-            println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
-            println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
-            a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
-            println("score : ", a,"\n\n")
-        end
     end
     pareto_tmp = get_solutions(NDtree)
     ## le PLS
+    OBJ = [[1,2,3],[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     while size(pareto_tmp)[1]>1 && temps_all>time()-debutall
+
+        obj = OBJ[rand(1:6)]
+        timeOPT, opt = phases_init(obj)
         println(size(pareto_tmp)[1])
-        temps_max=10
+        temps_max=30
         pareto1_tmp = get_solutions(NDtree)
         score_nadir = nadir_global(NDtree)
         for par in pareto_tmp
@@ -240,8 +220,9 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
         end
         pareto_tmp = secondpareto
     end
+    println("FIN")
     pareto_tmp = get_solutions(NDtree)
-    #println("hyper : ", hypervolume(NDtree))
+    println("hyper : ", hypervolume(NDtree))
     println("nadir : ",nadir_global(NDtree))
     return [p[2] for p in pareto_tmp]
 end
