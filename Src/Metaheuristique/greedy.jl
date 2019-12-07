@@ -53,8 +53,6 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
         mm = tmpplace+color[tmpi]-1
     end
     tmpfincol=mm
-
-
     while sum(color)!=0 && tmpplace <= size(instance)[1]
 
         if tmpcol>=pbl && color[tmpi]!=0
