@@ -63,9 +63,52 @@ function insertionPotentielle!(population::Array{Array{Array{Array{Int,1},1},1},
         #println("on ne l'a pas gardé !")
     end
 
+    return inserer
+end
+
+
+
+# Fonction qui permet de dessider de l'insertion ou non d'un enfant dans la population
+# @param population : la population comme elle est definie plus précisement dans generate.jl
+# @param enfant : l'enfant générer
+# @param NDTree : le nd tree qu'on met potentiellement à jour
+# @modify NDTree : on ajoute dans certains cas
+# @modify population : insere potentiellement l'enfant dans la pop
+function insertionPotentielle!NDTree(population::Array{Array{Array{Array{Int,1},1},1},1}, enfant::Array{Array{Array{Int,1},1},1}, NDTree::Sommet)
+
+
+    ordre = shuffle(MersenneTwister(1234), Vector(1:length(population)))
+
+    i = 1
+    inserer = false
+
+    while (i <= length(ordre)) && !inserer
+        if domineFortement(population[ordre[i]], enfant)
+            population[ordre[i]] = enfant
+            inserer = true
+        end
+        i += 1
+    end
+
+    if !inserer
+        i = 1
+        while (i <= length(ordre)) && !inserer
+            if domineClassique(population[ordre[i]], enfant)
+                population[ordre[i]] = enfant
+                inserer = true
+            end
+            i += 1
+        end
+    end
+
+    # Si il domine pas il n'est pas nécessairement à jeter donc j'en fais quoi ?
+    if !inserer
+        #println("on ne l'a pas gardé !")
+    end
+
     # Ajout dans l'arbre
     if inserer
-        # TODO : inserer dans l'arbre
+        maj!(NDTree, (enfant[1], enfant[3][1], enfant[2]))
     end
 
     return inserer

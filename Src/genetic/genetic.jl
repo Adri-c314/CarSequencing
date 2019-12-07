@@ -75,7 +75,7 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
     end
 
     if verbose
-        println(nbInserer, " enfants ont été insérés")
+        println("\n", nbInserer, " enfants ont été insérés")
     end
     if txtoutput
         txt = string(txt, nbInserer, " enfants ont été insérés\n")
@@ -101,6 +101,7 @@ end
 # @modify NDTree : mise à jour du NDTree
 # @return ::String : le string pour le txtoutput
 # @return ::Array{Array{Array{Array{Int,1},1},1},1} : La population
+# @return ::Instance : l'instance courante 
 function genetic!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, verbose::Bool=true, txtoutput::Bool=true)
     if verbose
         n=0
@@ -153,11 +154,11 @@ function genetic!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int, temps_
     end
 
     if verbose
-        println(nbInserer, " enfants ont été insérés")
+        println("\n", nbInserer, " enfants ont été insérés")
     end
     if txtoutput
         txt = string(txt, nbInserer, " enfants ont été insérés\n")
     end
 
-    return txt, population
+    return txt, population, inst
 end

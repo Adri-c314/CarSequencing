@@ -1,0 +1,25 @@
+1) Information sur les données :
+   ---------------------------
+Nombre d'options prioritaires : 3
+PAINT_BATCH_LIMIT : 450
+Nombre de vehicules : 485
+
+
+2) Creation de la population initiale :
+   ----------------------------------
+Taille de la population :50
+Budjet de calcule pour la phase initiale commune : 10.0 secondes
+Budjet de calcule pour creer le 1er ind elites : 10.0 secondes
+Budjet de calcule pour creer 1 des 5 autres ind elites : 10.0 secondes
+Done !
+Budjet de calcule pour chacune des 44 solutions non elites : 3.0 secondes
+Done !
+Score de la population inital :
+Array{Int64,1}[[112, 0, 0]];Array{Int64,1}[[103, 0, 0]];Array{Int64,1}[[99, 0, 0]];Array{Int64,1}[[102, 0, 0]];Array{Int64,1}[[108, 0, 0]];Array{Int64,1}[[115, 0, 0]];Array{Int64,1}[[111, 0, 0]];Array{Int64,1}[[107, 0, 0]];Array{Int64,1}[[99, 0, 0]];Array{Int64,1}[[109, 0, 0]];Array{Int64,1}[[119, 0, 0]];Array{Int64,1}[[107, 0, 0]];Array{Int64,1}[[107, 0, 0]];Array{Int64,1}[[107, 0, 0]];Array{Int64,1}[[113, 0, 0]];Array{Int64,1}[[114, 0, 0]];Array{Int64,1}[[108, 0, 0]];Array{Int64,1}[[101, 0, 0]];Array{Int64,1}[[109, 0, 0]];Array{Int64,1}[[108, 0, 0]];Array{Int64,1}[[108, 0, 0]];Array{Int64,1}[[109, 0, 0]];Array{Int64,1}[[103, 0, 0]];Array{Int64,1}[[105, 0, 0]];Array{Int64,1}[[108, 0, 0]];Array{Int64,1}[[104, 0, 0]];Array{Int64,1}[[105, 0, 0]];Array{Int64,1}[[94, 0, 0]];Array{Int64,1}[[103, 0, 0]];Array{Int64,1}[[107, 0, 0]];Array{Int64,1}[[107, 0, 0]];Array{Int64,1}[[107, 0, 0]];Array{Int64,1}[[112, 0, 0]];Array{Int64,1}[[110, 0, 0]];Array{Int64,1}[[106, 0, 0]];Array{Int64,1}[[109, 0, 0]];Array{Int64,1}[[105, 0, 0]];Array{Int64,1}[[102, 0, 0]];Array{Int64,1}[[106, 0, 0]];Array{Int64,1}[[101, 0, 0]];Array{Int64,1}[[101, 0, 0]];Array{Int64,1}[[110, 0, 0]];Array{Int64,1}[[94, 0, 0]];Array{Int64,1}[[94, 0, 0]];
+
+
+3) Réalisation de l'algorithme génétique :
+   ----------------------------------
+Budjet de temps de calcule : 300.0 secondes
+Budjet de temps de calcule d'une mutation : 0.1 secondes
+2965 enfants ont été insérés

@@ -1,5 +1,7 @@
 # Fichier toutes les fonction associé à la PLS
+# @author Xavier Pillet
 # @author Thaddeus Leonard
+# @author Corentin Pelhatre
 # @date 05/12/2019
 # @version 1
 

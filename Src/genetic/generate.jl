@@ -93,7 +93,7 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
 
         # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
         if verbose
-            if i >(n/50)*nbSol
+            if i >(n/50)*(nbSol-6)
                 st_output=string(st_output, "#")
                 tmp_st = ""
                 for i in 1:50-n-1
