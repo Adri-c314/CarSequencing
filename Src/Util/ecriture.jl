@@ -15,6 +15,19 @@ end
 
 
 
+# Fonction qui gère le path en cross plateforme
+# @param path : l'adresse ou l'on veut ecrire
+# @param onLinux : variable bool de la plateforme
+# @return ::String : le path adapté 
+function pathOS(path::String, onLinux::Bool)
+    if !onLinux
+        return replace(path, "/" => "\\")
+    end
+    return path
+end
+
+
+
 # Fonction qui ecris en csv la sequence
 # @param seq : la sequence
 # @return ::String : le csv lié à la sequence

@@ -42,6 +42,10 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         println("Nombre de vehicules : ", sz)
         println("\n\n\n")
     end
+    txt = ""
+    if txtoutput
+        txt = string(txt, "1) Information sur les données :\n", "   ---------------------------\n", "Nombre d'options prioritaires : ", Hprio, "\nPAINT_BATCH_LIMIT : ", pbl, "\nNombre de vehicules : ", sz, "\n\n\n")
+    end
 
     if verbose
         println("2) Creation de la population initiale :")
@@ -50,24 +54,71 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         println("Budjet de calcule pour la phase initiale commune : ", temps_init, " secondes")
         println("Budjet de calcule pour creer le 1er ind elites : ", temps_firstind, " secondes")
         println("Budjet de calcule pour creer 1 des 5 autres ind elites : ", temps_elites, " secondes")
-        println("Budjet de calcule pour chacune des ", nbSol-6, " solutions non elites : ", temps_popNonElite, " secondes")
-        println("\n\n\n")
+    end
+    if txtoutput
+        txt = string(txt, "2) Creation de la population initiale :\n", "   ----------------------------------\n", "Taille de la population :", nbSol, "\nBudjet de calcule pour la phase initiale commune : ", temps_init, " secondes\n", "Budjet de calcule pour creer le 1er ind elites : ", temps_firstind, " secondes\n", "Budjet de calcule pour creer 1 des 5 autres ind elites : ", temps_elites, " secondes\n")
     end
 
     elites = pop_elites(temps_firstind, temps_elites,deepcopy(sequence_meilleure),ratio,deepcopy(tab_violation), Hprio, pbl)
-    println(size(elites))
+
+    if verbose
+        println("Done !")
+    end
+    if txtoutput
+        txt = string(txt, "Done !\n")
+    end
+
+    # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
+    if verbose
+        println("Budjet de calcule pour chacune des ", nbSol-6, " solutions non elites : ", temps_popNonElite, " secondes")
+        n=0
+        st_output = string("Execution : [")
+        tmp_st = ""
+        for i in 1:50-n-1
+            tmp_st=string(tmp_st," ")
+        end
+        tmp_st=string(tmp_st,"   ] ")
+    end
+    if txtoutput
+        txt = string(txt, "Budjet de calcule pour chacune des ", nbSol-6, " solutions non elites : ", temps_popNonElite, " secondes\n")
+    end
+
     # Création des nbSol
     for i in 7:nbSol
         # Création de l'odre des obj pour cette instance :
         obj = shuffle(MersenneTwister(1234), Vector(1:3))
 
-        println("bite n°", i)
-
         # Ajout de l'elmt dans la pop
         push!(population, VFLS_genetic(sequence_meilleure, tab_violation, score_meilleur, obj, inst, temps_popNonElite))
+
+        # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
+        if verbose
+            if i >(n/50)*nbSol
+                st_output=string(st_output, "#")
+                tmp_st = ""
+                for i in 1:50-n-1
+                    tmp_st=string(tmp_st," ")
+                end
+                tmp_st=string(tmp_st," ] ")
+                print(st_output,tmp_st,n*2,"% \r")
+                n+=1
+            end
+        end
     end
 
-    return population, inst
+    if verbose
+        println("\n\n\n")
+    end
+    if txtoutput
+        txt = string(txt, "Done !\n")
+        txt = string(txt, "Score de la population inital :\n")
+        for i in population
+            txt = string(txt, i[3], ";")
+        end
+        txt = string(txt, "\n\n\n")
+    end
+
+    return population, inst, txt
 end
 
 

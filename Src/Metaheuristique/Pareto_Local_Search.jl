@@ -1,17 +1,61 @@
+# Fichier toutes les fonction associé à la PLS
+# @author Thaddeus Leonard
+# @date 05/12/2019
+# @version 1
+
+
+
 # Theoriquement fonctionnel mais aura peut-etre besoin d'une phase de debbug.
 # Necessite une population de base pour commencer (par exemple celle du genetique).
 
-# Pareto Local Search
-function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_moove::Float64 = temps_max/1000., verbose::Bool = true)
-    println("   ------------------------------------")
-    println("   Lancement de la Pareto Local Search pour : ", temps_max, " s")
-    debut = time()
+
+
+# Fonction qui réalise la Pareto Local Search
+# @param NDtree : l'abre tel que défini dans Sommet.jl
+# @param inst : L'instance du problème tel que defini dans instance.jl
+# @param temps_max : Le temps pour toute la PLS
+# @param temps_1_moov : Le temps associé à un unique mouvement (proportion de temps_max)
+# @param verbose : Si l'on souhaite un affichage console de l'execution
+# @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
+function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_moove::Float64 = temps_max/1000., verbose::Bool = true, txtoutput::Bool=true)
+    # Gestion d'un affichage :
+    if verbose
+        println("   ------------------------------------")
+        println("   Lancement de la Pareto Local Search pour : ", temps_max, " s")
+    end
+    txt = ""
+    if txtoutput
+        txt = string(txt, "   ------------------------------------\n", "   Lancement de la Pareto Local Search pour : ", temps_max, " s\n")
+    end
+
     pareto_tmp = get_solutions(NDtree)
+
     compteur_solutions_trouvees = 0
     compteur_solutions_trouvees_efficasses = 0
     nb = 0
     nb_effective = 0
+
+    # La barre de chargement qui fait du bien
+    if verbose
+        n=0
+        st_output = string("Execution : [")
+    end
+    debut = time()
     while temps_max > time() - debut
+        # La barre de chargement qui fait du bien
+        if verbose
+            if (time()-debut)>(n/50)*temps_max
+                st_output=string(st_output, "#")
+                tmp_st = ""
+                for i in 1:50-n-1
+                    tmp_st=string(tmp_st," ")
+                end
+                tmp_st=string(tmp_st," ] ")
+                print(st_output,tmp_st,n*2,"% \r")
+                n+=1
+            end
+        end
+
         local pareto = deepcopy(pareto_tmp)
         for y in pareto_tmp
             local y_tmp = LS(y)
@@ -23,6 +67,8 @@ function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_
             compteur_solutions_trouvees_efficasses += 1
         end
     end
+
+    # Gestion d'un affichage :
     if verbose
         println("   ------------------------------------")
         println("   Fin de la Pareto Local Search")
@@ -32,8 +78,32 @@ function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_
         println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
         println("Nombre de solutions trouvees : ", compteur_solutions_trouvees, "Nombre de solutions trouvees : ", compteur_solutions_trouvees_efficasses)
     end
+    if txtoutput
+        txt = string(txt, "   ------------------------------------\n", "   Fin de la Pareto Local Search\n", "Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1], "\nNombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2], "\nNombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3], "\nNombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ", nb_effectiv[4], "\nNombre de solutions trouvees : ", compteur_solutions_trouvees, "Nombre de solutions trouvees : ", compteur_solutions_trouvees_efficasses)
+    end
+
+    # Pour le txtoutput
+    return txt
 end
 
+
+
+# Fonction qui converti du genetic vers le pls
+# @param y : un membre de la population du génétic
+# @return ::Tuple{Array{U,1}, Array{T,1}, Q} : Utile pour la PLS
+function convert_genetic_PLS(y::Array{T,1}) where T
+    return (y[1], y[3], y[2])
+end
+
+
+
+# Fonction qui réalise une VFLS legerement custom pour PLS
+# @param y : L'instance tel que def dans PLS
+# @param inst : L'instance du problème tel que defini dans instance.jl
+# @param nb : le compteur de mouvements
+# @param nb_effectiv : Le compteur de mouvements effectifs
+# @param temps_1_moove : Le temps associé à cette VFLS custom
+# @modify y : On lui applique la VFLS
 function recherche_locale!(y::Tuple{Array{U,1}, Array{T,1}, Q}, inst::Instance, nb::Int, nb_effective::Int, temps_1_moove::Float64)  where T <: Real where U where Q
     Phase = rand(1:3)
     obj = [rand(1:3) for i in 1:3]
@@ -44,8 +114,4 @@ function recherche_locale!(y::Tuple{Array{U,1}, Array{T,1}, Q}, inst::Instance, 
         effect = global_mouvement!(f_mouv, y_tmp[3], k, l, inst.ratio,  y_tmp[4], inst.Hprio, obj, inst.pbl, f_rand)
         compteurMvt!(f_mouv, nb,nb_effectiv,effect)
     end
-end
-
-function convert_genetic_PLS(y::Array{T,1}) where T
-    return (y[1], y[3], y[2])
 end

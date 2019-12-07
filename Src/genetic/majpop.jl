@@ -38,6 +38,7 @@ function insertionPotentielle!(population::Array{Array{Array{Array{Int,1},1},1},
 
     i = 1
     inserer = false
+
     while (i <= length(ordre)) && !inserer
         if domineFortement(population[ordre[i]], enfant)
             population[ordre[i]] = enfant
@@ -62,7 +63,12 @@ function insertionPotentielle!(population::Array{Array{Array{Array{Int,1},1},1},
         #println("on ne l'a pas gardé !")
     end
 
-    return nothing
+    # Ajout dans l'arbre
+    if inserer
+        # TODO : inserer dans l'arbre
+    end
+
+    return inserer
 end
 
 
