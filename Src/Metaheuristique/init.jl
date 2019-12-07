@@ -178,7 +178,7 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
         tmpi+=1
     end
     tmpi=1
-    col = 0
+    col = instance[1][2]
 
     for n in instance
         tmprio = 1

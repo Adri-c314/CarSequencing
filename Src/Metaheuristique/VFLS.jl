@@ -46,7 +46,9 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     sz = size(sequence_meilleure)[1]
     szcar = size(sequence_meilleure[1])[1]
     timeOPT, opt = phases_init(obj)
-
+    for car in sequence_meilleure
+        println(car)
+    end
 
 
     # affichage initial :
@@ -376,7 +378,7 @@ end
 # @param Hprio : Le nombre de hprio
 # @return ::Array{Int,1} : [nombre de couleurs fail, H prio fail,L prio fail]
 function evaluation(instance::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},ratio::Array{Array{Int,1},1},Hprio::Int)
-    col = instance[1]
+    col = instance[1][2]
     sz =size(instance)[1]
     nbcol = 0
     Hpriofail=0
