@@ -12,11 +12,11 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     NDtree = Sommet()
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     debutall = time()
-    temps_all = 800
+    temps_all = 5000
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    temps_max=10
+    temps_max=600
 
 
     ## first solution
@@ -78,7 +78,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     sequence_best = deepcopy(sequence_meilleure)
     tab_violation_best =  deepcopy(tab_violation)
-    temps_max=5
+    temps_max=200
     OBJ = [[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     for objectif in OBJ
         pareto_tmp = get_solutions(NDtree)
@@ -137,7 +137,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     end
     timeOPT, opt = phases_init([2,1,3])
     pareto_tmp = get_solutions(NDtree)
-    temps_max=1
+    temps_max=10
     score_nadir = nadir_global(NDtree)
     println("Nadir : ",score_nadir)
     for par in pareto_tmp
@@ -180,7 +180,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
         obj = OBJ[rand(1:6)]
         timeOPT, opt = phases_init(obj)
         println(size(pareto_tmp)[1])
-        temps_max=30
+        temps_max=50
         pareto1_tmp = get_solutions(NDtree)
         score_nadir = nadir_global(NDtree)
         println(score_nadir)
@@ -192,32 +192,12 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
             sequence_meilleure = deepcopy(par[1])
             tab_violation=  deepcopy(par[3])
             a =  deepcopy(par[2])
-            println("debut de phase :", a )
             @time for Phase in 1:3
                 debut = time()
                 while temps_max*(timeOPT[Phase]/100)>time()-debut
                     f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
                     k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
                     effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand,a,score_nadir)
-                    aa,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
-                    if a[1]!=aa[1]||a[2]!=aa[2]||a[3]!=aa[3]
-                        println(f_mouv)
-                        if k>1
-                            k-=1
-                            println("ui")
-                        end
-                        if l<sz
-                            l+=1
-                            println("ui")
-                        end
-                        for i in k:l
-                            println(sequence_meilleure[i])
-                        end
-                        println(a)
-                        println(aa)
-                        println(obj)
-                        return tamere
-                    end
                     if effect
                         maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
                     end

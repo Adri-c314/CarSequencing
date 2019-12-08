@@ -291,11 +291,11 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_EP_RAF
 
         println(score )
         println("FIN")
-        #=path = "../../Output/PLS/"
+        path = "../../Output/PLS/"
         txt = ""
         txt = string(txt, scoreToCSV(score))
         txt2 = string("", allToCSV(nadir,szscore,sollexico))
         ecriture(txt, string(path,i[1],"/",i[2],"nb",size(score)[1],"scores",".txt"))
-        ecriture(txt2, string(path,i[1],"/",i[2],"nb",size(score)[1],"elements",".txt"))=#
+        ecriture(txt2, string(path,i[1],"/",i[2],"nb",size(score)[1],"elements",".txt"))
     end
 end

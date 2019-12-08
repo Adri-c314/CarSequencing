@@ -113,7 +113,6 @@ function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio
         score[1]+=tmp_color
         score[2]+=tmp_Hprio
         score[3]+=tmp_Lprio
-        println("col : ", tmp_color,"tmp_Hprio : ", tmp_Hprio,"tmp_Lprio : ", tmp_Lprio,)
         return true
     else
         return false
