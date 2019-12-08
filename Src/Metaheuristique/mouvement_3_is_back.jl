@@ -39,18 +39,12 @@ function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
     end
     cond = false
     tmp_color = eval_couleur_reflection(sequence_courante,pbl,k,l)
-    if score[1]+tmp_color>score_nadir[1]
-        return false
-    end
+
     tmp_Hprio = eval_Hprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-    if score[2]+tmp_Hprio>score_nadir[2]
-        return false
-    end
+
     tmp_Lprio = eval_Lprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-    if score[3]+tmp_Lprio>score_nadir[3]
-        return false
-    end
-    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
+
+    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] || score[2]+tmp_Hprio<score_nadir[2] || score[1]+tmp_color<score_nadir[1])
     if cond
         tmp = [i for i in (k):(l)]
         tmp =reverse(tmp)
@@ -92,19 +86,13 @@ function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio
     end
     cond = false
     tmp_color = eval_couleur_swap(sequence_courante, pbl, k, l)
-    if score[1]+tmp_color>score_nadir[1]
-        return false
-    end
-    tmp_Hprio = eval_Hprio_swap(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
-    if score[2]+tmp_Hprio>score_nadir[2]
-        return false
-    end
-    tmp_Lprio = eval_Lprio_swap(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-    if score[3]+tmp_Lprio>score_nadir[3]
-        return false
-    end
 
-    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
+    tmp_Hprio = eval_Hprio_swap(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
+
+    tmp_Lprio = eval_Lprio_swap(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+
+
+    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] || score[2]+tmp_Hprio<score_nadir[2] || score[1]+tmp_color<score_nadir[1])
     if cond
         tmp=copy(sequence_courante[k])
         sequence_courante[k]=sequence_courante[l]
@@ -156,19 +144,13 @@ function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ra
     tmp_Lprio =0
     cond = false
     tmp_color = eval_couleur_shuffle(sequence_courante,seq,pbl,k,l)
-    if score[1]+tmp_color>score_nadir[1]
-        return false
-    end
-    tmp_Hprio = eval_Hprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
-    if score[2]+tmp_Hprio>score_nadir[2]
-        return false
-    end
-    tmp_Lprio = eval_Lprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
-    if score[3]+tmp_Lprio>score_nadir[3]
-        return false
-    end
 
-    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
+    tmp_Hprio = eval_Hprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
+
+    tmp_Lprio = eval_Lprio_shuffle(sequence_courante,ratio_option,tab_violation,Hprio,k,l,seq)
+
+
+    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] || score[2]+tmp_Hprio<score_nadir[2] || score[1]+tmp_color<score_nadir[1])
     if cond
         update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
         splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
@@ -210,19 +192,13 @@ function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, 
         return false
     end
     tmp_color = eval_couleur_fi(sequence_courante, pbl, k, l)
-    if score[1]+tmp_color>score_nadir[1]
-        return false
-    end
-    tmp_Hprio = eval_Hprio_fi(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
-    if score[2]+tmp_Hprio>score_nadir[2]
-        return false
-    end
-    tmp_Lprio = eval_Lprio_fi(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
-    if score[3]+tmp_Lprio>score_nadir[3]
-        return false
-    end
 
-    cond = tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0
+    tmp_Hprio = eval_Hprio_fi(sequence_courante, ratio_option, tab_violation, Hprio, k, l)
+
+    tmp_Lprio = eval_Lprio_fi(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
+
+
+    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] || score[2]+tmp_Hprio<score_nadir[2] || score[1]+tmp_color<score_nadir[1])
     if cond
         seq = [i for i in k:l-1]
         prepend!(seq,l)

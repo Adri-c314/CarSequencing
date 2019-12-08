@@ -233,6 +233,9 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
             if i!= ii && tab_score[i][1]>=tab_score[ii][1] && tab_score[i][2]>=tab_score[ii][2] && tab_score[i][3]>=tab_score[ii][3]
                 ok = false
             end
+            if i<ii && tab_score[i][1]==tab_score[ii][1] && tab_score[i][2]==tab_score[ii][2] && tab_score[i][3]==tab_score[ii][3]
+                ok = true
+            end
         end
         if ok
             append!(final_score,[tab_score[i]])
