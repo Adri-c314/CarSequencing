@@ -12,11 +12,11 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     NDtree = Sommet()
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     debutall = time()
-    temps_all = 300
+    temps_all = 800
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    temps_max=60
+    temps_max=10
 
 
     ## first solution
@@ -78,7 +78,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     sequence_best = deepcopy(sequence_meilleure)
     tab_violation_best =  deepcopy(tab_violation)
-    temps_max=20
+    temps_max=5
     OBJ = [[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     for objectif in OBJ
         pareto_tmp = get_solutions(NDtree)
@@ -137,7 +137,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     end
     timeOPT, opt = phases_init([2,1,3])
     pareto_tmp = get_solutions(NDtree)
-    temps_max=10
+    temps_max=1
     score_nadir = nadir_global(NDtree)
     println("Nadir : ",score_nadir)
     for par in pareto_tmp
@@ -177,28 +177,47 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     ## le PLS
     OBJ = [[1,2,3],[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     while size(pareto_tmp)[1]>1 && temps_all>time()-debutall
-
         obj = OBJ[rand(1:6)]
         timeOPT, opt = phases_init(obj)
         println(size(pareto_tmp)[1])
         temps_max=30
         pareto1_tmp = get_solutions(NDtree)
         score_nadir = nadir_global(NDtree)
+        println(score_nadir)
+        println(size(pareto1_tmp))
         for par in pareto_tmp
-            if temps_all>time()-debutall
+            if temps_all<time()-debutall
                 break
             end
             sequence_meilleure = deepcopy(par[1])
             tab_violation=  deepcopy(par[3])
             a =  deepcopy(par[2])
-
+            println("debut de phase :", a )
             @time for Phase in 1:3
                 debut = time()
                 while temps_max*(timeOPT[Phase]/100)>time()-debut
-
                     f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
                     k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
                     effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand,a,score_nadir)
+                    aa,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
+                    if a[1]!=aa[1]||a[2]!=aa[2]||a[3]!=aa[3]
+                        println(f_mouv)
+                        if k>1
+                            k-=1
+                            println("ui")
+                        end
+                        if l<sz
+                            l+=1
+                            println("ui")
+                        end
+                        for i in k:l
+                            println(sequence_meilleure[i])
+                        end
+                        println(a)
+                        println(aa)
+                        println(obj)
+                        return tamere
+                    end
                     if effect
                         maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
                     end
@@ -220,9 +239,51 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
         end
         pareto_tmp = secondpareto
     end
-    println("FIN")
     pareto_tmp = get_solutions(NDtree)
-    println("hyper : ", hypervolume(NDtree))
-    println("nadir : ",nadir_global(NDtree))
-    return [p[2] for p in pareto_tmp]
+    println("FIN")
+    nadir = nadir_global(NDtree)
+
+    println("nadir : ",nadir)
+    tab_score = [p[2] for p in pareto_tmp]
+    final_score = [tab_score[1]]
+    println(tab_score)
+    for i in 1:size(tab_score)[1]
+        ok = true
+        for ii in 1:size(tab_score)[1]
+            if i!= ii && tab_score[i][1]>=tab_score[ii][1] && tab_score[i][2]>=tab_score[ii][2] && tab_score[i][3]>=tab_score[ii][3]
+                ok = false
+            end
+        end
+        if ok
+            append!(final_score,[tab_score[i]])
+        end
+    end
+    popfirst!(final_score)
+    println(final_score)
+    tmpi1=1
+    tmpi2=1
+    tmpi3=1
+    score1=final_score[1][1]
+    score2=final_score[1][2]
+    score3=final_score[1][3]
+
+    for i in 1:size(final_score)[1]
+        if final_score[i][1]<score1
+            tmpi1 = i
+            score1 = final_score[i][1]
+        end
+        if final_score[i][2]<score2
+            tmpi2 = i
+            score2 = final_score[i][2]
+        end
+        if final_score[i][3]<score3
+            tmpi3 = i
+            score3 = final_score[i][3]
+        end
+    end
+    println([final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]])
+    return final_score, size(final_score)[1], nadir, [final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]]
+
+
+
 end

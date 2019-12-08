@@ -43,10 +43,22 @@ end
 function scoreToCSV(score::Array{Array{Int,1},1})
     txt = ""
     for i in 1:size(score)[1]
-        txt = string(txt,"[")
-        txt = string(txt, score[i][1],",",score[i][2],",",score[i][3])
-        txt = string(txt,"];")
+        txt = string(txt, score[i][1]," ",score[i][2]," ",score[i][3])
+        txt = string(txt,"\n")
     end
+    return txt
+end
+
+# Fonction qui ecris en csv un array de score
+# @param score : la sequence
+# @return ::String : le csv lié à la sequence
+function allToCSV(nadir::Array{Int,1},nb::Int,score::Array{Array{Int,1},1})
+    txt = ""
+    txt = string(txt, nadir[1]," ",nadir[2]," ",nadir[3])
+    txt = string(txt,"\n")
+    txt = string(txt, nb)
+    txt = string(txt,"\n")
+    txt = string(txt, scoreToCSV(score))
     return txt
 end
 

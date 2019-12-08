@@ -2,10 +2,10 @@
 
 
 function global_mouvement_3!(LSfoo!::Symbol, sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, obj::Array{Int,1}, pbl::Int, rand_mov::Symbol,score::Array{Int,1},score_nadir::Array{Int,1})
-    if    LSfoo! == :reflection!
+    if    LSfoo! == :reflection! && k>25 && l-k>1 && l<size(sequence_courante)[1]-25
         return @eval reflection_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
     elseif LSfoo! == :shuffle!
-        return @eval shuffle_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
+         #return @eval shuffle_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
     elseif LSfoo! == :swap!
         return @eval swap_3!($sequence_courante, $k, $l, $ratio_option, $tab_violation , $Hprio, $obj, $pbl, :rand_mov,$score,$score_nadir)
     elseif LSfoo! == :insertion! && k>20 && l-k>1 && l<size(sequence_courante)[1]-20
@@ -60,7 +60,7 @@ function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
         update_col_and_pbl_reflection(sequence_courante,ratio_option,pbl,k,l)
         score[1]+=tmp_color
         score[2]+=tmp_Hprio
-        score[3]+=tmp_Lprio        
+        score[3]+=tmp_Lprio
         return true
     else
         return false
@@ -110,6 +110,10 @@ function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio
         sequence_courante[k]=sequence_courante[l]
         sequence_courante[l]=tmp
         update_tab_violation_and_pbl_swap!(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+        score[1]+=tmp_color
+        score[2]+=tmp_Hprio
+        score[3]+=tmp_Lprio
+        println("col : ", tmp_color,"tmp_Hprio : ", tmp_Hprio,"tmp_Lprio : ", tmp_Lprio,)
         return true
     else
         return false
@@ -170,6 +174,9 @@ function shuffle_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ra
         update_tab_violation_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
         splice!(sequence_courante,(k):(l+k-1),sequence_courante[seq])
         update_col_and_pbl_shuffle(sequence_courante,ratio_option,tab_violation,seq,Hprio,pbl,k,l)
+        score[1]+=tmp_color
+        score[2]+=tmp_Hprio
+        score[3]+=tmp_Lprio
         return true
     else
         return false
@@ -224,6 +231,9 @@ function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, 
         splice!(sequence_courante,(k):(l),sequence_courante[seq])
         # Mise à jour du tableau de violation et pbl :
         update_col_and_pbl_fi(sequence_courante,ratio_option,tab_violation,Hprio,pbl,k,l)
+        score[1]+=tmp_color
+        score[2]+=tmp_Hprio
+        score[3]+=tmp_Lprio
         return true
     else
         return false

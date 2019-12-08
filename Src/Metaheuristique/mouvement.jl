@@ -402,7 +402,17 @@ function eval_couleur_fi(sequence_courante::Array{Array{Int,1},1}, pbl::Int, k::
 
     #Les purges qui change en k
     if sequence_courante[l][2]==sequence_courante[k][2]
-        return 0
+
+        if sequence_courante[l][2]==sequence_courante[l-1][2] && sequence_courante[l][2]==sequence_courante[l+1][2]
+            return 0
+        end
+        if sequence_courante[l][2]!=sequence_courante[l-1][2] && sequence_courante[l][2]!=sequence_courante[l+1][2]
+            tmp_color-=1
+        end
+        if  sequence_courante[l-1][2]==sequence_courante[l+1][2]
+            tmp_color-=1
+        end
+
     else
         ## avant :
         if k>1 && sequence_courante[k][2]!=sequence_courante[k-1][2]
@@ -1260,16 +1270,17 @@ function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
     sz = size(sequence_courante)[1]
     tab_violation = deepcopy(tab_violation1)
     tmp_viol=0
+    tmp_viol_avant =0
     for i in 1:Hprio
         tab_deb=[0 for i in 1:ratio_option[i][2]-1]
         tab_fin=[0 for i in 1:ratio_option[i][2]-1]
-        for j in 0:min(l-k-1,ratio_option[i][2]-2,sz-k)
+        for j in 0:min(l-k,ratio_option[i][2]-2)
 
-            if sequence_courante[min(sz,k+j)][i+2]!=sequence_courante[max(1,l-j)][i+2]
+            if sequence_courante[k+j][i+2]!=sequence_courante[l-j][i+2]
                 if sequence_courante[k+j][i+2]==1
                     tab_fin[j+1]+=1
                     tab_deb[j+1]-=1
-                elseif sequence_courante[max(1,l-j)][i+2]==1
+                elseif sequence_courante[l-j][i+2]==1
                     tab_fin[j+1]-=1
                     tab_deb[j+1]+=1
                 end
@@ -1279,15 +1290,20 @@ function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
                 tab_deb[j+1]+=tab_deb[j]
             end
             tab_violation[i][k+j] += tab_deb[j+1]
+            tmp_viol+=max(0,tab_violation[i][k+j])
+            tmp_viol_avant+= max(0,tab_violation1[i][k+j])
+
             if (l-j+ratio_option[i][2]-1<=sz)
                 tab_violation[i][l-j+ratio_option[i][2]-1] += tab_fin[j+1]
                 tmp_viol+=max(0,tab_violation[i][l-j+ratio_option[i][2]-1])
+                tmp_viol_avant+=max(0,tab_violation1[i][l-j+ratio_option[i][2]-1])
             end
-            tmp_viol+=max(0,tab_violation[i][k+j])
+
         end
+
     end
 
-    return tmp_viol
+    return tmp_viol-tmp_viol_avant
 end
 
 # Fonction qui evalue la difference de EP si on effectu la reflection k,l
@@ -1302,16 +1318,17 @@ function eval_Lprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
     sz = size(sequence_courante)[1]
     tab_violation = deepcopy(tab_violation1)
     tmp_viol=0
-    for i in Hprio+1:size(ratio_option)[1]
+    tmp_viol_avant =0
+    for i in 1+Hprio:size(ratio_option)[1]
         tab_deb=[0 for i in 1:ratio_option[i][2]-1]
         tab_fin=[0 for i in 1:ratio_option[i][2]-1]
-        for j in 0:min(l-k-1,ratio_option[i][2]-2,sz-k)
+        for j in 0:min(l-k,ratio_option[i][2]-2)
 
-            if sequence_courante[min(sz,k+j)][i+2]!=sequence_courante[max(1,l-j)][i+2]
+            if sequence_courante[k+j][i+2]!=sequence_courante[l-j][i+2]
                 if sequence_courante[k+j][i+2]==1
                     tab_fin[j+1]+=1
                     tab_deb[j+1]-=1
-                elseif sequence_courante[max(1,l-j)][i+2]==1
+                elseif sequence_courante[l-j][i+2]==1
                     tab_fin[j+1]-=1
                     tab_deb[j+1]+=1
                 end
@@ -1320,14 +1337,19 @@ function eval_Lprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
                 tab_fin[j+1]+=tab_fin[j]
                 tab_deb[j+1]+=tab_deb[j]
             end
+
             tab_violation[i][k+j] += tab_deb[j+1]
+            tmp_viol+=max(0,tab_violation[i][k+j])-max(0,tab_violation1[i][k+j])
+
             if (l-j+ratio_option[i][2]-1<=sz)
                 tab_violation[i][l-j+ratio_option[i][2]-1] += tab_fin[j+1]
-                tmp_viol+=max(0,tab_violation[i][l-j+ratio_option[i][2]-1])
+                tmp_viol+=max(0,tab_violation[i][l-j+ratio_option[i][2]-1])-max(0,tab_violation1[i][l-j+ratio_option[i][2]-1])
             end
-            tmp_viol+=max(0,tab_violation[i][k+j])
+
         end
+
     end
+
     return tmp_viol
 end
 
@@ -2043,15 +2065,13 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
     szcar = size(sequence_courante[1])[1]
     sz = size(sequence_courante)[1]
 
-    deb = 1
     deb = max(1,k-1)
-    fin = sz
     fin = min(k+l-1,sz)
     col = sequence_courante[deb][2]
     nbcol=0
     tmpi = sequence_courante[deb][szcar-1]
 
-    while tmpi<=fin && tmpi<sz
+    while tmpi<=fin
         tmpi = sequence_courante[tmpi+1][szcar-1]
         nbcol+=1
     end
@@ -2064,16 +2084,9 @@ function eval_couleur_shuffle(sequence_courante::Array{Array{Int,1},1},sequence:
             tmpnbcol+=1
             col=sequence_courante[sequence[i-k+1]][2]
         end
-        if(tmpnbcol>nbcol)
-            return 1
-        end
     end
     if sequence_courante[k+l][2]!= col
         tmpnbcol+=1
-    end
-
-    if (tmpnbcol>nbcol)
-        return 1
     end
 
     return tmpnbcol-nbcol
