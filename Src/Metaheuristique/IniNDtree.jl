@@ -13,11 +13,13 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     debutall = time()
     temps_all = 5000
+    temps_max=600
+    temps_max2=30
+    temps_max3=10
+    temps_max4=50
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    temps_max=600
-
 
     ## first solution
     @time for Phase in 1:3
@@ -78,7 +80,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
     sequence_best = deepcopy(sequence_meilleure)
     tab_violation_best =  deepcopy(tab_violation)
-    temps_max=200
+
     OBJ = [[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     for objectif in OBJ
         pareto_tmp = get_solutions(NDtree)
@@ -105,19 +107,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
         debut = time()
         @time for Phase in 1:3
             debut = time()
-
-            # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
-            if verbose
-                n=0
-                st_output = string("Phase : ",Phase ,", Execution : [")
-                tmp_st = ""
-                for i in 1:50-n-1
-                    tmp_st=string(tmp_st," ")
-                end
-                tmp_st=string(tmp_st,"   ] ")
-            end
-
-            while temps_max*(timeOPT[Phase]/100)>time()-debut
+            while temps_max2*(timeOPT[Phase]/100)>time()-debut
 
                 f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
                 k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
@@ -137,7 +127,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     end
     timeOPT, opt = phases_init([2,1,3])
     pareto_tmp = get_solutions(NDtree)
-    temps_max=10
+
     score_nadir = nadir_global(NDtree)
     println("Nadir : ",score_nadir)
     for par in pareto_tmp
@@ -152,7 +142,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
         sortie  = false
         @time for Phase in 1:3
             debut = time()
-            while temps_max*(timeOPT[Phase]/100)>time()-debut
+            while temps_max3*(timeOPT[Phase]/100)>time()-debut
 
                 f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
                 k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
@@ -180,7 +170,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
         obj = OBJ[rand(1:6)]
         timeOPT, opt = phases_init(obj)
         println(size(pareto_tmp)[1])
-        temps_max=50
+
         pareto1_tmp = get_solutions(NDtree)
         score_nadir = nadir_global(NDtree)
         println(score_nadir)
@@ -194,7 +184,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
             a =  deepcopy(par[2])
             @time for Phase in 1:3
                 debut = time()
-                while temps_max*(timeOPT[Phase]/100)>time()-debut
+                while temps_max4*(timeOPT[Phase]/100)>time()-debut
                     f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
                     k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
                     effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand,a,score_nadir)

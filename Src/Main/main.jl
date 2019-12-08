@@ -261,7 +261,7 @@ end
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_EP_RAF_ENP_ch2")],  verbose::Bool = true, txtoutput::Bool = true)
+function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
