@@ -40,15 +40,15 @@ const TAILLE_MAX_FEUILLE = Int32(2)
 const DEBBUG = false
 
 function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
-    DEBBUG ? println("Tentative d'insertion de la solution : ", y, "\ndans la branche : ", som) : nothing
-    global DEBBUG
+    #DEBBUG ? println("Tentative d'insertion de la solution : ", y, "\ndans la branche : ", som) : nothing
+    #global DEBBUG
     if isempty(som)
-        DEBBUG ? println("Ajout de l'unique solution a la racine.") : nothing
+        #DEBBUG ? println("Ajout de l'unique solution a la racine.") : nothing
         som.val = (deepcopy(ideal(som)), deepcopy(nadir(som)), [y])
         return true
     else
         if maj_sommet!(som, y)
-            DEBBUG ? println("Insertion de la solution dans une branche partant de : ", som) : nothing
+            #DEBBUG ? println("Insertion de la solution dans une branche partant de : ", som) : nothing
             insert!(som, y)
             return true
         end
@@ -75,38 +75,38 @@ function domine(y1::Tuple{Array{U,1}, Array{T,1}, Q}, y2::Tuple{Array{V,1}, Arra
 end
 
 function maj_sommet!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
-    global DEBBUG
+    #global DEBBUG
     if domine(som.val[2], y)
-        DEBBUG ? println("La solution est dominee par le nadir local : ", som.val[2]) : nothing
+        #DEBBUG ? println("La solution est dominee par le nadir local : ", som.val[2]) : nothing
         return false
     elseif domine(y, som.val[1])
-        DEBBUG ? println("La solution domine l'ideal local : ", som.val[1]) : nothing
+        #DEBBUG ? println("La solution domine l'ideal local : ", som.val[1]) : nothing
         suppr_branche!(som)
     elseif domine(som.val[1], y) || domine(y, som.val[2])
-        DEBBUG ? println("La solution est comprise entre le nadir local : ", som.val[2], "\n et l'ideal local : ", som.val[1]) : nothing
+        #DEBBUG ? println("La solution est comprise entre le nadir local : ", som.val[2], "\n et l'ideal local : ", som.val[1]) : nothing
         if isempty(som.succ)
-            DEBBUG ? println("Il s'agit d'une feuille.") : nothing
+            #DEBBUG ? println("Il s'agit d'une feuille.") : nothing
             for ys in som.val[3]
                 if domine(ys, y)
-                    DEBBUG ? println("La solution est dominee dans la feuille par : ", ys) : nothing
+                    #DEBBUG ? println("La solution est dominee dans la feuille par : ", ys) : nothing
                     return false
                 elseif domine_fortement(y, ys)
-                    DEBBUG ? println("La solution domine fortement dans la feuille : ", ys) : nothing
+                    #DEBBUG ? println("La solution domine fortement dans la feuille : ", ys) : nothing
                     filter!(s -> s != ys, som.val[3])
                 end
             end
         else
-            DEBBUG ? println("Il ne 'sagit pas d'une feuille, la descente de l'arbre continue.") : nothing
+            #DEBBUG ? println("Il ne 'sagit pas d'une feuille, la descente de l'arbre continue.") : nothing
             for suc in som.succ
                 if !maj_sommet!(suc, y)
-                    DEBBUG ? println("La solution n'est pas comprise dans ce successeur : ", suc) : nothing
+                    #DEBBUG ? println("La solution n'est pas comprise dans ce successeur : ", suc) : nothing
                     return false
                 elseif isempty(suc)
-                    DEBBUG ? println("Le successeur est vide : ", suc) : nothing
+                    #DEBBUG ? println("Le successeur est vide : ", suc) : nothing
                     suppr_som!(suc)
                 end
             end
-            DEBBUG ? println("Le sommet ne contient plus qu'un successeur, il est remplace par celui-ci : ", som.succ) : nothing
+            #DEBBUG ? println("Le sommet ne contient plus qu'un successeur, il est remplace par celui-ci : ", som.succ) : nothing
             if length(som.succ) == 1
                 remplace_som!(som, som.succ[1])
             end
@@ -116,19 +116,19 @@ function maj_sommet!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <
 end
 
 function insert!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
-    global DEBBUG
+    #global DEBBUG
     global TAILLE_MAX_FEUILLE
     if isempty(som.succ)
-        DEBBUG ? println("Ajout de la solution a la feuille : ", som.val) : nothing
+        #DEBBUG ? println("Ajout de la solution a la feuille : ", som.val) : nothing
         append!(som.val[3], [y])
-        DEBBUG ? println("La solution a ete ajoutee a la feuille : ", som.val) : nothing
+        #DEBBUG ? println("La solution a ete ajoutee a la feuille : ", som.val) : nothing
         maj_nadir_ideal!(som, y)
         if length(som.val[3]) > TAILLE_MAX_FEUILLE
-            DEBBUG ? println("La feuille et trop chargee, elle va etre decoupee en plusieurs autres feuilles.") : nothing
+            #DEBBUG ? println("La feuille et trop chargee, elle va etre decoupee en plusieurs autres feuilles.") : nothing
             split!(som)
         end
     else
-        DEBBUG ? println("Tentative d'insertion dans le successeur le plus proche.") : nothing
+        #DEBBUG ? println("Tentative d'insertion dans le successeur le plus proche.") : nothing
         suc = som.succ[suc_le_plus_proche(som, y)]
         insert!(suc, y)
     end
@@ -160,8 +160,8 @@ function y_le_plus_eloigne2(y::Tuple{Array{U,1}, Array{T,1}, Q}, som::Sommet)  w
 end
 
 function split!(som::Sommet)
-    global DEBBUG
-    DEBBUG ? println("Decoupage du sommet en plusieurs feuilles.") : nothing
+    #global DEBBUG
+    #DEBBUG ? println("Decoupage du sommet en plusieurs feuilles.") : nothing
     y = y_le_plus_eloigne(som.val[3])
     aj_suc!(som, ((Int32.([]), copy(y[2]), Int32.([])), (Int32.([]), copy(y[2]), Int32.([])), [y]))
     lambda = ys -> ys != y
@@ -170,20 +170,20 @@ function split!(som::Sommet)
     global TAILLE_MAX_FEUILLE
     nb_feuilles = Int32(floor(length(som.val[3])/TAILLE_MAX_FEUILLE))
     for i in 1:nb_feuilles # Il faut qu'il y ait suffisament de feuilles successeurs pour pouvoir y recaser toutes les solutions y.
-        DEBBUG ? println("Creation d'une ", i+1, "-eme feuille.") : nothing
+        #DEBBUG ? println("Creation d'une ", i+1, "-eme feuille.") : nothing
         y = y_le_plus_eloigne2(y, som)
-        DEBBUG ? println("Ajout a la ", i+1, "-eme feuille de la solution ", y) : nothing
+        #DEBBUG ? println("Ajout a la ", i+1, "-eme feuille de la solution ", y) : nothing
         local feuille = Sommet(((Int32.([]), copy(y[2]), Int32.([])), (Int32.([]), copy(y[2]), Int32.([])), [y]))
         aj_suc!(som, feuille)
         maj_nadir_ideal!(feuille, y)
         filter!(lambda, som.val[3]) # Le y du lambda pointe sur le y redfinit dans la boucle.
     end
-    DEBBUG ? println("Repartition des solutions dans les nouvelles feuilles.") : nothing
+    #DEBBUG ? println("Repartition des solutions dans les nouvelles feuilles.") : nothing
     while !isempty(som.val[3])
         y = popfirst!(som.val[3])
         local ipp = suc_le_plus_proche(som, y)
         local feuille = som.succ[ipp]
-        DEBBUG ? println("Deplacement de la solution : ", y, "\ndans la feuille : ", ipp) : nothing
+        #DEBBUG ? println("Deplacement de la solution : ", y, "\ndans la feuille : ", ipp) : nothing
         append!(feuille.val[3], [y])
         maj_nadir_ideal!(feuille, y)
     end
@@ -289,8 +289,8 @@ function get_solutions_plus_extremes(som::Sommet ; nb_obj::Int = 3)
 end
 
 function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
-    DEBBUG ? println("Maj de l'ideal et du nadir dans le sommet : ", som) : nothing
-    global DEBBUG
+    #DEBBUG ? println("Maj de l'ideal et du nadir dans le sommet : ", som) : nothing
+    #global DEBBUG
     drapeau = false
     if !domine(som.val[1], y)
         drapeau = true
@@ -307,7 +307,7 @@ function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) wher
     if drapeau && !isempty(som.pred)
         maj_nadir_ideal!(som.pred[1], y)
     end
-    DEBBUG ? println("Maj terminee de l'ideal et du nadir dans le sommet : ", som) : nothing
+    #DEBBUG ? println("Maj terminee de l'ideal et du nadir dans le sommet : ", som) : nothing
 end
 
 function suc_le_plus_proche(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q},) where T <: Real where U where Q
