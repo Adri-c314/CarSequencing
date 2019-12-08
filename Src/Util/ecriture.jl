@@ -49,6 +49,8 @@ function scoreToCSV(score::Array{Array{Int,1},1})
     return txt
 end
 
+
+
 # Fonction qui ecris en csv un array de score
 # @param score : la sequence
 # @return ::String : le csv lié à la sequence

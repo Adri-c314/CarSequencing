@@ -9,6 +9,7 @@
 # @version 1
 
 
+
 # Fonction qui selectionne l'obj a focus ainsi que l'indice du pere et de la mere
 # @param population : la population comme elle est definie plus précisement dans generate.jl
 # @return ::Int : l'indice du pere dans la population tq on le recupere avec population[papa]
