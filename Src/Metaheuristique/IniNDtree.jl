@@ -1,7 +1,7 @@
 
 
 
-function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bool=true)
+function IniNDtree(datas::NTuple{4,DataFrame}, NDtree::Sommet, temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 200., temps_max3::Float64 = 10., temps_max4::Float64 = 30., verbose::Bool=true, txtoutput::Bool=true)
     # compute initial sequence :
     sequence_meilleure::Array{Array{Int,1},1},sequence_avant, score_init, tab_violation::Array{Array{Int,1},1}  , ratio_option, Hprio, obj, pbl = compute_initial_sequence_2(datas)
     sz = size(sequence_meilleure)[1]
@@ -9,17 +9,15 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     obj = [1,2,3]
     timeOPT, opt = phases_init(obj)
     a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
-    NDtree = Sommet()
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
+
     debutall = time()
-    temps_all = 5000
-    temps_max=600
-    temps_max2=200
-    temps_max3=10
-    temps_max4=30
+
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
+
     debut = time()
+
 
     ## first solution
     @time for Phase in 1:3
@@ -217,7 +215,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     tab_score = [p[2] for p in pareto_tmp]
     final_score = [tab_score[1]]
     println(tab_score)
-    # TODO : SUppr les sequences = ? 
+    # TODO : SUppr les sequences = ?
     for i in 1:size(tab_score)[1]
         ok = true
         for ii in 1:size(tab_score)[1]
@@ -257,7 +255,4 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     end
     println([final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]])
     return final_score, size(final_score)[1], nadir, [final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]]
-
-
-
 end

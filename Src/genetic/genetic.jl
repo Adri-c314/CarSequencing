@@ -19,11 +19,12 @@
 # @param temps_popNonElite : Le temps alloué à tout le processus d'amélioration pour les solutions non élites
 # @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart
 # @param temps_mutation : Le temps alloué à une unique mutation
+# @param mutation2 : Utilisation de la seconde methode de mutation
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @return ::String : le string pour le txtoutput
 # @return ::Array{Array{Array{Array{Int,1},1},1},1} : La population
-function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, verbose::Bool=true, txtoutput::Bool=true)
+function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool=true, verbose::Bool=true, txtoutput::Bool=true)
     if verbose
         n=0
         st_output = string("Execution : [")
@@ -66,7 +67,11 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
         @time enfant = crossover(papa, maman, population, focus, inst)
 
         # mutation
-        mutation!(enfant, focus, inst, temps_mutation)
+        if mutation2
+            mutation2!(enfant, focus, inst, temps_mutation)
+        else
+            mutation!(enfant, focus, inst, temps_mutation)
+        end
 
         # insertion dans la pop
         if insertionPotentielle!(population, enfant)
@@ -96,13 +101,14 @@ end
 # @param temps_popNonElite : Le temps alloué à tout le processus d'amélioration pour les solutions non élites
 # @param temps_global : Le temps alloué à tout l'algo genetique apres generation de la population de depart
 # @param temps_mutation : Le temps alloué à une unique mutation
+# @param mutation2 : Utilisation de la seconde methode de mutation
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @modify NDTree : mise à jour du NDTree
 # @return ::String : le string pour le txtoutput
 # @return ::Array{Array{Array{Array{Int,1},1},1},1} : La population
 # @return ::Instance : l'instance courante
-function genetic!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, verbose::Bool=true, txtoutput::Bool=true)
+function genetic!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool=true, verbose::Bool=true, txtoutput::Bool=true)
     if verbose
         n=0
         st_output = string("Execution : [")
@@ -145,7 +151,11 @@ function genetic!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int, temps_
         enfant = crossover(papa, maman, population, focus, inst)
 
         # mutation
-        mutation!(enfant, focus, inst, temps_mutation)
+        if mutation2
+            mutation2!(enfant, focus, inst, temps_mutation)
+        else
+            mutation!(enfant, focus, inst, temps_mutation)
+        end
 
         # insertion dans la pop
         if insertionPotentielle!NDTree(population, enfant, NDTree)
