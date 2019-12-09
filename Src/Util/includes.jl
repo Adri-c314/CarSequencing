@@ -16,11 +16,11 @@ include("../Metaheuristique/IniNDtree.jl")
 include("../Metaheuristique/mouvement_3_is_back.jl")
 
 # Les fichiers liés à l'algorithm genetic
-#include("../genetic/crossover.jl")
-#include("../genetic/generate.jl")
-#include("../genetic/genetic.jl")
-#include("../genetic/mutation.jl")
-#include("../genetic/majpop.jl")
+include("../genetic/crossover.jl")
+include("../genetic/generate.jl")
+include("../genetic/genetic.jl")
+include("../genetic/mutation.jl")
+include("../genetic/majpop.jl")
 
 # Les fichiers lié à la PLS et tous ce qui touche au KDTree
 include("../PLS&Tree/Sommet.jl")
