@@ -40,11 +40,11 @@ const TAILLE_MAX_FEUILLE = Int32(2)
 const DEBBUG = false
 
 function maj!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
-    #DEBBUG ? println("Tentative d'insertion de la solution : ", y, "\ndans la branche : ", som) : nothing
     #global DEBBUG
+    #DEBBUG ? println("Tentative d'insertion de la solution : ", y, "\ndans la branche : ", som) : nothing
     if isempty(som)
         #DEBBUG ? println("Ajout de l'unique solution a la racine.") : nothing
-        som.val = (deepcopy(ideal(som)), deepcopy(nadir(som)), [y])
+        som.val = (deepcopy(ideal(som)), deepcopy(nadir(som)), [deepcopy(y)])
         return true
     else
         if maj_sommet!(som, y)
@@ -120,7 +120,7 @@ function insert!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Re
     global TAILLE_MAX_FEUILLE
     if isempty(som.succ)
         #DEBBUG ? println("Ajout de la solution a la feuille : ", som.val) : nothing
-        append!(som.val[3], [y])
+        append!(som.val[3], [deepcopy(y)])
         #DEBBUG ? println("La solution a ete ajoutee a la feuille : ", som.val) : nothing
         maj_nadir_ideal!(som, y)
         if length(som.val[3]) > TAILLE_MAX_FEUILLE
@@ -289,8 +289,8 @@ function get_solutions_plus_extremes(som::Sommet ; nb_obj::Int = 3)
 end
 
 function maj_nadir_ideal!(som::Sommet, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
-    #DEBBUG ? println("Maj de l'ideal et du nadir dans le sommet : ", som) : nothing
     #global DEBBUG
+    #DEBBUG ? println("Maj de l'ideal et du nadir dans le sommet : ", som) : nothing
     drapeau = false
     if !domine(som.val[1], y)
         drapeau = true
@@ -399,36 +399,35 @@ function test_NDtree()
     @assert isempty(NDtree.succ)
     @assert length(NDtree.val) == 3
     @assert NDtree.val[3][1] == y1
-    @assert NDtree.val[3][1] === y1
+    @assert !(NDtree.val[3][1] === y1)
     for ys in NDtree.val[3]
         @assert domine(ideal(NDtree), ys)
         @assert domine(ys, nadir(NDtree))
     end
-    @time y2 = (Int32.([rand(1:10) for i in 1:10]), copy(y1[2]) - ones(typeof(y1[2][1]),length(y1[2])), [])
+    @time y2 = (y1[1], y1[2] - ones(typeof(y1[2][1]), length(y1[2])), y1[3])
     @assert maj!(NDtree, y2)
     @assert isempty(NDtree.succ)
     @assert length(NDtree.val[3]) == 1
     @assert NDtree.val[3][1] == y2
-    @assert NDtree.val[3][1] === y2
+    @assert !(NDtree.val[3][1] === y2)
     display(NDtree.val)
     for ys in NDtree.val[3]
         @assert domine(ideal(NDtree), ys)
         @assert domine(ys, nadir(NDtree))
     end
-    y3 = deepcopy(y2)
+    y3 = y2
     y3[2][1] += 1
     y3[2][2] -= 1
     @assert maj!(NDtree, y3)
     @assert isempty(NDtree.succ)
     @assert length(NDtree.val[3]) == 2
     @assert NDtree.val[3][2] == y3
-    @assert NDtree.val[3][2] === y3
+    @assert !(NDtree.val[3][2] === y3)
     display(NDtree.val)
     for ys in NDtree.val[3]
         @assert domine(ideal(NDtree), ys)
         @assert domine(ys, nadir(NDtree))
     end
-
     y4 = deepcopy(y3)
     y4[2][1] += 1
     y4[2][2] -= 1
@@ -460,7 +459,7 @@ function test_NDtree()
         @assert domine(ys, nadir(NDtree))
     end
 
-    y5 = deepcopy(y4)
+    y5 = y4
     y5[2][1] += 1
     y5[2][2] -= 1
     @time maj!(NDtree, y5)
@@ -479,7 +478,7 @@ function test_NDtree()
     display(nadir(feuille2))
     display(nadir(NDtree))
 
-    y6 = deepcopy(y5)
+    y6 = y5
     y5[2][1] += 1
     @time drapeau = maj!(NDtree, y5);
     @assert !drapeau
@@ -684,9 +683,6 @@ function y_extremes(NDtree::Sommet)
     end
 end
 
-#test_domination()
-#test_NDtree()
-
 # Fonction qui isnere une solution efficasse dans une liste, pour comparer avec le NDtree
 function maj!(liste::Array{Tuple{Array{U,1}, Array{T,1}, Q},1}, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
     drapeau = true
@@ -732,4 +728,5 @@ function test_NDtree2(nb_y::Int = 100 ; d::Int = 2)
 end
 
 #test_NDtree2(100000, d = 3)
-
+#test_domination()
+#test_NDtree()
