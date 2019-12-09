@@ -1,8 +1,11 @@
+# Structures :
+include("./instance.jl"
+include("../PLS&Tree/Sommet.jl")
+
 # Les fichiers utils
 include("./ecriture.jl")
 include("./lecture.jl")
 include("./fonction_rand.jl")
-include("./instance.jl")
 
 # Les fichiers liés à la méta de base
 include("../Metaheuristique/choisir_klLS.jl")
@@ -23,6 +26,5 @@ include("../genetic/mutation.jl")
 include("../genetic/majpop.jl")
 
 # Les fichiers lié à la PLS et tous ce qui touche au KDTree
-include("../PLS&Tree/Sommet.jl")
 include("../PLS&Tree/Pareto_Local_Search.jl")
 include("../PLS&Tree/NDtree.jl")
