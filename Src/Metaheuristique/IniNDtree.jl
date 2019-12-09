@@ -14,9 +14,9 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     debutall = time()
     temps_all = 5000
     temps_max=600
-    temps_max2=30
+    temps_max2=200
     temps_max3=10
-    temps_max4=50
+    temps_max4=30
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
@@ -217,6 +217,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, verbose::Bool=true, txtoutput::Bo
     tab_score = [p[2] for p in pareto_tmp]
     final_score = [tab_score[1]]
     println(tab_score)
+    # TODO : SUppr les sequences = ? 
     for i in 1:size(tab_score)[1]
         ok = true
         for ii in 1:size(tab_score)[1]

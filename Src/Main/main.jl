@@ -261,7 +261,25 @@ end
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true)
+function mainTestPLS(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2")
+("X", "023_EP_RAF_ENP_S49_J2")
+("X", "024_EP_RAF_ENP_S49_J2")
+("X", "025_EP_ENP_RAF_S49_J1")
+("X", "028_CH1_EP_ENP_RAF_S50_J4")
+("X", "028_CH2_EP_ENP_RAF_S51_J1")
+("X", "029_EP_RAF_ENP_S49_J5")
+("X", "034_VP_EP_RAF_ENP_S51_J1_J2_J3")
+("X", "034_VU_EP_RAF_ENP_S51_J1_J2_J3")
+("X", "035_CH1_RAF_EP_S50_J4")
+("X", "035_CH2_RAF_EP_S50_J4")
+("X", "039_CH1_EP_RAF_ENP_S49_J1")
+("X", "039_CH3_EP_RAF_ENP_S49_J1")
+("X", "048_CH1_EP_RAF_ENP_S50_J4")
+("X", "048_CH2_EP_RAF_ENP_S49_J5")
+("X", "064_CH1_EP_RAF_ENP_S49_J1")
+("X", "064_CH2_EP_RAF_ENP_S49_J4")
+("X", "655_CH1_EP_RAF_ENP_S51_J2_J3_J4")
+("X", "655_CH2_EP_RAF_ENP_S52_J1_J2_S01_J1")],  verbose::Bool = true, txtoutput::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -285,13 +303,17 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
 
         # Lecture du fichier csv
         datas = lectureCSV(i[1], i[2])
-        path = "..\\..\\output\\"
+
         # Lancement de la VFLS
         @time score, szscore, nadir,sollexico = IniNDtree(datas, verbose, txtoutput)
 
-        println(score )
+        # Gestion de l'affichage :
+        if verbose
+
+        end
+
+        println(score)
         println("FIN")
-        path = "../../Output/PLS/"
         txt = ""
         txt = string(txt, scoreToCSV(score))
         txt2 = string("", allToCSV(nadir,szscore,sollexico))
