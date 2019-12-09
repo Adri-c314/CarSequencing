@@ -12,7 +12,7 @@
 
 
 
-# Fonction qui réalise une mutation sur une solution donnée
+# Fonction qui réalise une mutation sur une solution donnée en appliquant une VFLS
 # @param enfant : l'enfant générer par le crossover
 #       enfant[1] : Array{Array{Int,1},1} la sequence x
 #       enfant[2] : Array{Array{Int,1},1} le tab violation associé à la sequence x
@@ -146,7 +146,7 @@ function mutation!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, ins
     end
 
     # Re evaluation en fin d'exection :
-    a,b =evaluation_init(enfant[1], inst.sequence_j_avant, inst.ratio, inst.Hprio)
+    a = evaluation(enfant[1], enfant[2], inst.ratio, inst.Hprio)
     enfant[3] = [a]
 
     if verbose
@@ -164,6 +164,10 @@ end
 
 
 
+# Fonction associé à la mutation qui créer un tab d'ordre des obj :
+# @param obj : l'objectif principale
+# @param inst : l'instance courante
+# @return Array{Int,1} : le tab des obj
 function generateObj(objectif::Symbol, inst::Instance)
     obj = copy(inst.obj)
     alea = rand(1:2)
@@ -196,4 +200,82 @@ function generateObj(objectif::Symbol, inst::Instance)
         end
     end
     return obj
+end
+
+
+
+# Fonction qui réalise une mutation sur une solution donnée en faisant que des swap peu importe si la sol est déteriorer
+# @param enfant : l'enfant générer par le crossover
+#       enfant[1] : Array{Array{Int,1},1} la sequence x
+#       enfant[2] : Array{Array{Int,1},1} le tab violation associé à la sequence x
+#       enfant[3][1] : Array{Int,1} le score sur les 3 obj
+# @param objectif : l'objectif choisi (:pbl!, :hprio!, :lprio!) suivant l'obj qu'on focus
+# @param inst : L'instance du problème étudié cf Util/instance.jl
+# @param temps_mutation : le temps associé à une mutation
+# @param verbose : Si l'on souhaite un affichage console de l'execution
+# @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
+# @modify ::Array{Array{Array{Int,1},1},1} : L'enfant applique la mutation sur l'enfant
+function mutation2!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, inst::Instance, temps_mutation::Float64 = 0.1, verbose::Bool = false, txtoutput::Bool = false)
+        debut = time()
+        taille = length(enfant[1])
+
+        # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
+        if verbose
+            n=0
+            st_output = string("Execution : [")
+            tmp_st = ""
+            for i in 1:50-n-1
+                tmp_st=string(tmp_st," ")
+            end
+            tmp_st=string(tmp_st,"   ] ")
+        end
+
+        while temps_mutation*(timeOPT[Phase]/100)>time()-debut
+            swap_mutation!(enfant, rand(1:taille), rand(1:taille), inst)
+
+            # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
+            if verbose
+                if (time()-debut)>(n/50)*temps_mutation*(timeOPT[Phase]/100)
+                    st_output=string(st_output, "#")
+                    tmp_st = ""
+                    for i in 1:50-n-1
+                        tmp_st=string(tmp_st," ")
+                    end
+                    tmp_st=string(tmp_st," ] ")
+                    print(st_output,tmp_st,n*2,"% \r")
+                    n+=1
+                end
+            end
+        end
+
+        # Re evaluation en fin d'exection :
+        a = evaluation(enfant[1], enfant[2], inst.ratio, inst.Hprio)
+        enfant[3] = [a]
+end
+
+
+
+# Fonction principale du mouvement de swap pour le genetic
+# @param enfant : l'enfant générer par le crossover
+#       enfant[1] : Array{Array{Int,1},1} la sequence x
+#       enfant[2] : Array{Array{Int,1},1} le tab violation associé à la sequence x
+#       enfant[3][1] : Array{Int,1} le score sur les 3 obj
+# @param k
+# @param l
+# @param inst : L'instance du problème étudié cf Util/instance.jl
+# @return nothing : Pas de return pour eviter les copies de memoire.
+# @modify enfant
+function swap_mutation!(enfant::Array{Array{Array{Int,1},1},1}, k::Int, l::Int, inst::Instance)
+    # Maj de la seq et du tab violation
+    update_tab_violation_and_pbl_swap!(enfant[1], inst.ratio, enfant[2], inst.Hprio, inst.pbl, k, l)
+
+    # Reval du score
+    score[1]+=eval_couleur_swap(enfant[1], inst.pbl, k, l)
+    score[2]+=eval_Hprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
+    score[3]+=eval_Lprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
+
+    # Swap
+    tmp=copy(enfant[1][k])
+    enfant[1][k]=enfant[1][l]
+    enfant[1][l]=tmp
 end
