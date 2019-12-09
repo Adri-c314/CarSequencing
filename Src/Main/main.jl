@@ -279,7 +279,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_
 ("X", "064_CH1_EP_RAF_ENP_S49_J1")
 ("X", "064_CH2_EP_RAF_ENP_S49_J4")
 ("X", "655_CH1_EP_RAF_ENP_S51_J2_J3_J4")
-("X", "655_CH2_EP_RAF_ENP_S52_J1_J2_S01_J1")],  verbose::Bool = true, txtoutput::Bool = true)
+("X", "655_CH2_EP_RAF_ENP_S52_J1_J2_S01_J1")],  verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -301,23 +301,34 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_
             ))
         end
 
+        temps_all = 5000
+        temps_max=600
+        temps_max2=200
+        temps_max3=10
+        temps_max4=30
+
+
         # Lecture du fichier csv
         datas = lectureCSV(i[1], i[2])
 
         # Lancement de la VFLS
-        @time score, szscore, nadir,sollexico = IniNDtree(datas, verbose, txtoutput)
+        @time score, szscore, nadir, sollexico = IniNDtree(datas, verbose, txtoutput)
 
         # Gestion de l'affichage :
         if verbose
-
+            println("Score : ", score)
+            println("\n\n\n")
+            println("===================================================")
+            println("Ecriture des logs .txt : ", txtoutput)
+            println("Ecriture des scores .csv : ", csvscore)
+            println("===================================================")
+            println("\n\n\n")
         end
-
-        println(score)
-        println("FIN")
-        txt = ""
-        txt = string(txt, scoreToCSV(score))
-        txt2 = string("", allToCSV(nadir,szscore,sollexico))
-        ecriture(txt, string(path,i[1],"/",i[2],"nb",size(score)[1],"scores",".txt"))
-        ecriture(txt2, string(path,i[1],"/",i[2],"nb",size(score)[1],"elements",".txt"))
+        if csvscore
+            ecriture(scoreToCSV(score), pathOS(string(path,i[1],"/",i[2],time(),"scores",".txt"), surLinux))
+        end
+        if csvpopulation
+            ecriture(string(temps_all, " ", temps_max, " ", temps_max2, " ", temps_max3, " ", temps_max4 ,allToCSV(nadir,szscore,sollexico)), pathOS(string(path,i[1],"/",i[2],time(),"elements",".txt"), surLinux))
+        end
     end
 end

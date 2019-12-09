@@ -1,4 +1,4 @@
-# Fichier contenant la fonction VFLS, fonction principale de l'heuristique
+# Fichier contenant la fonction pour generer une population delite
 # @author Oryan Rampon
 # @author Corentin Pelhatre
 # @author Mathis Ocquident
@@ -10,21 +10,16 @@
 
 
 
-#=
-## Instance : les voitures avec [1]= leur place mais pas utlie en vrai
-##            les voitures avec [2]= leurs couleurs
-##            les voitures avec [3:3+Hprio]= leurs Hprio (ca serait pas plutot [3:3+Hprio-1] ?)
-##            les voitures avec [3+Hprio:]= leurs Lprio
-##                              [size()[1]-2] = le debut de leur sequence de couleur
-##                              [size()[1]-1] = la fin de leur sequence de couleur
-##                              [size()[1]] : l'ordre initial
-## Ratio x/y: Les ratio avec [1] = x
-##            Les ratio avec [2] = y
-## pbl      : Le paint batch limit
-## obj      : Les obj des l'ordre
-## Hprio    : le nombre de Hprio
-## return 6 individu elites
-=#
+# Fonction qui génère et renvois la population élite
+# @param temps_firstind : le temps pour la phase commune à toutes les sol elites (et la premiere entre autre)
+# @param temps_elites : le temps pour les 5 autres solutions elites
+# @param sequence_meilleure : la sequence de base pour creer les sol elites
+# @param Ratio x/y : Les ratio avec [1] = x
+#                   Les ratio avec [2] = y
+# @param pbl : Le paint batch limit
+# @param obj : Les obj des l'ordre
+# @param Hprio : le nombre de Hprio
+# @return Array{Array{Array{Array{Int,1},1},1},1} : la population elite, cf generate.jl pour voir comment on considère la population
 function pop_elites(temps_firstind::Float64, temps_elites::Float64,sequence_meilleure::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1}}, tab_violation::Array{Array{Int,1}} , Hprio::Int, pbl::Int)
     # compute initial sequence :
 
@@ -40,7 +35,8 @@ function pop_elites(temps_firstind::Float64, temps_elites::Float64,sequence_meil
             effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand)
         end
     end
-    tab_pop = [[sequence_meilleure,tab_violation]]
+    a = evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
+    tab_pop = [[sequence_meilleure,tab_violation, [a]]]
     sequence_best = deepcopy(sequence_meilleure)
     tab_violation_best =  deepcopy(tab_violation)
 
@@ -61,7 +57,8 @@ function pop_elites(temps_firstind::Float64, temps_elites::Float64,sequence_meil
                 effect = global_mouvement!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand)
             end
         end
-        append!(tab_pop,[[deepcopy(sequence_meilleure),deepcopy(tab_violation)]])
+        a = evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
+        append!(tab_pop,[[deepcopy(sequence_meilleure),deepcopy(tab_violation), [a]]])
     end
 
     return tab_pop

@@ -61,6 +61,8 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
 
     elites = pop_elites(temps_firstind, temps_elites,deepcopy(sequence_meilleure),ratio,deepcopy(tab_violation), Hprio, pbl)
 
+    append!(population, elites)
+
     if verbose
         println("Done !")
     end
@@ -93,7 +95,7 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
 
         # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
         if verbose
-            if i >(n/50)*(nbSol-6)
+            if i-6 >(n/50)*(nbSol-6)
                 st_output=string(st_output, "#")
                 tmp_st = ""
                 for i in 1:50-n-1

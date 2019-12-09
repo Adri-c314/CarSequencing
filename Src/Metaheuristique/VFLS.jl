@@ -98,8 +98,11 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     nb = [0, 0, 0, 0]
     nb_effectiv = [0,0,0,0]
     debut = time()
-    a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
-    println("score : ", a,"\n\n")
+    a = evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
+
+    if verbose
+        println("score : ", a,"\n\n")
+    end
     @time for Phase in 1:3
         debut = time()
 
@@ -135,9 +138,11 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
                 end
             end
         end
-        for car in sequence_meilleure
-            if car[szcar-1]-car[szcar-2]>pbl
-                println(car)
+        if verbose
+            for car in sequence_meilleure
+                if car[szcar-1]-car[szcar-2]>pbl
+                    println(car)
+                end
             end
         end
 
@@ -150,13 +155,10 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
                 "Nombre de shuffle : ",nb[4], "\n",
             )
         end
-        for car in sequence_meilleure
-            #println(car)
-        end
+
         if verbose
             st_output=string(st_output, "#] ")
             println(st_output,100,"%")
-            #println("\nPhase ", Phase, " :")
             println("Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1])
             println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
             println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
@@ -170,14 +172,20 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         nb = [0, 0, 0, 0]
         nb_effectiv = [0,0,0,0]
     end
-    for car in sequence_meilleure
-        println(car)
+
+    if verbose
+        for car in sequence_meilleure
+            println(car)
+        end
     end
+
     # Re evaluation en fin d'exection :
     a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
-    println(a)
 
-    println("___________________________________________")
+    if verbose
+        println(a)
+        println("___________________________________________")
+    end
 
     return a, sequence_meilleure, txt
 end
