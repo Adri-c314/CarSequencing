@@ -18,7 +18,6 @@
 # @param inst : L'instance du problème étudié cf Util/instance.jl
 # @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
 function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, obj::Symbol, inst::Instance)
-<<<<<<< HEAD
     #Hprio/LPrio/Pbl
     #println("debut crossover")
     if obj == :pbl!
@@ -34,15 +33,6 @@ function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{In
     #println("fin crossover")
     #println(typeof(sequence),typeof(tab_violation),typeof(score))
     return enfant
-=======
-    #on choisit le crossover à realiser selon l'objectif 
-    if obj == :pbl!
-        return crossoverCouleur(papa, maman, population, inst)
-    else
-        #TODO met ton crossover ici Adri ;) (j'ai laissé le mien juste pour pas que ca bug en attendant)
-        return crossoverCouleur(papa, maman, population, inst)
-    end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
 end
 
 
@@ -54,14 +44,6 @@ end
 # @param population : la population globale
 # @param inst : L'instance du problème étudié cf Util/instance.jl
 # @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
-<<<<<<< HEAD
-function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1},inst::Instance)
-    #println("\n")
-    #println("------------------------CROSSOVER---------------------------", "\n")
-    #println("taille de la population : ", length(population))
-    #println("taille maman ; ", length(population[maman][1]))
-    #println("taille papa ; ", length(population[papa][1]))
-=======
 function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1},inst::Instance,verbose = false)
     if verbose
         println("\n")
@@ -70,42 +52,19 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
         println("taille maman ; ", length(population[maman][1]))
         println("taille papa ; ", length(population[papa][1]))
     end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
     debCol = length(population[papa][1][1])-2
     finCol = length(population[papa][1][1])-1
     id = length(population[papa][1][1])
     nbCars = length(population[papa][1])
-<<<<<<< HEAD
 
     #on maj les blocs couleurs des parents
-    violMaman, pblAdmissible = majData(population[maman][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
-    #println("verifier couleurs maman")
-    verifierBlocsCol(population[maman][1])
-    violPapa, pblAdmissible = majData(population[papa][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
-    #println("verifier couleurs papa")
-    verifierBlocsCol(population[papa][1])
-
-    #points de coupe du crossover (on coupe sur le pere puis on injecte dans la maman)
-    cut1 = rand(1:nbCars)
-    cut2 = rand(cut1:nbCars)
-    #println("cut1Avant : ", cut1)
-    #println("cut2Avant : ", cut2)
-    #on décale les points au debut et à la fin du bloc de couleur
-    cut1 = population[papa][1][cut1][debCol]
-    cut2 = population[papa][1][cut2][finCol]
-    #println("cut1 : ", cut1)
-    #println("cut2 : ",cut2)
-
-=======
-    
-    #on maj les blocs couleurs des parents 
     violMaman, pblAdmissible = majData(population[maman][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl,verbose)
     if verbose println("verifier couleurs maman") end
     verifierBlocsCol(population[maman][1],verbose)
     violPapa, pblAdmissible = majData(population[papa][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl,verbose)
     if verbose println("verifier couleurs papa") end
     verifierBlocsCol(population[papa][1],verbose)
-    
+
     #points de coupe du crossover (on coupe sur le pere puis on injecte dans la maman)
     cut1 = rand(1:nbCars)
     cut2 = rand(cut1:nbCars)
@@ -113,15 +72,14 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
         println("cut1Avant : ", cut1)
         println("cut2Avant : ", cut2)
     end
-    #on décale les points au debut et à la fin du bloc de couleur 
+    #on décale les points au debut et à la fin du bloc de couleur
     cut1 = population[papa][1][cut1][debCol]
     cut2 = population[papa][1][cut2][finCol]
     if verbose
         println("cut1 : ", cut1)
         println("cut2 : ",cut2)
     end
-    
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
+
     #on stock les ID des voitures du pere entre cut1 et cut2
     idPere = [population[papa][1][i][id] for i in cut1:cut2]
 
@@ -185,21 +143,12 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
             push!(enfant,deepcopy(population[maman][1][i]))
         end
     end
-<<<<<<< HEAD
-    #println("taille enfant jusqu'à cut1-1: ", length(enfant), "\n")
-    #println("enfant id jusqu'à cut1-1 : ", [enfant[i][id] for i in 1:(cut1-1)], "\n")
-=======
     if verbose println("taille enfant jusqu'à cut1-1: ", length(enfant), "\n") end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
     #de cut1 à cut2 : on copie le père
     for i in cut1:cut2
         push!(enfant,population[papa][1][i])
     end
-<<<<<<< HEAD
-        #println("taille enfant jusqu'à cut2: ", length(enfant), "\n")
-=======
         if verbose println("taille enfant jusqu'à cut2: ", length(enfant), "\n") end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
         #println("enfant id de jusqu'à cut2 : ", [enfant[i][id] for i in 1:cut2], "\n")
     #de cut2 jusqu'à la fin : on copie la mère en gérant les doublons possibles
     for i in (cut2+1):nbCars
@@ -244,36 +193,19 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
             push!(enfant,deepcopy(population[maman][1][i]))
         end
     end
-<<<<<<< HEAD
-    #println("taille enfant : ", length(enfant), "\n")
-    #println("enfant id : ", [enfant[i][id] for i in 1:nbCars], "\n")
-=======
     if verbose println("taille enfant : ", length(enfant), "\n") end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
     verifierVoitures(enfant)
     verifierPapa(enfant,population[papa][1],cut1,cut2)
 
     #on verifie que le crossover est admissible (pbl)
     #et on met à jour les données : tab violation, blocs de couleur
-<<<<<<< HEAD
-    violEnfant, pblAdmissible = majData(enfant, inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
-    #population[papa][2], houit = majData(population[papa][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
-    #population[maman][2], houit = majData(population[maman][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
-
-    #println("verifier couleurs enfant")
-    verifierBlocsCol(enfant)
-    #si l'enfant est pas admissible : on refait un crossover
-    if !pblAdmissible
-        #println("PBL non admissible : on refait un crossover")
-=======
     violEnfant, pblAdmissible = majData(enfant, inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl,verbose)
-    
+
     if verbose println("verifier couleurs enfant") end
     verifierBlocsCol(enfant,verbose)
     #si l'enfant est pas admissible : on refait un crossover
     if !pblAdmissible
         if verbose println("PBL non admissible : on refait un crossover") end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
         return crossoverCouleur(papa, maman, population,inst)
     else
         return [enfant, violEnfant, [[0,0,0]]]
@@ -365,11 +297,7 @@ function majData(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{I
 
     #maj des blocs de couleur
     push!(blocsCol,sz+1)
-<<<<<<< HEAD
-    #println("\n", "blocsCol : ", blocsCol, "\n")
-=======
     if verbose println("\n", "blocsCol : ", blocsCol, "\n") end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
     for i in 1:(length(blocsCol)-1)
         debBloc = deepcopy(blocsCol[i])
         finBloc = deepcopy(blocsCol[i+1]-1)
@@ -378,13 +306,8 @@ function majData(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{I
             instance[j][finCol] = finBloc
         end
     end
-<<<<<<< HEAD
 
-    #println("verification couleurs juste à la fin du majData : ")
-=======
-    
     if verbose println("verification couleurs juste à la fin du majData : ") end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
     verifierBlocsCol(instance)
 
     #l'instance est pas retournée car on veut juste la modifier (pas de copie memoire tmtc)
@@ -417,17 +340,10 @@ function verifierPapa(enfant::Array{Array{Int,1},1}, papa::Array{Array{Int,1},1}
 end
 
 #verifier que les debuts/fins de blocs de couleur correspondent bien
-<<<<<<< HEAD
-function verifierBlocsCol(instance::Array{Array{Int,1},1})
+function verifierBlocsCol(instance::Array{Array{Int,1},1},verbose = false)
     debCol = length(instance[1])-2
     finCol = length(instance[1])-1
-    #println("couleur,debCol,finCol : ", [(instance[i][2], instance[i][debCol], instance[i][finCol]) for i in 1:length(instance)] )
-=======
-function verifierBlocsCol(instance::Array{Array{Int,1},1},verbose = false)
-    debCol = length(instance[1])-2 
-    finCol = length(instance[1])-1 
     if verbose println("couleur,debCol,finCol : ", [(instance[i][2], instance[i][debCol], instance[i][finCol]) for i in 1:length(instance)] ) end
->>>>>>> c23b07ac5f8d6f78b89fee464bb89ea9225938f9
     i = 1
     while i <= length(instance)
         col = instance[i][2]
