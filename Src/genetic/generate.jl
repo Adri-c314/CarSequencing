@@ -61,9 +61,7 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
 
     elites = pop_elites(temps_firstind, temps_elites,deepcopy(sequence_meilleure),ratio,deepcopy(tab_violation), Hprio, pbl)
 
-    for i in elites
-        push!(population, i)
-    end
+    append!(population, elites)
 
     if verbose
         println("Done !")
@@ -93,11 +91,11 @@ function generate(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64, t
         obj = shuffle(MersenneTwister(1234), Vector(1:3))
 
         # Ajout de l'elmt dans la pop
-        push!(population, VFLS_genetic(deepcopy(sequence_meilleure), deepcopy(tab_violation), deepcopy(score_meilleur), obj, inst, temps_popNonElite))
+        push!(population, VFLS_genetic(sequence_meilleure, tab_violation, score_meilleur, obj, inst, temps_popNonElite))
 
         # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
         if verbose
-            if i >(n/50)*(nbSol-6)
+            if i-6 >(n/50)*(nbSol-6)
                 st_output=string(st_output, "#")
                 tmp_st = ""
                 for i in 1:50-n-1
