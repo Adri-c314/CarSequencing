@@ -1,5 +1,9 @@
 # Structures :
+<<<<<<< HEAD
 include("./instance.jl")
+=======
+include("./instance.jl"
+>>>>>>> 55487d3cc625e43fa562eab5c25afa566e661fd6
 include("../PLS&Tree/Sommet.jl")
 
 # Les fichiers utils
