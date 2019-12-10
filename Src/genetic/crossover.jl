@@ -202,7 +202,7 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
     violEnfant, pblAdmissible = majData(enfant, inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl,verbose)
 
     if verbose println("verifier couleurs enfant") end
-    verifierBlocsCol(enfant,verbose)
+    #verifierBlocsCol(enfant,verbose)
     #si l'enfant est pas admissible : on refait un crossover
     if !pblAdmissible
         if verbose println("PBL non admissible : on refait un crossover") end
@@ -263,7 +263,7 @@ function majData(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{I
             checkPBL += 1
             if checkPBL > pbl
                 pblAdmissible = false
-                return tab_violation,pblAdmissible
+                return tab_violation,pblAdmissible, instance
             end
         else
             col=n[2]
@@ -309,9 +309,9 @@ function majData(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{I
 
     if verbose println("verification couleurs juste à la fin du majData : ") end
     verifierBlocsCol(instance)
-
+    #println(instance)
     #l'instance est pas retournée car on veut juste la modifier (pas de copie memoire tmtc)
-    return tab_violation,pblAdmissible
+    return tab_violation,pblAdmissible,instance
 end
 
 
@@ -453,7 +453,7 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     tab_violation=population[maman][2]
     Hprio = inst.Hprio
     ratio = inst.ratio
-    sequence_maman = population[maman][1]
+    sequence_maman = deepcopy(population[maman][1])
     sz = size(sequence_maman)[1]
     szcar =size(sequence_maman[1])[1]
     #println("sz", sz)
@@ -489,9 +489,14 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     #println("tab voitures avec conflit",PosHpoConflict)
 
     #Step 1 On ajoute un nb de voitures sans conflits
-    E1 = sequence_maman
-    elementNul=map(x->0, sequence_maman[1])
-    E1 = map(x -> elementNul, sequence_maman)
+    #E1 = deepcopy(sequence_maman)
+    #elementNul=map(x->0, deepcopy(sequence_maman[1]))
+    #E1 = map(x -> elementNul, deepcopy(sequence_maman))
+    elementNul=zeros(Int, length(sequence_maman[1]))
+    E1 = Array{Array{Int,1},1}()
+    for i in 1:length(sequence_maman)
+        push!(E1, elementNul)
+    end
 
     ajout = 0
     while ajout < randHpo
@@ -548,20 +553,22 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
     #println("Enfant fin",E1)
 
-    #=test sequence valide
+    #test sequence valide
     for i in 1:sz
         positionnn=findfirst(x -> x==sequence_maman[i],E1)[1]
-    end=#
+    end
 
     ##Evaluation
-    tab_violationE1, checkPbl = majData(E1,sequence_maman,ratio,Hprio,inst.pbl)
+    tab_violationE1, checkPbl, E1 = majData(E1,sequence_maman,ratio,Hprio,inst.pbl)
+    #println(E1)
     #println("verification couleurs juste à la fin du majData : ")
-    verifierVoitures(E1)
-    verifierBlocsCol(E1)
+    #verifierVoitures(E1)
+#    verifierBlocsCol(E1)
     if !checkPbl
         #println("PBL non admissible : on refait un crossover")
-        return crossoverhprio!(papa, maman, population,inst)
+        return HprioEnfant!(maman, population,inst)
     else
+        #println(E1)
         return [E1, tab_violationE1, [[0,0,0]]]
     end
 end
@@ -570,13 +577,13 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     tab_violation=population[maman][2]
     Hprio = inst.Hprio
     ratio = inst.ratio
-    sequence_maman = population[maman][1]
+    sequence_maman = deepcopy(population[maman][1])
     sz = size(sequence_maman)[1]
     szcar =size(sequence_maman[1])[1]
     #println("sz", sz)
     tab_violation, pblAdmissible = majData(population[maman][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
     #println("verifier couleurs maman")
-    verifierBlocsCol(population[maman][1])
+    #verifierBlocsCol(population[maman][1])
 
     #crossover sur P1 : maman
     nbPosHpo = 0
@@ -605,9 +612,13 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     #println("tab voitures avec conflit",PosHpoConflict)
 
     #Step 1 On ajoute un nb de voitures sans conflits
-    E1 = sequence_maman
-    elementNul=map(x->0, sequence_maman[1])
-    E1 = map(x -> elementNul, sequence_maman)
+    #E1 = sequence_maman
+
+    elementNul=zeros(Int, length(sequence_maman[1]))
+    E1 = Array{Array{Int,1},1}()
+    for i in 1:length(sequence_maman)
+        push!(E1, elementNul)
+    end
 
     ajout = 0
     while ajout < randHpo
@@ -664,19 +675,20 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
     #println("Enfant fin",E1)
 
-    #=test sequence valide
+    #test sequence valide
     for i in 1:sz
         positionnn=findfirst(x -> x==sequence_maman[i],E1)[1]
-    end=#
+    end
     ##Evaluation
     tab_violationE1, checkPbl = majData(E1,sequence_maman,ratio,Hprio,inst.pbl)
     #println("verification couleurs juste à la fin du majData : ")
-    verifierVoitures(E1)
-    verifierBlocsCol(E1)
+    #verifierVoitures(E1)
+    #verifierBlocsCol(E1)
     if !checkPbl
         #println("PBL non admissible : on refait un crossover")
-        return crossoverlprio!(papa, maman, population,inst)
+        return LprioEnfant!(maman, population,inst)
     else
+        #println(E1)
         return [E1, tab_violationE1, [[0,0,0]]]
     end
 end
