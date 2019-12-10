@@ -64,7 +64,7 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
         papa, maman, focus = selection(population)
 
         # crossover
-        @time enfant = crossover(papa, maman, population, focus, inst)
+        enfant = crossover(papa, maman, population, focus, inst)
 
         # mutation
         if mutation2
