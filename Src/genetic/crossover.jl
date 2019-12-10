@@ -18,7 +18,6 @@
 # @param inst : L'instance du problème étudié cf Util/instance.jl
 # @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
 function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, obj::Symbol, inst::Instance)
-    #=
     #Hprio/LPrio/Pbl
     #println("debut crossover")
     if obj == :pbl!
@@ -34,9 +33,6 @@ function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{In
     #println("fin crossover")
     #println(typeof(sequence),typeof(tab_violation),typeof(score))
     return enfant
-    =#
-
-    return crossoverCouleur(papa, maman, population, inst,false,false)
 end
 
 
@@ -252,7 +248,7 @@ function majData(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{I
             checkPBL += 1
             if checkPBL > pbl
                 pblAdmissible = false
-                return tab_violation,pblAdmissible, instance
+                return tab_violation,pblAdmissible
             end
         else
             col=n[2]
@@ -547,7 +543,7 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
 
     ##Evaluation
-    tab_violationE1, checkPbl, E1 = majData(E1,sequence_maman,ratio,Hprio,inst.pbl)
+    tab_violationE1, checkPbl = majData(E1,sequence_maman,ratio,Hprio,inst.pbl)
     #println(E1)
     #println("verification couleurs juste à la fin du majData : ")
     #verifierVoitures(E1)
