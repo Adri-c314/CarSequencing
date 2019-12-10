@@ -71,6 +71,78 @@ end
 
 # Fonction qui permet de dessider de l'insertion ou non d'un enfant dans la population
 # @param population : la population comme elle est definie plus précisement dans generate.jl
+# @param enfants : la pop d'enfants générer
+# @modify population : insere potentiellement l'enfant dans la pop
+function insertionPotentielleEnfants!(population::Array{Array{Array{Array{Int,1},1},1},1}, enfants::Array{Array{Array{Array{Int,1},1},1},1}, nbEnfants::Int)
+    # Gestion des enfants conservés
+    enfantsKeep = Array{Array{Array{Array{Int,1},1},1},1}()
+    indkeep = Array{Int,1}()
+    while length(enfantsKeep)<=nbEnfants
+        ens = Vector(1:length(population))
+        for b in indkeep
+            deleteat!(ens,b)
+        end
+        ordre = shuffle(MersenneTwister(1234), ens)
+
+        i = 1
+        while i<=length(ordre) && length(enfantsKeep)<=nbEnfants
+            println("infini de ", i)
+            if nonDomineInPop(enfants, ordre[i], ordre)
+                push!(enfantsKeep, deepcopy(enfants[ordre[i]]))
+                push!(indkeep, ordre[i])
+            end
+            i += 1
+        end
+    end
+    println("\n\n\n\n\n\n pas de boucle infini mon gars")
+
+    # Gestion des parents gardés
+    popkeep = Array{Array{Array{Array{Int,1},1},1},1}()
+    indkeep = Array{Int,1}()
+    while length(popkeep)<=length(population)-nbEnfants
+        ens = Vector(1:length(population))
+        for b in indkeep
+            deleteat!(ens,b)
+        end
+        ordre = shuffle(MersenneTwister(1234), ens)
+
+        i = 1
+        while i<=length(ordre) && length(popkeep)<=length(population)-nbEnfants
+            println("infini 2 de ", i)
+            if nonDomineInPop(population, ordre[i], ordre)
+                push!(popkeep, deepcopy(population[ordre[i]]))
+                push!(indkeep, ordre[i])
+            end
+            i += 1
+        end
+    end
+
+    population = Array{Array{Array{Array{Int,1},1},1},1}()
+    append!(population, deepcopy(popkeep))
+    append!(population, deepcopy(enfantsKeep))
+end
+
+
+function nonDomineInPop(pop::Array{Array{Array{Array{Int,1},1},1},1}, indice::Int, ordre::Array{Int,1})
+    dominer = false
+    i = 1
+
+    while !dominer && i<=length(ordre)
+        if domineFortement(pop[indice], pop[ordre[i]])
+            dominer = true
+        end
+        i += 1
+    end
+
+    if dominer
+        return false
+    end
+
+    return true
+end
+
+# Fonction qui permet de dessider de l'insertion ou non d'un enfant dans la population
+# @param population : la population comme elle est definie plus précisement dans generate.jl
 # @param enfant : l'enfant générer
 # @param NDTree : le nd tree qu'on met potentiellement à jour
 # @modify NDTree : on ajoute dans certains cas
