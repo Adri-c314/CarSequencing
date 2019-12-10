@@ -1,0 +1,25 @@
+1) Information sur les données :
+   ---------------------------
+Nombre d'options prioritaires : 4
+PAINT_BATCH_LIMIT : 10
+Nombre de vehicules : 1161
+
+
+2) Creation de la population initiale :
+   ----------------------------------
+Taille de la population :11
+Budjet de calcule pour la phase initiale commune : 1.0 secondes
+Budjet de calcule pour creer le 1er ind elites : 1.0 secondes
+Budjet de calcule pour creer 1 des 5 autres ind elites : 1.0 secondes
+Done !
+Budjet de calcule pour chacune des 5 solutions non elites : 3.0 secondes
+Done !
+Score de la population inital :
+Array{Int64,1}[[126, 1643, 6769]];Array{Int64,1}[[126, 885, 5659]];Array{Int64,1}[[642, 34, 4673]];Array{Int64,1}[[552, 388, 2810]];Array{Int64,1}[[818, 32, 4404]];Array{Int64,1}[[590, 411, 2842]];Array{Int64,1}[[828, 3, 3326]];Array{Int64,1}[[843, 1, 3449]];Array{Int64,1}[[826, 4, 3851]];Array{Int64,1}[[839, 0, 4020]];Array{Int64,1}[[829, 1, 3439]];
+
+
+3) Réalisation de l'algorithme génétique :
+   ----------------------------------
+Budjet de temps de calcule : 300.0 secondes
+Budjet de temps de calcule d'une mutation : 0.1 secondes
+3 enfants ont été insérés
