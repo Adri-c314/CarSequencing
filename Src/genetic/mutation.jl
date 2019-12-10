@@ -230,8 +230,8 @@ function mutation2!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, in
             tmp_st=string(tmp_st,"   ] ")
         end
 
-        while temps_mutation*(timeOPT[Phase]/100)>time()-debut
-            swap_mutation!(enfant, rand(1:taille), rand(1:taille), inst)
+        while temps_mutation > time()-debut
+            swap_mutation!(enfant, rand(2:taille-1), rand(2:taille-1), inst)
 
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
             if verbose
@@ -270,9 +270,9 @@ function swap_mutation!(enfant::Array{Array{Array{Int,1},1},1}, k::Int, l::Int, 
     update_tab_violation_and_pbl_swap!(enfant[1], inst.ratio, enfant[2], inst.Hprio, inst.pbl, k, l)
 
     # Reval du score
-    score[1]+=eval_couleur_swap(enfant[1], inst.pbl, k, l)
-    score[2]+=eval_Hprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
-    score[3]+=eval_Lprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
+    enfant[3][1][1]+=eval_couleur_swap(enfant[1], inst.pbl, k, l)
+    enfant[3][1][2]+=eval_Hprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
+    enfant[3][1][3]+=eval_Lprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
 
     # Swap
     tmp=copy(enfant[1][k])

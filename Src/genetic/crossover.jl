@@ -18,6 +18,7 @@
 # @param inst : L'instance du problème étudié cf Util/instance.jl
 # @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
 function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, obj::Symbol, inst::Instance)
+    #=
     #Hprio/LPrio/Pbl
     #println("debut crossover")
     if obj == :pbl!
@@ -33,6 +34,9 @@ function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{In
     #println("fin crossover")
     #println(typeof(sequence),typeof(tab_violation),typeof(score))
     return enfant
+    =#
+
+    return crossoverCouleur(papa, maman, population, inst,false,false)
 end
 
 
@@ -44,7 +48,7 @@ end
 # @param population : la population globale
 # @param inst : L'instance du problème étudié cf Util/instance.jl
 # @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
-function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1},inst::Instance,verbose = false)
+function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1},inst::Instance,verbose = false,debug = false)
     if verbose
         println("\n")
         println("------------------------CROSSOVER---------------------------", "\n")
@@ -60,10 +64,10 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
     #on maj les blocs couleurs des parents
     violMaman, pblAdmissible = majData(population[maman][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl,verbose)
     if verbose println("verifier couleurs maman") end
-    verifierBlocsCol(population[maman][1],verbose)
+    if debug verifierBlocsCol(population[maman][1],verbose) end
     violPapa, pblAdmissible = majData(population[papa][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl,verbose)
     if verbose println("verifier couleurs papa") end
-    verifierBlocsCol(population[papa][1],verbose)
+    if debug verifierBlocsCol(population[papa][1],verbose) end
 
     #points de coupe du crossover (on coupe sur le pere puis on injecte dans la maman)
     cut1 = rand(1:nbCars)
@@ -106,9 +110,9 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
             #95% de chance que le remplacement soit déterminisite; 5% de chance qu'il soit random (comme dans le papier genetic)
             r = rand()
             remplace = false
-            if r < 0.95 #on essaye de remplacer par une voiture qui a la même couleur qu'au moins un voisin
+            if r < 2 #on essaye de remplacer par une voiture qui a la même couleur que la derniere voiture ajoutée du fils
                 j = 1
-                if i == 1 #on regarde la couleur que de la voiture suivante
+                if i == 1 #premiere voiture du fils : on regarde la 2evoiture de la mere
                     while (j <= length(remplacerInd)) & !remplace
                         if population[maman][1][remplacerInd[j]][2] == population[maman][1][i+1][2]
                             push!(enfant,deepcopy(population[maman][1][remplacerInd[j]]))
@@ -119,10 +123,9 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
                             j += 1
                         end
                     end
-                else #on regarde la couleur de la voiture suivante et précédente
+                else #on regarde la couleur de la dernière voiture insérée dans l'enfant
                     while (j <= length(remplacerInd)) & !remplace
-                        if (population[maman][1][remplacerInd[j]][2] == population[maman][1][i+1][2]) ||
-                        (population[maman][1][remplacerInd[j]][2] == population[maman][1][i-1][2])
+                        if population[maman][1][remplacerInd[j]][2] == enfant[i-1][2]
                             push!(enfant,deepcopy(population[maman][1][remplacerInd[j]]))
                             deleteat!(remplacerID,j)
                             deleteat!(remplacerInd,j)
@@ -133,7 +136,7 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
                     end
                 end
             end
-            if (r >= 0.95) | !remplace #remplacement random
+            if (r >= 2) | !remplace #remplacement random
                 j = rand(1:length(remplacerInd))
                 push!(enfant,deepcopy(population[maman][1][remplacerInd[j]]))
                 deleteat!(remplacerID,j)
@@ -156,34 +159,20 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
             #95% de chance que le remplacement soit déterminisite; 5% de chance qu'il soit random (comme dans le papier genetic)
             r = rand()
             remplace = false
-            if r < 0.95 #on essaye de remplacer par une voiture qui a la même couleur qu'au moins un voisin
+            if r < 2 #on essaye de remplacer par une voiture qui a la même couleur que la derniere voiture de l'enfant
                 j = 1
-                if i == nbCars #on regarde la couleur que de la voiture précédente
-                    while j <= length(remplacerInd) & !remplace
-                        if population[maman][1][remplacerInd[j]][2] == population[maman][1][i-1][2]
-                            push!(enfant,deepcopy(population[maman][1][remplacerInd[j]]))
-                            deleteat!(remplacerID,j)
-                            deleteat!(remplacerInd,j)
-                            remplace = true
-                        else
-                            j += 1
-                        end
-                    end
-                else #on regarde la couleur de la voiture suivante et précédente
-                    while j <= length(remplacerInd) & !remplace
-                        if (population[maman][1][remplacerInd[j]][2] == population[maman][1][i+1][2]) ||
-                        (population[maman][1][remplacerInd[j]][2] == population[maman][1][i-1][2])
-                            push!(enfant,deepcopy(population[maman][1][remplacerInd[j]]))
-                            deleteat!(remplacerID,j)
-                            deleteat!(remplacerInd,j)
-                            remplace = true
-                        else
-                            j += 1
-                        end
+                while j <= length(remplacerInd) & !remplace
+                    if population[maman][1][remplacerInd[j]][2] == enfant[i-1][2]
+                        push!(enfant,deepcopy(population[maman][1][remplacerInd[j]]))
+                        deleteat!(remplacerID,j)
+                        deleteat!(remplacerInd,j)
+                        remplace = true
+                    else
+                        j += 1
                     end
                 end
             end
-            if (r >= 0.95) | !remplace #remplacement random
+            if (r >= 2) | !remplace #remplacement random
                 j = rand(1:length(remplacerInd))
                 push!(enfant,deepcopy(population[maman][1][remplacerInd[j]]))
                 deleteat!(remplacerID,j)
@@ -194,8 +183,8 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
         end
     end
     if verbose println("taille enfant : ", length(enfant), "\n") end
-    verifierVoitures(enfant)
-    verifierPapa(enfant,population[papa][1],cut1,cut2)
+    if debug verifierVoitures(enfant) end
+    if debug verifierPapa(enfant,population[papa][1],cut1,cut2) end
 
     #on verifie que le crossover est admissible (pbl)
     #et on met à jour les données : tab violation, blocs de couleur
@@ -293,7 +282,6 @@ function majData(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array{I
         end
         tmpi+=1
     end
-
 
     #maj des blocs de couleur
     push!(blocsCol,sz+1)
