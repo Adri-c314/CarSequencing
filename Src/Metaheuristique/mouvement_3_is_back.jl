@@ -44,7 +44,7 @@ function reflection_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int,
 
     tmp_Lprio = eval_Lprio_reflection(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
 
-    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] || score[2]+tmp_Hprio<score_nadir[2] || score[1]+tmp_color<score_nadir[1])
+    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] && score[2]+tmp_Hprio<score_nadir[2] && score[1]+tmp_color<score_nadir[1])
     if cond
         tmp = [i for i in (k):(l)]
         tmp =reverse(tmp)
@@ -92,7 +92,7 @@ function swap_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, ratio
     tmp_Lprio = eval_Lprio_swap(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
 
 
-    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] || score[2]+tmp_Hprio<score_nadir[2] || score[1]+tmp_color<score_nadir[1])
+    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] && score[2]+tmp_Hprio<score_nadir[2] && score[1]+tmp_color<score_nadir[1])
     if cond
         tmp=copy(sequence_courante[k])
         sequence_courante[k]=sequence_courante[l]
@@ -198,7 +198,7 @@ function insertion_3!(sequence_courante::Array{Array{Int,1},1}, k::Int, l::Int, 
     tmp_Lprio = eval_Lprio_fi(sequence_courante,ratio_option,tab_violation,Hprio,k,l)
 
 
-    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] || score[2]+tmp_Hprio<score_nadir[2] || score[1]+tmp_color<score_nadir[1])
+    cond = (tmp_color<0 || tmp_Hprio<0 || tmp_Lprio<0) && (score[3]+tmp_Lprio<score_nadir[3] && score[2]+tmp_Hprio<score_nadir[2] && score[1]+tmp_color<score_nadir[1])
     if cond
         seq = [i for i in k:l-1]
         prepend!(seq,l)
