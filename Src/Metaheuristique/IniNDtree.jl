@@ -10,7 +10,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, NDtree::Sommet, temps_all::Float6
     timeOPT, opt = phases_init(obj)
     a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
     maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
-
+    nb_efficace_pls=5
     debutall = time()
 
     nb = [0, 0, 0, 0]
@@ -89,7 +89,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, NDtree::Sommet, temps_all::Float6
         tmpi= 1
         ii=1
         for pareto in pareto_tmp
-            if tmp[objectif[1]]>pareto[2][objectif[1]] || (tmp[objectif[1]]==pareto[2][objectif[1]] && tmp[objectif[2]]>pareto[2][objectif[2]]) ||(tmp[objectif[1]]==pareto[2][objectif[1]] && tmp[objectif[2]]==pareto[2][objectif[2]]&& tmp[objectif[3]]>pareto[2][objectif[3]])
+            if tmp[objectif[1]]<pareto[2][objectif[1]] || (tmp[objectif[1]]==pareto[2][objectif[1]] && tmp[objectif[2]]<pareto[2][objectif[2]]) ||(tmp[objectif[1]]==pareto[2][objectif[1]] && tmp[objectif[2]]==pareto[2][objectif[2]]&& tmp[objectif[3]]<pareto[2][objectif[3]])
                 tmp = pareto[2]
                 tmpi=ii
             end
@@ -145,13 +145,11 @@ function IniNDtree(datas::NTuple{4,DataFrame}, NDtree::Sommet, temps_all::Float6
                 f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
                 k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
                 effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand,a,score_nadir)
-                compteurMvt!(f_mouv, nb,nb_effectiv,effect)
                 if effect
-                    a =evaluation(sequence_meilleure,tab_violation,ratio_option ,Hprio)
-                    maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
-                    sortie = true
+                    if maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
+                        sortie = true
+                    end
                 end
-                # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
                 if sortie
                     break
                 end
@@ -164,6 +162,7 @@ function IniNDtree(datas::NTuple{4,DataFrame}, NDtree::Sommet, temps_all::Float6
     pareto_tmp = get_solutions(NDtree)
     ## le PLS
     OBJ = [[1,2,3],[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
+    tmp_sortie = 0
     while size(pareto_tmp)[1]>1 && temps_all>time()-debutall
         obj = OBJ[rand(1:6)]
         timeOPT, opt = phases_init(obj)
@@ -173,6 +172,9 @@ function IniNDtree(datas::NTuple{4,DataFrame}, NDtree::Sommet, temps_all::Float6
         score_nadir = nadir_global(NDtree)
         println(score_nadir)
         println(size(pareto1_tmp))
+
+
+        tmp_sortie = 0
         for par in pareto_tmp
             if temps_all<time()-debutall
                 break
@@ -180,17 +182,36 @@ function IniNDtree(datas::NTuple{4,DataFrame}, NDtree::Sommet, temps_all::Float6
             sequence_meilleure = deepcopy(par[1])
             tab_violation=  deepcopy(par[3])
             a =  deepcopy(par[2])
+            sortie = false
+            tmp_sortie =0
             @time for Phase in 1:3
                 debut = time()
                 while temps_max4*(timeOPT[Phase]/100)>time()-debut
+
                     f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
                     k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
                     effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand,a,score_nadir)
                     if effect
-                        maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
+                        if maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
+                            tmp_sortie += 1
+
+                        end
+                        if tmp_sortie == nb_efficace_pls
+                                sortie = true
+                        end
+                        sequence_meilleure = deepcopy(par[1])
+                        tab_violation=  deepcopy(par[3])
+                        a =  deepcopy(par[2])
+                    end
+                    if sortie
+                        break
                     end
                 end
+                if sortie
+                    break
+                end
             end
+            println(tmp_sortie)
         end
         pareto_tmp2 = get_solutions(NDtree)
         secondpareto=[pareto_tmp2[1]]

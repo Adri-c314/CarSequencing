@@ -46,9 +46,6 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
     sz = size(sequence_meilleure)[1]
     szcar = size(sequence_meilleure[1])[1]
     timeOPT, opt = phases_init(obj)
-    for car in sequence_meilleure
-        println(car)
-    end
 
 
     # affichage initial :

@@ -1266,9 +1266,9 @@ end
 # @param k : l'indice de k (avec k<l)
 # @param l : l'indice de l (avec k<l)
 # @return ::Int : la difference de Hprio violer
-function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation1::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
+function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_option::Array{Array{Int,1},1},tab_violation::Array{Array{Int,1},1},Hprio::Int,k::Int,l::Int)
     sz = size(sequence_courante)[1]
-    tab_violation = deepcopy(tab_violation1)
+    #tab_violation = deepcopy(tab_violation1)
     tmp_viol=0
     tmp_viol_avant =0
     for i in 1:Hprio
@@ -1289,14 +1289,15 @@ function eval_Hprio_reflection(sequence_courante::Array{Array{Int,1},1},ratio_op
                 tab_fin[j+1]+=tab_fin[j]
                 tab_deb[j+1]+=tab_deb[j]
             end
-            tab_violation[i][k+j] += tab_deb[j+1]
+            #=tab_violation[i][k+j] += tab_deb[j+1]
             tmp_viol+=max(0,tab_violation[i][k+j])
-            tmp_viol_avant+= max(0,tab_violation1[i][k+j])
-
+            tmp_viol_avant+= max(0,tab_violation1[i][k+j])=#
+            tmp_viol+=(max(0,tab_violation[i][k+j]+ tab_deb[j+1])-max(0,tab_violation[i][k+j]))
             if (l-j+ratio_option[i][2]-1<=sz)
-                tab_violation[i][l-j+ratio_option[i][2]-1] += tab_fin[j+1]
+                #=tab_violation[i][l-j+ratio_option[i][2]-1] += tab_fin[j+1]
                 tmp_viol+=max(0,tab_violation[i][l-j+ratio_option[i][2]-1])
-                tmp_viol_avant+=max(0,tab_violation1[i][l-j+ratio_option[i][2]-1])
+                tmp_viol_avant+=max(0,tab_violation1[i][l-j+ratio_option[i][2]-1])=#
+                tmp_viol+=(max(0,tab_violation[i][l-j+ratio_option[i][2]-1]+ tab_fin[j+1])-max(0,tab_violation[i][l-j+ratio_option[i][2]-1]))
             end
 
         end

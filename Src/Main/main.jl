@@ -48,7 +48,7 @@ function main(ir::Array{Tuple{String,String},1} = [("X", "028_CH2_EP_ENP_RAF_S51
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2], surLinux)
+        datas = lectureCSV(i[1], i[2])
 
         # Lancement de la VFLS
         score, sol, tmp = VFLS(datas, temps_max, verbose, txtoutput)
@@ -88,11 +88,15 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param csvscore : Si l'on souhaite conserver les score de toute la pop dans un fichier .csv
 # @param csvsequences : Si l'on souhaite conserver la sequence de toute la pop dans un fichier .csv
+<<<<<<< HEAD
 <<<<<<< current
 function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "024_38_3_EP_ENP_RAF")], nbSol::Int=50, temps_init::Float64 = 1., temps_phase1::Float64 = 1., temps_phaseAutres::Float64 = 1., temps_popNonElite::Float64 = 3., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool = false, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
 =======
 function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 10., temps_phase1::Float64 = 0.1, temps_phaseAutres::Float64 = 0.1, temps_popNonElite::Float64 = .001, temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
 >>>>>>> before discard
+=======
+function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 10., temps_phase1::Float64 = 10., temps_phaseAutres::Float64 = 10., temps_popNonElite::Float64 = 3., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool = true, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+>>>>>>> 6f660292c87ed1999ea0f3db9adbbe3862422fed
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -115,7 +119,7 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2], surLinux)
+        datas = lectureCSV(i[1], i[2])
 
         # Lancement de la VFLS
         txt, population = geneticEnfants(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
@@ -189,7 +193,7 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_R
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2], surLinux)
+        datas = lectureCSV(i[1], i[2])
 
         # Creation du NDTree pour le genetic
         NDTree = Sommet()
@@ -265,79 +269,66 @@ end
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function mainTestPLS(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_S49_J2")
-("X", "023_EP_RAF_ENP_S49_J2")
-("X", "024_EP_RAF_ENP_S49_J2")
-("X", "025_EP_ENP_RAF_S49_J1")
-("X", "028_CH1_EP_ENP_RAF_S50_J4")
-("X", "028_CH2_EP_ENP_RAF_S51_J1")
-("X", "029_EP_RAF_ENP_S49_J5")
-("X", "034_VP_EP_RAF_ENP_S51_J1_J2_J3")
-("X", "034_VU_EP_RAF_ENP_S51_J1_J2_J3")
-("X", "035_CH1_RAF_EP_S50_J4")
-("X", "035_CH2_RAF_EP_S50_J4")
-("X", "039_CH1_EP_RAF_ENP_S49_J1")
-("X", "039_CH3_EP_RAF_ENP_S49_J1")
-("X", "048_CH1_EP_RAF_ENP_S50_J4")
-("X", "048_CH2_EP_RAF_ENP_S49_J5")
-("X", "064_CH1_EP_RAF_ENP_S49_J1")
-("X", "064_CH2_EP_RAF_ENP_S49_J4")
-("X", "655_CH1_EP_RAF_ENP_S51_J2_J3_J4")
-("X", "655_CH2_EP_RAF_ENP_S52_J1_J2_S01_J1")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 200., temps_max3::Float64 = 10., temps_max4::Float64 = 30., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = true)
-    for i in ir
-        # Gestion affichage :
-        if txtoutput
-            txt = string(
-                "===================================================\n",
-                "Etude de l'instance : ", i[1], "\n",
-                "Reference du dossier : ", i[2], "\n",
-                "A la date du : ", Dates.now(), "\n",
-                "===================================================\n\n"
-            )
-        end
-        if verbose
-            println(string(
-                "===================================================\n",
-                "Etude de l'instance : ", i[1], "\n",
-                "Reference du dossier : ", i[2], "\n",
-                "A la date du : ", Dates.now(), "\n",
-                "===================================================\n\n"
-            ))
-        end
-
-        # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2], surLinux)
-
-        # Creation d'un NDTree gloablisé
-        NDtree = Sommet()
-
-        # Lancement de la VFLS
-        @time score, szscore, nadir, sollexico = IniNDtree(datas, NDtree, temps_all, temps_max, temps_max2, temps_max3, temps_max4, verbose, txtoutput)
-
-        # Gestion de l'affichage :
-        if verbose
-            println("Score : ", score)
-            println("\n\n\n")
-            println("===================================================")
-            println("Ecriture des pts .txt : ", txtoutput)
-            println("Ecriture des scores .txt : ", csvscore)
-            println("Ecriture de la population .csv : ", csvpopulation)
-            println("===================================================")
-            println("\n\n\n")
-        end
-        if csvscore
-            ecriture(scoreToCSV(score), pathOS(string(path,i[1],"/PLSsolo",i[2],time(),"scores",".txt"), surLinux))
-        end
-        if txtoutput
-            ecriture(string(temps_all, " ", temps_max, " ", temps_max2, " ", temps_max3, " ", temps_max4 ,allToCSV(nadir,szscore,sollexico)), pathOS(string(path,i[1],"/PLSsolo",i[2],time(),"elements",".txt"), surLinux))
-        end
-        if csvpopulation
-            solutions = get_solutions(NDTree)
-            tmp = ""
-            for ii in 1:length(solutions)
-                tmp = string(tmp, "\n", seqToCSV(solutions[ii][1]))
+function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 50., temps_max3::Float64 = 2., temps_max4::Float64 = 10., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = true)
+    temps2 = [20,50,100,200]
+    for j in 1:4
+        temps_max2 = temps2[i]
+        for i in ir
+            # Gestion affichage :
+            if txtoutput
+                txt = string(
+                    "===================================================\n",
+                    "Etude de l'instance : ", i[1], "\n",
+                    "Reference du dossier : ", i[2], "\n",
+                    "A la date du : ", Dates.now(), "\n",
+                    "===================================================\n\n"
+                )
             end
-            ecriture(tmp, pathOS(string(path, i[1], "/", "PLSsolo_seq_", i[2],".csv"), surLinux))
+            if verbose
+                println(string(
+                    "===================================================\n",
+                    "Etude de l'instance : ", i[1], "\n",
+                    "Reference du dossier : ", i[2], "\n",
+                    "A la date du : ", Dates.now(), "\n",
+                    "===================================================\n\n"
+                ))
+            end
+
+            # Lecture du fichier csv
+            datas = lectureCSV(i[1], i[2],false)
+
+            # Creation d'un NDTree gloablisé
+            NDtree = Sommet()
+
+            # Lancement de la VFLS
+            @time score, szscore, nadir, sollexico = IniNDtree(datas, NDtree, temps_all, temps_max, temps_max2, temps_max3, temps_max4, verbose, txtoutput)
+
+            # Gestion de l'affichage :
+            if verbose
+                println("Score : ", score)
+                println("\n\n\n")
+                println("===================================================")
+                println("Ecriture des pts .txt : ", txtoutput)
+                println("Ecriture des scores .txt : ", csvscore)
+                println("Ecriture de la population .csv : ", csvpopulation)
+                println("===================================================")
+                println("\n\n\n")
+            end
+            ttt = time()
+            if csvscore
+                ecriture(scoreToCSV(score), pathOS(string(path,i[1],"/PLSsolo",i[2],ttt,"scores",".txt"), surLinux))
+            end
+            if txtoutput
+                ecriture(string(temps_all, " ", temps_max, " ", temps_max2, " ", temps_max3, " ", temps_max4 ,allToCSV(nadir,szscore,sollexico)), pathOS(string(path,i[1],"/PLSsolo",i[2],ttt,"elements",".txt"), surLinux))
+            end
+            if csvpopulation
+                solutions = get_solutions(NDTree)
+                tmp = ""
+                for ii in 1:length(solutions)
+                    tmp = string(tmp, "\n", seqToCSV(solutions[ii][1]))
+                end
+                ecriture(tmp, pathOS(string(path, i[1], "/", "PLSsolo_seq_", i[2],".csv"), surLinux))
+            end
         end
     end
 end
