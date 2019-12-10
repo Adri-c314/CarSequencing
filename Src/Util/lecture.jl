@@ -17,8 +17,9 @@ using Query
 #           paint_batch_limit :: DataFrames.DataFrame
 #           ratio :: DataFrames.DataFrame
 #           )
-function lectureCSV(instance::String, ref::String)
+function lectureCSV(instance::String, ref::String, onLinux::Bool)
     path = string("../../Input/Instances_set_", instance, "/", ref, "/")
+    path = pathOS(path, onLinux)
     return (CSV.read(string(path, "vehicles.txt"),ignoreemptylines=true), CSV.read(string(path, "optimization_objectives.txt")), CSV.read(string(path, "paint_batch_limit.txt")), CSV.read(string(path, "ratios.txt")))
 end
 

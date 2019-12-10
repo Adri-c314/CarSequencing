@@ -48,7 +48,7 @@ function main(ir::Array{Tuple{String,String},1} = [("X", "028_CH2_EP_ENP_RAF_S51
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
+        datas = lectureCSV(i[1], i[2], surLinux)
 
         # Lancement de la VFLS
         score, sol, tmp = VFLS(datas, temps_max, verbose, txtoutput)
@@ -111,7 +111,7 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
+        datas = lectureCSV(i[1], i[2], surLinux)
 
         # Lancement de la VFLS
         txt, population = genetic(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
@@ -185,7 +185,7 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_R
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
+        datas = lectureCSV(i[1], i[2], surLinux)
 
         # Creation du NDTree pour le genetic
         NDTree = Sommet()
@@ -302,7 +302,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("X", "022_RAF_EP_ENP_
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
+        datas = lectureCSV(i[1], i[2], surLinux)
 
         # Creation d'un NDTree gloablisé
         NDtree = Sommet()
