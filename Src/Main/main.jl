@@ -88,7 +88,11 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param csvscore : Si l'on souhaite conserver les score de toute la pop dans un fichier .csv
 # @param csvsequences : Si l'on souhaite conserver la sequence de toute la pop dans un fichier .csv
-function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "024_38_3_EP_ENP_RAF")], nbSol::Int=11, temps_init::Float64 = 1., temps_phase1::Float64 = 1., temps_phaseAutres::Float64 = 1., temps_popNonElite::Float64 = 3., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool = false, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+<<<<<<< current
+function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "024_38_3_EP_ENP_RAF")], nbSol::Int=50, temps_init::Float64 = 1., temps_phase1::Float64 = 1., temps_phaseAutres::Float64 = 1., temps_popNonElite::Float64 = 3., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool = false, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+=======
+function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 10., temps_phase1::Float64 = 0.1, temps_phaseAutres::Float64 = 0.1, temps_popNonElite::Float64 = .001, temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+>>>>>>> before discard
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -114,7 +118,7 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "024_38_3_EP_ENP
         datas = lectureCSV(i[1], i[2], surLinux)
 
         # Lancement de la VFLS
-        txt, population = genetic(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
+        txt, population = geneticEnfants(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
 
         # Gestion affichage :
         if txtoutput
