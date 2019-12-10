@@ -262,9 +262,9 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
 function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 50., temps_max3::Float64 = 2., temps_max4::Float64 = 10., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = true)
-    temps2 = [20,50,100,200]
+    temps4 = [3.,5.,10.,20.]
     for j in 1:4
-        temps_max2 = temps2[i]
+        temps_max4 = temps4[j]
         for i in ir
             # Gestion affichage :
             if txtoutput
