@@ -154,7 +154,6 @@ function geneticEnfants(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Floa
     end
 
     # Boucle du genetic
-    nbInserer = 0
     debut = time()
     while temps_global >= (time()-debut)
         if verbose
@@ -221,10 +220,10 @@ function geneticEnfants(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Floa
     end
 
     if verbose
-        println("\n", nbInserer, " enfants ont été insérés")
+        println("\nFin de l'algorithme génétique")
     end
     if txtoutput
-        txt = string(txt, nbInserer, " enfants ont été insérés\n")
+        txt = string(txt, "Fin de l'algorithme génétique\n")
     end
 
     return txt, population
@@ -284,13 +283,11 @@ function geneticEnfants!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int,
             end
         end
 
-        # selection prendre des elements de la pop
-        papa, maman, focus = selection(population)
-
         # Boucle sur la taille de pop pour generer des enfants
         enfants = Array{Array{Array{Array{Int,1},1},1},1}()
         for i in 1:nbSol
-
+            # selection prendre des elements de la pop
+            papa, maman, focus = selection(population)
 
             if focus != :pbl!
 
@@ -331,7 +328,7 @@ function geneticEnfants!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int,
         end
 
         # insertion dans la pop
-        insertionPotentielleEnfants!NDTree(population, enfants, cota, NDTree)
+        nbInserer += insertionPotentielleEnfants!NDTree(population, enfants, cota, NDTree)
     end
 
     if verbose

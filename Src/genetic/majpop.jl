@@ -179,13 +179,16 @@ function insertionPotentielleEnfants!NDTree(population::Array{Array{Array{Array{
         end
     end
 
+    cpt = 0
     population = Array{Array{Array{Array{Int,1},1},1},1}()
     for i in indkeep
         if i <= nn
-            maj(NDTree, enfants[i])
+            maj!(NDTree, (enfants[i][1], enfants[i][3][1], enfants[i][2]))
+            cpt += 1
         end
         push!(population, deepcopy(enfants[i]))
     end
+    return cpt
 end
 
 
@@ -234,11 +237,13 @@ function insertionPotentielleEnfants!NDTree(population::Array{Array{Array{Array{
         population = Array{Array{Array{Array{Int,1},1},1},1}()
         append!(population, deepcopy(popkeep))
         for i in indkeepEnfants
-            maj(NDTree, enfants[i])
+            maj!(NDTree, (enfants[i][1], enfants[i][3][1], enfants[i][2]))
             push!(population, deepcopy(enfants[i]))
         end
+
+        return length(indkeepEnfants)
     else
-        insertionPotentielleEnfants!(population, enfants)
+        return insertionPotentielleEnfants!NDTree(population, enfants, NDTree)
     end
 end
 
