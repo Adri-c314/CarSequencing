@@ -42,97 +42,115 @@ function GreedyRAF(instance::Array{Array{Int,1},1},sequence_j_avant::Array{Array
     tmpcol=0
     tmpi = argmax(color)[2]
     tmp=0
-
+    nbcol = 0
     for n in color
         tmp+=ceil(Int,n/pbl)
+        nbcol+=1
     end
-
     if color[tmpi]>pbl
         mm = tmpplace+pbl-1
     else
         mm = tmpplace+color[tmpi]-1
     end
     tmpfincol=mm
-    while sum(color)!=0 && tmpplace <= size(instance)[1]
 
-        if tmpcol>=pbl && color[tmpi]!=0
-            tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
-            tmpcol=0
-            tmpdebcol=tmpplace
-            if color[tmpi]>pbl
-                mm = tmpplace+pbl-1
-            else
-                mm = tmpplace+color[tmpi]-1
+    if color[tmpi]/pbl<= sum(color)-color[tmpi]+1
+        while sum(color)!=0 && tmpplace <= size(instance)[1]
+            block = [ceil(color[i]/pbl) for i in 1:nbcol]
+            if  tmpcol>=pbl && tmpi == argmax(color)[2] && block[tmpi]> sum(block)-block[tmpi]
+                tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
+                tmpcol=0
+                tmpdebcol=tmpplace
+                tmpfincol=tmpplace
+            elseif tmpdebcol==tmpfincol && block[argmax(color)[2]]> sum(block)-block[argmax(color)[2]]
+                tmpi = argmax(color)[2]
+                tmpcol=0
+                tmpdebcol=tmpplace
+                if color[tmpi]>pbl
+                    mm = tmpplace+pbl-1
+                else
+                    mm = tmpplace+color[tmpi]-1
+                end
+                tmpfincol=mm
+            elseif tmpcol>=pbl && color[tmpi]!=0
+                tmpi = argmax2(convert(Array{Int,2},color),convert(Int,tmpi))
+                tmpcol=0
+                tmpdebcol=tmpplace
+                if color[tmpi]>pbl
+                    mm = tmpplace+pbl-1
+                else
+                    mm = tmpplace+color[tmpi]-1
+                end
+                tmpfincol=mm
+            elseif color[tmpi]==0
+                tmpi = argmax(color)[2]
+                tmpcol=0
+                tmpdebcol=tmpplace
+                if color[tmpi]>pbl
+                    mm = tmpplace+pbl-1
+                else
+                    mm = tmpplace+color[tmpi]-1
+                end
+                tmpfincol=mm
             end
-            tmpfincol=mm
-        elseif color[tmpi]==0
-            tmpi = argmax(color)[2]
-            tmpcol=0
-            tmpdebcol=tmpplace
-            if color[tmpi]>pbl
-                mm = tmpplace+pbl-1
-            else
-                mm = tmpplace+color[tmpi]-1
-            end
-            tmpfincol=mm
-        end
-        tmpdur=-1
-        ttt=1
-        if tmpcol<pbl
-            while instance[ttt][1]!=0
-
-                ttt+=1
-            end
-        else
-            ok =true
-            while ok
+            tmpdur=-1
+            ttt=1
+            if tmpcol<pbl
                 while instance[ttt][1]!=0
 
                     ttt+=1
                 end
-                if instance[ttt][2]!=color
-                    ok = false
-                else
-                    ttt+=1
+            else
+                ok =true
+                while ok
+                    while instance[ttt][1]!=0
+
+                        ttt+=1
+                    end
+                    if instance[ttt][2]!=color
+                        ok = false
+                    else
+                        ttt+=1
+                    end
                 end
             end
-        end
-        tmpduri = instance[ttt]
+            tmpduri = instance[ttt]
 
-        for ii in 1:sz
-            car = instance[ii]
-            if car[1]==0 && car[2]==tmpi && color[tmpi]>0
+            for ii in 1:sz
+                car = instance[ii]
+                if car[1]==0 && car[2]==tmpi && color[tmpi]>0
+                    for i in 1:Hprio
+                        pi[i][1]+=car[2+i]
+                        pi[i][2]+=1
+                    end
+                    tmpdurdur = dur(ratio,PI,pi,Hprio)
+                    if tmpdurdur>tmpdur
+                        tmpduri=car
+                        tmpdur=tmpdurdur
+
+                    end
+                    for i in 1:Hprio
+                        pi[i][1]-=car[2+i]
+                        pi[i][2]-=1
+                    end
+                end
+            end
+
+            if  tmpcol>=pbl
+            elseif tmpduri[1]==0 && tmpduri[2]==tmpi && color[tmpi]>0
+                tmpduri[1]=tmpplace
+                tmpduri[szcar-1]=tmpfincol
+                tmpduri[szcar-2]=tmpdebcol
+                tmpplace+=1
+                tmpcol+=1
+                color[tmpi]-=1
                 for i in 1:Hprio
-                    pi[i][1]+=car[2+i]
+                    pi[i][1]+=tmpduri[2+i]
                     pi[i][2]+=1
                 end
-                tmpdurdur = dur(ratio,PI,pi,Hprio)
-                if tmpdurdur>tmpdur
-                    tmpduri=car
-                    tmpdur=tmpdurdur
-
-                end
-                for i in 1:Hprio
-                    pi[i][1]-=car[2+i]
-                    pi[i][2]-=1
-                end
+            else
+                debb=false
             end
-        end
-
-        if  tmpcol>=pbl
-        elseif tmpduri[1]==0 && tmpduri[2]==tmpi && color[tmpi]>0
-            tmpduri[1]=tmpplace
-            tmpduri[szcar-1]=tmpfincol
-            tmpduri[szcar-2]=tmpdebcol
-            tmpplace+=1
-            tmpcol+=1
-            color[tmpi]-=1
-            for i in 1:Hprio
-                pi[i][1]+=tmpduri[2+i]
-                pi[i][2]+=1
-            end
-        else
-            debb=false
         end
     end
     return tri_car(instance)
