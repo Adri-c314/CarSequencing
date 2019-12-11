@@ -211,12 +211,11 @@ end
 #       enfant[3][1] : Array{Int,1} le score sur les 3 obj
 # @param objectif : l'objectif choisi (:pbl!, :hprio!, :lprio!) suivant l'obj qu'on focus
 # @param inst : L'instance du problème étudié cf Util/instance.jl
-# @param temps_mutation : le temps associé à une mutation
+# @param nbSwap : le nombre de swap réalisé 
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @modify ::Array{Array{Array{Int,1},1},1} : L'enfant applique la mutation sur l'enfant
-function mutation2!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, inst::Instance, temps_mutation::Float64 = 0.1, verbose::Bool = false, txtoutput::Bool = false)
-        debut = time()
+function mutation2!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, inst::Instance, nbSwap::Int, verbose::Bool = false, txtoutput::Bool = false)
         taille = length(enfant[1])
 
         # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
@@ -230,7 +229,7 @@ function mutation2!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, in
             tmp_st=string(tmp_st,"   ] ")
         end
 
-        while temps_mutation > time()-debut
+        for i in 1:nbSwap
             swap_mutation!(enfant, rand(2:taille-1), rand(2:taille-1), inst)
 
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
