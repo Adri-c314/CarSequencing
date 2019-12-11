@@ -6,7 +6,7 @@
 # NDtree = Sommet()
 #
 # 2) Tentative d'insertion d'une nouvelle solution y::Tuple{Array{Array{Int32,1},1}, Array{Int32,1}, Q}.
-#    Exemple de y : (sequence des vehilcules, [RAF, EP, ENP], table_violation).
+#    Exemple de y : (sequence des vehicules, [RAF, EP, ENP], table_violation).
 #    (Bien conserver cet ordre pour les objectifs.)
 # maj!(NDtree, y) # Retourne un boolean qui dit si la solution est efficasse et a ete inseree.
 #    NB : Les y sont stockes par reference et pas deepcopies.
@@ -191,7 +191,11 @@ end
 
 function profondeur(som::Sommet, solutions::Array{T,1}) where T
     if isempty(som.succ)
-        append!(solutions, som.val[3])
+        try
+            append!(solutions, som.val[3])
+        catch
+            println("ERROR get_solutions(NDtree), solutions pas retournees : ", som.val[3], "\n")
+        end
     else
         for suc in som.succ
             profondeur(suc, solutions)
@@ -202,7 +206,11 @@ end
 function get_solutions(som::Sommet)
     solutions = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
     if isempty(som.succ)
-        append!(solutions, som.val[3])
+        try
+            append!(solutions, som.val[3])
+        catch
+            println("ERROR get_solutions(NDtree), solutions pas retournees : ", som.val[3], "\n")
+        end
     else
         for suc in som.succ
             profondeur(suc, solutions)
@@ -214,11 +222,15 @@ end
 
 function profondeur_nadir(som::Sommet, solutions::Array{T,1}, nadir_::Array{N,1}) where T where N <: Number
     if isempty(som.succ)
-        append!(solutions, som.val[3])
-        for y in som.val[3]
-            for i in 1:length(y[2])
-                y[2][i] > nadir_[i] ? nadir_[i] = y[2][i] : nothing
+        try
+            append!(solutions, som.val[3])
+            for y in som.val[3]
+                for i in 1:length(y[2])
+                    y[2][i] > nadir_[i] ? nadir_[i] = y[2][i] : nothing
+                end
             end
+        catch
+            println("ERROR get_solutions_plus_nadir(NDtree), solutions pas retournees : ", som.val[3], "\n")
         end
     else
         for suc in som.succ
@@ -231,11 +243,15 @@ function get_solutions_plus_nadir(som::Sommet ; nb_obj::Int = 3)
     solutions = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
     nadir_ = fill(Int32(-1), nb_obj)
     if isempty(som.succ)
-        append!(solutions, som.val[3])
-        for y in som.val[3]
-            for i in 1:length(y[2])
-                y[2][i] > nadir_[i] ? nadir_[i] = y[2][i] : nothing
+        try
+            append!(solutions, som.val[3])
+            for y in som.val[3]
+                for i in 1:length(y[2])
+                    y[2][i] > nadir_[i] ? nadir_[i] = y[2][i] : nothing
+                end
             end
+        catch
+            println("ERROR get_solutions_plus_nadir(NDtree), solutions pas retournees : ", som.val[3], "\n")
         end
     else
         for suc in som.succ
@@ -247,16 +263,20 @@ end
 
 function profondeur_extremes(som::Sommet, solutions::Array{T,1}, extremes::Array{T,1}) where T
     if isempty(som.succ)
-        append!(solutions, som.val[3])
-        if isempty(extremes)
-            for i in 1:length(som.val[3][1][2])
-                append!(extremes, [som.val[3][1]])
+        try
+            append!(solutions, som.val[3])
+            if isempty(extremes)
+                for i in 1:length(som.val[3][1][2])
+                    append!(extremes, [som.val[3][1]])
+                end
             end
-        end
-        for y in som.val[3]
-            for i in 1:length(y[2])
-                y[2][i] > extremes[i][2][i] ? extremes[i] = y : nothing
+            for y in som.val[3]
+                for i in 1:length(y[2])
+                    y[2][i] > extremes[i][2][i] ? extremes[i] = y : nothing
+                end
             end
+        catch
+            println("ERROR get_solutions_plus_extremes(NDtree), solutions pas retournees : ", som.val[3], "\n")
         end
     else
         for suc in som.succ
@@ -269,16 +289,20 @@ function get_solutions_plus_extremes(som::Sommet ; nb_obj::Int = 3)
     solutions = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
     extremes = Array{Tuple{Array{Any,1}, Array{Int,1}, Any},1}(undef, 0)
     if isempty(som.succ)
-        append!(solutions, som.val[3])
-        if isempty(extremes)
-            for i in 1:length(som.val[3][1][2])
-                append!(extremes, [som.val[3][1]])
+        try
+            append!(solutions, som.val[3])
+            if isempty(extremes)
+                for i in 1:length(som.val[3][1][2])
+                    append!(extremes, [som.val[3][1]])
+                end
             end
-        end
-        for y in som.val[3]
-            for i in 1:length(y[2])
-                y[2][i] > extremes[i][2][i] ? extremes[i] = y : nothing
+            for y in som.val[3]
+                for i in 1:length(y[2])
+                    y[2][i] > extremes[i][2][i] ? extremes[i] = y : nothing
+                end
             end
+        catch
+            println("ERROR get_solutions_plus_extremes(NDtree), solutions pas retournees : ", som.val[3], "\n")
         end
     else
         for suc in som.succ
@@ -727,6 +751,6 @@ function test_NDtree2(nb_y::Int = 100 ; d::Int = 2)
     end
 end
 
-#test_NDtree2(100000, d = 3)
 #test_domination()
 #test_NDtree()
+#test_NDtree2(100000, d = 3)
