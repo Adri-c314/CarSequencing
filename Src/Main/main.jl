@@ -88,7 +88,7 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param csvscore : Si l'on souhaite conserver les score de toute la pop dans un fichier .csv
 # @param csvsequences : Si l'on souhaite conserver la sequence de toute la pop dans un fichier .csv
-function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 10., temps_phase1::Float64 = 10., temps_phaseAutres::Float64 = 10., temps_popNonElite::Float64 = 3., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool = true, enfants::Bool = true, cota::Int=0, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], nbSol::Int=50, temps_init::Float64 = 300., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 10., temps_global::Float64 = 600., temps_mutation::Float64 = 0.1, mutation2::Bool = true, enfants::Bool = true, cota::Int=0, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -117,7 +117,7 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
         if enfants
             txt, population = geneticEnfants(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, 0, verbose, txtoutput)
         else
-            txt, population = geneticEnfants(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
+            txt, population = genetic(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
         end
 
         # Gestion affichage :
@@ -166,7 +166,7 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param csvscore : Si l'on souhaite conserver les score de toute la pop dans un fichier .csv
 # @param csvsequences : Si l'on souhaite conserver la sequence de toute la pop dans un fichier .csv
-function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_ENP")], nbSol::Int=50, temps_init::Float64 = 10., temps_phase1::Float64 = 10., temps_phaseAutres::Float64 = 10., temps_popNonElite::Float64 = 3., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool = true, temps_max::Float64 = 1.0, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], nbSol::Int=50, temps_init::Float64 = 300., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 10., temps_global::Float64 = 600., temps_mutation::Float64 = 0.1, mutation2::Bool = true, enfants::Bool = true, cota::Int=0, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -194,8 +194,11 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_R
         # Creation du NDTree pour le genetic
         NDTree = Sommet()
 
-        # Lancement de la VFLS
-        txt, population, inst = genetic!(datas, NDTree, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
+        if enfants
+            txt, population = geneticEnfants!(datas, NDTree, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, 0, verbose, txtoutput)
+        else
+            txt, population = genetic!(datas, NDTree, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
+        end
 
         # Gestion affichage :
         if csvscore
@@ -219,6 +222,14 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_R
             println("Ecriture des scores .csv : ", csvscore)
             println("===================================================")
             println("\n\n\n")
+        end
+        solutions = get_solutions(NDTree)
+        if csvscore
+            tmp = ""
+            for ii in 1:length(solutions)
+                tmp = string(tmp, scoreToCSV(population[ii][2]))
+            end
+            ecriture(tmp, pathOS(string(path, i[1], "/", "genetic&PLS_scrore_", i[2],".csv"), surLinux))
         end
 
         # TODO : Verifier que j'ai bien fait
