@@ -402,20 +402,47 @@ function genetic!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int, temps_
         # selection prendre des elements de la pop
         papa, maman, focus = selection(population)
 
-        # crossover
-        enfant = crossover(papa, maman, population, focus, inst)
+        if focus != :pbl!
 
-        # mutation
-        if mutation2
-            mutation2!(enfant, focus, inst, 5)
+            # crossover
+            enfant1, enfant2 = crossover(papa, maman, population, focus, inst)
+
+            # mutation
+            if mutation2
+                mutation2!(enfant1, focus, inst, 5)
+                mutation2!(enfant2, focus, inst, 5)
+            else
+                mutation!(enfant1, focus, inst, temps_mutation)
+                mutation!(enfant2, focus, inst, temps_mutation)
+            end
+
+            # insertion dans la pop
+            if insertionPotentielle!NDTree(population, enfant1, NDTree)
+                nbInserer += 1
+            end
+            if insertionPotentielle!NDTree(population, enfant2, NDTree)
+                nbInserer += 1
+            end
+
         else
-            mutation!(enfant, focus, inst, temps_mutation)
+
+            # crossover
+            enfant = crossover(papa, maman, population, focus, inst)
+
+            # mutation
+            if mutation2
+                mutation2!(enfant, focus, inst, 5)
+            else
+                mutation!(enfant, focus, inst, temps_mutation)
+            end
+
+            # insertion dans la pop
+            if insertionPotentielle!NDTree(population, enfant, NDTree)
+                nbInserer += 1
+            end
+
         end
 
-        # insertion dans la pop
-        if insertionPotentielle!NDTree(population, enfant, NDTree)
-            nbInserer += 1
-        end
     end
 
     if verbose
