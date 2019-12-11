@@ -242,7 +242,7 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF
             for ii in 1:length(solutions)
                 tmp = string(tmp, solutions[ii][2][1]," ", solutions[ii][2][2]," ", solutions[ii][2][3],"\n")
             end
-            ecriture(tmp, pathOS(string(path, i[1], "/", "genetic&PLS_scrore_", i[2],".csv"), surLinux))
+            ecriture(tmp, pathOS(string(path, i[1], "/", "genetic&PLS_scroreInNDTRee_", i[2],".csv"), surLinux))
         end
         if csvsequences
             tmp = ""
@@ -261,10 +261,17 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF
             println("===================================================")
             println("\n\n\n")
         end
+        if csvscore
+            ecriture(scoreToCSV(final_score), pathOS(string(path,i[1],"/genetic&PLS_",i[2],"scores",".txt"), surLinux))
+        end
+        if txtoutput
+            ecriture(string(temps_max, " ", temps_1_moove, "\n",allToCSV(nadir, nbscore, tabchelou)), pathOS(string(path,i[1],"/genetic&PLS",i[2],"elements",".txt"), surLinux))
+        end
+
 
         # Sortie TXT à la toute fin
         if txtoutput
-            ecriture(string(txt, txt2) , pathOS(string(path, i[1], "/", "geneticPLS", i[2],".txt"), surLinux))
+            ecriture(string(txt) , pathOS(string(path, i[1], "/", "geneticPLS", i[2],".txt"), surLinux))
         end
     end
 end
