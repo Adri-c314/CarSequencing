@@ -166,7 +166,7 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param csvscore : Si l'on souhaite conserver les score de toute la pop dans un fichier .csv
 # @param csvsequences : Si l'on souhaite conserver la sequence de toute la pop dans un fichier .csv
-function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], nbSol::Int=50, temps_init::Float64 = 300., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 10., temps_global::Float64 = 600., temps_mutation::Float64 = 0.1, mutation2::Bool = true, enfants::Bool = true, cota::Int=0, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], nbSol::Int=50, temps_init::Float64 = 300., temps_phase1::Float64 = 10., temps_phaseAutres::Float64 = 2., temps_popNonElite::Float64 = 1., temps_global::Float64 = 30., temps_mutation::Float64 = 0.02, mutation2::Bool = true, enfants::Bool = true, cota::Int=0, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
