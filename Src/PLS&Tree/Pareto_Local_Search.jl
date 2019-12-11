@@ -26,7 +26,8 @@ function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps
     ## le PLS
     OBJ = [[1,2,3],[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     tmp_sortie = 0
-    while size(pareto_tmp)[1]>1 && temps_all>time()-debutall
+    tmp_sortie_all = 0
+    while size(pareto_tmp)[1]>1 && temps_max>time()-debutall
 
         println(size(pareto_tmp)[1])
 
@@ -34,24 +35,25 @@ function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps
         score_nadir = nadir_global(NDtree)
 
         tmp_sortie = 0
+
         for par in pareto_tmp
-            if temps_all<time()-debutall
+            if temps_max<time()-debutall
                 break
             end
-            sequence_meilleure = deepcopy(par[1])
-            tab_violation=  deepcopy(par[3])
+            sequence_meilleure::Array{Array{Int,1},1} = deepcopy(par[1])
+            tab_violation::Array{Array{Int,1},1}=  deepcopy(par[3])
             a =  deepcopy(par[2])
             sortie = false
             tmp_sortie =0
-            timeOPT1 = [33,33,33]
+            timeOPT1 = [100/3,100/3,100/3]
             @time for Phase in 1:3
                 debut = time()
-                while temps_max4*(timeOPT1[Phase]/100)>time()-debut
+                while temps_1_moove*(timeOPT1[Phase]/100)>time()-debut
                     obj = OBJ[rand(1:6)]
                     timeOPT, opt = phases_init(obj)
                     f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
-                    k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
-                    effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand,a,score_nadir)
+                    k, l = choose_f_rand(sequence_meilleure, inst.ratio , tab_violation, f_rand, Phase, obj, inst.Hprio)
+                    effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, inst.ratio, tab_violation , inst.Hprio, obj, inst.pbl, f_rand,a,score_nadir)
                     if effect
                         if maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
                             tmp_sortie += 1
@@ -161,8 +163,8 @@ function recherche_locale!(y::Tuple{Array{U,1}, Array{T,1}, Q}, inst::Instance, 
     timeOPT, opt = phases_init(obj)
     while temps_1_moove*(timeOPT[Phase]/100)>time()-debut
         f_rand, f_mouv = choisir_klLS(y_tmp[3], opt, obj, Phase)
-        k, l = choose_f_rand(y_tmp[3], inst.ratio, y_tmp[4], f_rand, Phase, obj, inst.Hprio)
-        effect = global_mouvement!(f_mouv, y_tmp[3], k, l, inst.ratio,  y_tmp[4], inst.Hprio, obj, inst.pbl, f_rand)
+        k, l = choose_f_rand(y_tmp[3], inst.ratio, y_tmp[4], f_rand, Phase, obj, inst.inst.Hprio)
+        effect = global_mouvement!(f_mouv, y_tmp[3], k, l, inst.ratio,  y_tmp[4], inst.inst.Hprio, obj, inst.inst.pbl, f_rand)
         compteurMvt!(f_mouv, nb,nb_effectiv,effect)
     end
 end

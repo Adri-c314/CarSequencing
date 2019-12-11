@@ -166,7 +166,7 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param csvscore : Si l'on souhaite conserver les score de toute la pop dans un fichier .csv
 # @param csvsequences : Si l'on souhaite conserver la sequence de toute la pop dans un fichier .csv
-function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], nbSol::Int=50, temps_init::Float64 = 300., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 200., temps_popNonElite::Float64 = 10., temps_global::Float64 = 600., temps_mutation::Float64 = 0.02, mutation2::Bool = true, enfants::Bool = true, cota::Int=0, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
+function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], nbSol::Int=50, temps_init::Float64 = 300., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 200., temps_popNonElite::Float64 = 10., temps_global::Float64 = 600., temps_mutation::Float64 = 0.02, mutation2::Bool = true, enfants::Bool = true, cota::Int=0, temps_max::Float64 = 2800., temps_1_moove::Float64 = 10.,nb_efficace_pls::Int = 10, verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvsequences::Bool = true)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -195,9 +195,9 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF
         NDTree = Sommet()
 
         if enfants
-            txt, population = geneticEnfants!(datas, NDTree, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, 0, verbose, txtoutput)
+            txt, population, inst = geneticEnfants!(datas, NDTree, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, 0, verbose, txtoutput)
         else
-            txt, population = genetic!(datas, NDTree, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
+            txt, population, inst = genetic!(datas, NDTree, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
         end
 
         # Gestion affichage :
@@ -223,6 +223,19 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF
             println("===================================================")
             println("\n\n\n")
         end
+        if csvscore
+            solutions = get_solutions(NDTree)
+            tmp = ""
+            for ii in 1:length(solutions)
+                tmp = string(tmp, solutions[ii][2][1]," ", solutions[ii][2][2]," ", solutions[ii][2][3],"\n")
+            end
+            ecriture(tmp, pathOS(string(path, i[1], "/", "geneticNDTree_scrore_", i[2],".csv"), surLinux))
+        end
+
+        # TODO : Verifier que j'ai bien fait
+        txt2 = PLS!(NDTree, inst, temps_max, temps_1_moove, nb_efficace_pls, verbose, txtoutput)
+
+        # Gestion affichage :
         solutions = get_solutions(NDTree)
         if csvscore
             tmp = ""
@@ -231,23 +244,11 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF
             end
             ecriture(tmp, pathOS(string(path, i[1], "/", "genetic&PLS_scrore_", i[2],".csv"), surLinux))
         end
-
-        # TODO : Verifier que j'ai bien fait
-        txt2 = PLS!(NDTree, inst, temps_max, temps_max/1000., verbose, txtoutput)
-
-        # Gestion affichage :
-        solutions = get_solutions(NDTree)
-        if csvscore
-            tmp = ""
-            for ii in 1:length(solutions)
-                tmp = string(tmp, scoreToCSV(population[ii][2]))
-            end
-            ecriture(tmp, pathOS(string(path, i[1], "/", "genetic&PLS_scrore_", i[2],".csv"), surLinux))
-        end
         if csvsequences
             tmp = ""
             for ii in 1:length(solutions)
-                tmp = string(tmp, "\n", seqToCSV(solutions[ii][1]))
+                tmp2::Array{Array{Int,1},1} = solutions[ii][1]
+                tmp = string(tmp, "\n", seqToCSV(tmp2))
             end
             ecriture(tmp, pathOS(string(path, i[1], "/", "genetic&PLS_seq_", i[2],".csv"), surLinux))
         end

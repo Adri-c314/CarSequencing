@@ -1,0 +1,26 @@
+1) Information sur les données :
+   ---------------------------
+Nombre d'options prioritaires : 4
+PAINT_BATCH_LIMIT : 15
+Nombre de vehicules : 335
+
+
+2) Creation de la population initiale :
+   ----------------------------------
+Taille de la population :50
+Budjet de calcule pour la phase initiale commune : 3.0 secondes
+Budjet de calcule pour creer le 1er ind elites : 3.0 secondes
+Budjet de calcule pour creer 1 des 5 autres ind elites : 2.0 secondes
+Done !
+Budjet de calcule pour chacune des 44 solutions non elites : 0.1 secondes
+Done !
+Score de la population inital :
+Array{Int64,1}[[27, 75, 59]];Array{Int64,1}[[27, 184, 31]];Array{Int64,1}[[48, 0, 32]];Array{Int64,1}[[43, 64, 0]];Array{Int64,1}[[85, 0, 0]];Array{Int64,1}[[65, 4, 0]];Array{Int64,1}[[160, 2, 45]];Array{Int64,1}[[170, 11, 26]];Array{Int64,1}[[175, 21, 29]];Array{Int64,1}[[178, 11, 30]];Array{Int64,1}[[155, 11, 54]];Array{Int64,1}[[177, 7, 7]];Array{Int64,1}[[160, 7, 38]];Array{Int64,1}[[156, 6, 31]];Array{Int64,1}[[161, 25, 20]];Array{Int64,1}[[164, 8, 26]];Array{Int64,1}[[157, 9, 36]];Array{Int64,1}[[174, 3, 20]];Array{Int64,1}[[144, 19, 32]];Array{Int64,1}[[158, 5, 10]];Array{Int64,1}[[168, 6, 43]];Array{Int64,1}[[166, 6, 21]];Array{Int64,1}[[161, 11, 20]];Array{Int64,1}[[167, 11, 32]];Array{Int64,1}[[146, 16, 24]];Array{Int64,1}[[167, 4, 33]];Array{Int64,1}[[178, 4, 33]];Array{Int64,1}[[149, 8, 42]];Array{Int64,1}[[155, 9, 54]];Array{Int64,1}[[164, 8, 36]];Array{Int64,1}[[158, 1, 23]];Array{Int64,1}[[163, 4, 14]];Array{Int64,1}[[156, 2, 43]];Array{Int64,1}[[164, 7, 43]];Array{Int64,1}[[180, 10, 19]];Array{Int64,1}[[169, 8, 32]];Array{Int64,1}[[157, 5, 20]];Array{Int64,1}[[153, 7, 44]];Array{Int64,1}[[150, 4, 31]];Array{Int64,1}[[154, 0, 37]];Array{Int64,1}[[166, 28, 29]];Array{Int64,1}[[174, 6, 18]];Array{Int64,1}[[147, 22, 11]];Array{Int64,1}[[178, 1, 21]];Array{Int64,1}[[167, 1, 64]];Array{Int64,1}[[155, 8, 47]];Array{Int64,1}[[155, 3, 39]];Array{Int64,1}[[164, 11, 29]];Array{Int64,1}[[155, 3, 43]];Array{Int64,1}[[166, 7, 48]];
+
+
+3) Réalisation de l'algorithme génétique :
+   ----------------------------------
+Budjet de temps de calcule : 6.0 secondes
+Budjet de temps de calcule d'une mutation : 0.02 secondes
+598 enfants ont été insérés
+(Array{Int64,1}[[75, 45, 5], [49, 73, 67], [50, 66, 65], [49, 72, 68], [50, 72, 64], [92, 32, 0], [48, 67, 69], [70, 37, 33], [69, 37, 36], [71, 38, 28], [55, 68, 18], [68, 44, 35], [68, 50, 31], [57, 67, 17], [67, 39, 37], [68, 37, 37], [56, 66, 18], [59, 60, 18], [65, 37, 38], [59, 66, 17], [61, 53, 18], [60, 64, 0], [59, 113, 1], [75, 43, 6], [60, 57, 3], [88, 32, 3], [49, 85, 65], [90, 31, 3], [74, 44, 6], [73, 45, 6], [58, 297, 3], [76, 57, 0], [47, 355, 3], [36, 102, 61], [116, 0, 9], [99, 3, 18], [112, 5, 9], [113, 4, 9], [83, 1, 32], [114, 2, 8], [116, 2, 5], [39, 190, 36], [68, 0, 38], [92, 21, 3], [55, 13, 49], [56, 13, 43], [91, 22, 3], [90, 27, 6], [51, 85, 63], [93, 20, 3], [112, 9, 5], [58, 12, 49], [113, 12, 4], [109, 11, 9], [114, 12, 3], [86, 3, 24], [42, 184, 36], [53, 289, 21], [89, 1, 29], [45, 182, 29], [60, 7, 39], [63, 2, 39], [42, 187, 31]], 63, [117, 355, 69], Array{Int64,1}[[36, 102, 61], [116, 0, 9], [92, 32, 0]])

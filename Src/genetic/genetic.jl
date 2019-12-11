@@ -338,7 +338,7 @@ function geneticEnfants!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int,
         txt = string(txt, nbInserer, " enfants ont été insérés\n")
     end
 
-    return txt, population
+    return txt, population, inst
 end
 
 
