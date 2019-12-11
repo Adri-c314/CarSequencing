@@ -17,76 +17,125 @@
 # @param inst : L'instance du problème tel que defini dans instance.jl
 # @param temps_max : Le temps pour toute la PLS
 # @param temps_1_moov : Le temps associé à un unique mouvement (proportion de temps_max)
+# @^param nb_efficace_pls : nb de solution no dominé avant que ça passe a une autre solutions
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
-function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 1.0, temps_1_moove::Float64 = temps_max/1000., verbose::Bool = true, txtoutput::Bool=true)
-    # Gestion d'un affichage :
-    if verbose
-        println("   ------------------------------------")
-        println("   Lancement de la Pareto Local Search pour : ", temps_max, " s")
-    end
-    txt = ""
-    if txtoutput
-        txt = string(txt, "   ------------------------------------\n", "   Lancement de la Pareto Local Search pour : ", temps_max, " s\n")
-    end
-
+function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps_1_moove::Float64 = 10.,nb_efficace_pls::Int = 10, verbose::Bool = true, txtoutput::Bool=true)
+    debutall = time()
     pareto_tmp = get_solutions(NDtree)
+    ## le PLS
+    OBJ = [[1,2,3],[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
+    tmp_sortie = 0
+    while size(pareto_tmp)[1]>1 && temps_all>time()-debutall
 
-    compteur_solutions_trouvees = 0
-    compteur_solutions_trouvees_efficasses = 0
-    nb = 0
-    nb_effective = 0
+        println(size(pareto_tmp)[1])
 
-    # La barre de chargement qui fait du bien
-    if verbose
-        n=0
-        st_output = string("Execution : [")
-    end
-    debut = time()
-    while temps_max > time() - debut
-        # La barre de chargement qui fait du bien
-        if verbose
-            if (time()-debut)>(n/50)*temps_max
-                st_output=string(st_output, "#")
-                tmp_st = ""
-                for i in 1:50-n-1
-                    tmp_st=string(tmp_st," ")
+        pareto1_tmp = get_solutions(NDtree)
+        score_nadir = nadir_global(NDtree)
+
+        tmp_sortie = 0
+        for par in pareto_tmp
+            if temps_all<time()-debutall
+                break
+            end
+            sequence_meilleure = deepcopy(par[1])
+            tab_violation=  deepcopy(par[3])
+            a =  deepcopy(par[2])
+            sortie = false
+            tmp_sortie =0
+            timeOPT1 = [33,33,33]
+            @time for Phase in 1:3
+                debut = time()
+                while temps_max4*(timeOPT1[Phase]/100)>time()-debut
+                    obj = OBJ[rand(1:6)]
+                    timeOPT, opt = phases_init(obj)
+                    f_rand, f_mouv = choisir_klLS(sequence_meilleure, opt, obj, Phase)
+                    k, l = choose_f_rand(sequence_meilleure, ratio_option, tab_violation, f_rand, Phase, obj, Hprio)
+                    effect = global_mouvement_3!(f_mouv, sequence_meilleure, k, l, ratio_option, tab_violation , Hprio, obj, pbl, f_rand,a,score_nadir)
+                    if effect
+                        if maj!(NDtree, (deepcopy(sequence_meilleure),deepcopy(a),deepcopy(tab_violation)))
+                            tmp_sortie += 1
+                            tmp_sortie_all+=1
+                        end
+                        if tmp_sortie == nb_efficace_pls
+                                sortie = true
+                        end
+                        sequence_meilleure = deepcopy(par[1])
+                        tab_violation=  deepcopy(par[3])
+                        a =  deepcopy(par[2])
+                    end
+                    if sortie
+                        break
+                    end
                 end
-                tmp_st=string(tmp_st," ] ")
-                print(st_output,tmp_st,n*2,"% \r")
-                n+=1
+                if sortie
+                    break
+                end
             end
         end
 
-        local pareto = deepcopy(pareto_tmp)
-        for y in pareto_tmp
-            local y_tmp = LS(y)
-            while !maj!(NDtree, y_tmp)
-                recherche_locale!(ytmp, inst, nb, nb_effective, temps_1_moov)
-                compteur_solutions_trouvees += 1
+
+        pareto_tmp2 = get_solutions(NDtree)
+        secondpareto=[pareto_tmp2[1]]
+        for pareto2 in pareto_tmp2
+            tmpcond = true
+            for pareto in pareto1_tmp
+                if pareto[2][1]==pareto2[2][1]&&pareto[2][2]==pareto2[2][2]&&pareto[2][3]==pareto2[2][3]
+                    tmpcond = false
+                end
             end
-            append!(pareto_tmp, [deepcopy(y_tmp)])
-            compteur_solutions_trouvees_efficasses += 1
+            if tmpcond
+                append!(secondpareto,[pareto2])
+            end
+        end
+        pareto_tmp = secondpareto
+    end
+    pareto_tmp = get_solutions(NDtree)
+    println("FIN")
+    nadir = nadir_global(NDtree)
+    tab_score = [p[2] for p in pareto_tmp]
+    final_score = [tab_score[1]]
+
+    for i in 1:size(tab_score)[1]
+        ok = true
+        for ii in 1:size(tab_score)[1]
+            if i!= ii && tab_score[i][1]>=tab_score[ii][1] && tab_score[i][2]>=tab_score[ii][2] && tab_score[i][3]>=tab_score[ii][3]
+                ok = false
+            end
+            if i<ii && tab_score[i][1]==tab_score[ii][1] && tab_score[i][2]==tab_score[ii][2] && tab_score[i][3]==tab_score[ii][3]
+                ok = true
+            end
+        end
+        if ok
+            append!(final_score,[tab_score[i]])
         end
     end
+    popfirst!(final_score)
+    tmpi1=1
+    tmpi2=1
+    tmpi3=1
+    score1=final_score[1][1]
+    score2=final_score[1][2]
+    score3=final_score[1][3]
 
-    # Gestion d'un affichage :
-    if verbose
-        println("   ------------------------------------")
-        println("   Fin de la Pareto Local Search")
-        println("Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1])
-        println("Nombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2])
-        println("Nombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3])
-        println("Nombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ",nb_effectiv[4])
-        println("Nombre de solutions trouvees : ", compteur_solutions_trouvees, "Nombre de solutions trouvees : ", compteur_solutions_trouvees_efficasses)
+    for i in 1:size(final_score)[1]
+        if final_score[i][1]<score1
+            tmpi1 = i
+            score1 = final_score[i][1]
+        end
+        if final_score[i][2]<score2
+            tmpi2 = i
+            score2 = final_score[i][2]
+        end
+        if final_score[i][3]<score3
+            tmpi3 = i
+            score3 = final_score[i][3]
+        end
     end
-    if txtoutput
-        txt = string(txt, "   ------------------------------------\n", "   Fin de la Pareto Local Search\n", "Nombre de swap : ",nb[1],", Nombre de swap_effectif : ",nb_effectiv[1], "\nNombre d'insertion : ",nb[2],", Nombre de insertion_effectif : ",nb_effectiv[2], "\nNombre de reflection : ",nb[3],", Nombre de reflection_effectif : ",nb_effectiv[3], "\nNombre de shuffle : ",nb[4],", Nombre de shuffle_effectif : ", nb_effectiv[4], "\nNombre de solutions trouvees : ", compteur_solutions_trouvees, "Nombre de solutions trouvees : ", compteur_solutions_trouvees_efficasses)
-    end
-
-    # Pour le txtoutput
-    return txt
+    println([final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]])
+    return final_score, size(final_score)[1], nadir, [final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]]
 end
+
 
 
 
