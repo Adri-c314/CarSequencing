@@ -331,7 +331,7 @@ function geneticEnfants!(datas::NTuple{4,DataFrame}, NDTree::Sommet, nbSol::Int,
         end
 
         # insertion dans la pop
-        insertionPotentielleEnfants!NDTree(population, NDTree, enfants, cota)
+        insertionPotentielleEnfants!NDTree(population, enfants, cota, NDTree)
     end
 
     if verbose
