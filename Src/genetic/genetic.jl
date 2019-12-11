@@ -63,20 +63,48 @@ function genetic(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 1
         # selection prendre des elements de la pop
         papa, maman, focus = selection(population)
 
-        # crossover
-        enfant = crossover(papa, maman, population, focus, inst)
+        if focus != :pbl!
 
-        # mutation
-        if mutation2
-            mutation2!(enfant, focus, inst, temps_mutation)
-        else
-            mutation!(enfant, focus, inst, temps_mutation)
+            # crossover
+            enfant1, enfant2 = crossover(papa, maman, population, focus, inst)
+
+            # mutation
+            if mutation2
+                mutation2!(enfant1, focus, inst, temps_mutation)
+                mutation2!(enfant2, focus, inst, temps_mutation)
+            else
+                mutation!(enfant1, focus, inst, temps_mutation)
+                mutation!(enfant2, focus, inst, temps_mutation)
+            end
+
+            # insertion dans la pop
+            if insertionPotentielle!(population, enfant1)
+                nbInserer += 1
+            end
+            # insertion dans la pop
+            if insertionPotentielle!(population, enfant2)
+                nbInserer += 1
+            end
+
+            else
+
+            # crossover
+            enfant = crossover(papa, maman, population, focus, inst)
+
+            # mutation
+            if mutation2
+                mutation2!(enfant, focus, inst, temps_mutation)
+            else
+                mutation!(enfant, focus, inst, temps_mutation)
+            end
+
+            # insertion dans la pop
+            if insertionPotentielle!(population, enfant)
+                nbInserer += 1
+            end
+
         end
 
-        # insertion dans la pop
-        if insertionPotentielle!(population, enfant)
-            nbInserer += 1
-        end
     end
 
     if verbose
@@ -150,18 +178,42 @@ function geneticEnfants(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Floa
         for i in 1:nbSol
 
 
-            # crossover
-            enfant = crossover(papa, maman, population, focus, inst)
+            if focus != :pbl!
 
-            # mutation
-            if mutation2
-                mutation2!(enfant, focus, inst, temps_mutation)
+                # crossover
+                enfant1, enfant2 = crossover(papa, maman, population, focus, inst)
+
+                # mutation
+                if mutation2
+                    mutation2!(enfant1, focus, inst, temps_mutation)
+                    mutation2!(enfant2, focus, inst, temps_mutation)
+                else
+                    mutation!(enfant1, focus, inst, temps_mutation)
+                    mutation!(enfant2, focus, inst, temps_mutation)
+                end
+
+                # Ajout de l'enfant courant
+                push!(enfants, enfant1)
+                push!(enfants, enfant2)
+                i+=1
+
             else
-                mutation!(enfant, focus, inst, temps_mutation)
+
+                # crossover
+                enfant = crossover(papa, maman, population, focus, inst)
+
+                # mutation
+                if mutation2
+                    mutation2!(enfant, focus, inst, temps_mutation)
+                else
+                    mutation!(enfant, focus, inst, temps_mutation)
+                end
+
+                # Ajout de l'enfant courant
+                push!(enfants, enfant)
+
             end
 
-            # Ajout de l'enfant courant
-            push!(enfants, enfant)
         end
 
         # insertion dans la pop

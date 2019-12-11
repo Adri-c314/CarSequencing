@@ -261,10 +261,17 @@ end
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
+<<<<<<< HEAD
 function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 50., temps_max3::Float64 = 2., temps_max4::Float64 = 10., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = false)
     temps2 = [50.,100.,200.]
     for j in 1:4
         temps_max2 = temps2[j]
+=======
+function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 50., temps_max3::Float64 = 2., temps_max4::Float64 = 10., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = true)
+    temps4 = [3.,5.,10.,20.]
+    for j in 1:4
+        temps_max4 = temps4[j]
+>>>>>>> 961c439e73b13ba736e2674351ef6140cbb124f3
         for i in ir
             # Gestion affichage :
             if txtoutput

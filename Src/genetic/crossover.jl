@@ -19,23 +19,21 @@
 # @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
 function crossover(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, obj::Symbol, inst::Instance)
     #Hprio/LPrio/Pbl
-    #println("debut crossover")
     if obj == :pbl!
-        #println("PblCross")
         enfant = crossoverCouleur(papa, maman, population, inst)
+        return enfant
     elseif obj == :hprio!
-        #println("HPOCross")
-        enfant = crosshprio!(papa, maman, population, inst)
+        enfant1, enfant2 = crosshprio!(papa, maman, population, inst)
+        return enfant1, enfant2
     else
-        #println("LPOCross")
-        enfant = crosslprio!(papa, maman, population, inst)
+        enfant1, enfant2 = crosslprio!(papa, maman, population, inst)
+        return enfant1, enfant2
     end
-    #println("fin crossover")
-    #println(typeof(sequence),typeof(tab_violation),typeof(score))
-    return enfant
 end
 
 
+
+#-------------------------------------------fonctions Pour le crossover Couleur-----------------------------------------
 
 
 # Crossover pour améliorer les couleurs (si l'enfant est pas admissible on en refait un)
@@ -64,7 +62,7 @@ function crossoverCouleur(papa::Int, maman::Int, population::Array{Array{Array{A
     #violPapa, pblAdmissible = majData(population[papa][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl,verbose)
     if verbose println("verifier couleurs papa") end
     if debug verifierBlocsCol(population[papa][1],verbose) end
-    
+
     #points de coupe du crossover (on coupe sur le pere puis on injecte dans la maman)
     cut1 = rand(1:nbCars)
     cut2 = rand(cut1:nbCars)
@@ -299,48 +297,8 @@ end
 
 
 
-#-------------------------------fonctions POUR TESTER que le crossover couleur est ok----------------------------
-#verifier que toutes les voitures de la sequence sont différentes
-function verifierVoitures(enfant::Array{Array{Int,1},1})
-    id = length(enfant[1])
-    idEnfant = []
-    for car in enfant
-        if car[id] in idEnfant
-            error("!!!!!popopo y'a une voiture qui apparait 2 fois laaaa !!!!!")
-        end
-        push!(idEnfant, car[id])
-    end
-end
 
-#verifier qu'on a bien le pere entre cut1 et cut2
-function verifierPapa(enfant::Array{Array{Int,1},1}, papa::Array{Array{Int,1},1}, cut1::Int64, cut2::Int64)
-    id = length(enfant[1])
-    for car in cut1:cut2
-        if enfant[car][id] != papa[car][id]
-            error("!!!!!Le pauvre papa il est pas copié bah c'est pas trop un crossover ca!!!!!!")
-        end
-    end
-end
-
-#verifier que les debuts/fins de blocs de couleur correspondent bien
-function verifierBlocsCol(instance::Array{Array{Int,1},1},verbose = false)
-    debCol = length(instance[1])-2
-    finCol = length(instance[1])-1
-    if verbose println("couleur,debCol,finCol : ", [(instance[i][2], instance[i][debCol], instance[i][finCol]) for i in 1:length(instance)] ) end
-    i = 1
-    while i <= length(instance)
-        col = instance[i][2]
-        debBloc = instance[i][debCol]
-        finBloc = instance[i][finCol]
-        while i <= finBloc
-            if (instance[i][2] != col) | (instance[i][debCol] != debBloc) | (instance[i][finCol] != finBloc)
-                error("euh ya un pb au niveau des blocs de couleur la : indice ", i)
-            end
-            i += 1
-        end
-    end
-end
-
+#-------------------------------------------fonctions Pour le crossover Prio-----------------------------------------
 
 #Fonction qui calcul la meilleure voiture à inserer
 #@param other : voitures disponibles
@@ -426,12 +384,10 @@ function interestLpo!(car::Int, E::Array{Array{Int,1},1}, maman::Array{Array{Int
 end
 
 # Fonction qui realise le crossover entre deux sequences
-# @param papa : l'indice du papa dans la population
 # @param maman : l'indice de la maman dans la population
 # @param population : la population globale
-# @param obj : l'objectif in (:pbl!, :hprio!, :lprio!) suivant l'obj qu'on focus
 # @param inst : L'instance du problème étudié cf Util/instance.jl
-# @return ::Array{Array{Array{Int,1},1},1} : l'enfant générer
+# @return enfant : la séquence générée et son tab violation
 function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, inst::Instance)
     tab_violation=population[maman][2]
     Hprio = inst.Hprio
@@ -439,15 +395,10 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     sequence_maman = deepcopy(population[maman][1])
     sz = size(sequence_maman)[1]
     szcar =size(sequence_maman[1])[1]
-    #println("sz", sz)
-
-    tab_violation, pblAdmissible = majData(population[maman][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
-    #println("verifier couleurs maman")
-    verifierBlocsCol(population[maman][1])
 
     #crossover sur P1 : maman
     nbPosHpo = 0
-    #tabconflictHpo = Array{Int,1}(undef,sz)
+
     tabconflictHpo=map(x->0, tab_violation[1])
     for i in 1:Hprio
         for j in 1:sz
@@ -456,13 +407,11 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
     PosHpoConflict = findall(x->x>0, tabconflictHpo)
     PosHpo = findall(x->x<=0, tabconflictHpo)
+
     if size(PosHpo)[1]==0
-        #println(PosHpo)
-        #println(PosHpoConflict)
-        #println(tab_violation)
-        #println(tabconflictHpo)
         println("Mauvaise gestion des conflits -> debbug crossover Prio")
     end
+
     nbPosHpo = size(PosHpo)[1]
     randHpo = rand(0:nbPosHpo)
     randPosHpo = rand(1:nbPosHpo)
@@ -472,9 +421,10 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     #println("tab voitures avec conflit",PosHpoConflict)
 
     #Step 1 On ajoute un nb de voitures sans conflits
-    #E1 = deepcopy(sequence_maman)
+
     #elementNul=map(x->0, deepcopy(sequence_maman[1]))
     #E1 = map(x -> elementNul, deepcopy(sequence_maman))
+
     elementNul=zeros(Int, length(sequence_maman[1]))
     E1 = Array{Array{Int,1},1}()
     for i in 1:length(sequence_maman)
@@ -492,7 +442,6 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
 
     if debut+randHpo>size(PosHpo)[1]
-        #deb = randPosHpo + randHpo - size(PosHpo)[1]
         other = vcat(PosHpo[randPosHpo:debut-1],PosHpoConflict)
     else
         other = vcat(PosHpo[1:debut-1],PosHpo[randPosHpo:size(PosHpo)[1]])
@@ -536,22 +485,21 @@ function HprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
     #println("Enfant fin",E1)
 
-    #test sequence valide
+    #=test sequence valide
     for i in 1:sz
         positionnn=findfirst(x -> x==sequence_maman[i],E1)[1]
-    end
+    end=#
 
     ##Evaluation
     tab_violationE1, checkPbl = majData(E1,sequence_maman,ratio,Hprio,inst.pbl)
-    #println(E1)
-    #println("verification couleurs juste à la fin du majData : ")
-    #verifierVoitures(E1)
-#    verifierBlocsCol(E1)
+
     if !checkPbl
         #println("PBL non admissible : on refait un crossover")
         return HprioEnfant!(maman, population,inst)
     else
-        #println(E1)
+        #println("verification couleurs juste à la fin du majData : ")
+        #verifierVoitures(E1)
+        #verifierBlocsCol(E1)
         return [E1, tab_violationE1, [[0,0,0]]]
     end
 end
@@ -563,27 +511,20 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     sequence_maman = deepcopy(population[maman][1])
     sz = size(sequence_maman)[1]
     szcar =size(sequence_maman[1])[1]
-    #println("sz", sz)
-    tab_violation, pblAdmissible = majData(population[maman][1], inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
-    #println("verifier couleurs maman")
-    #verifierBlocsCol(population[maman][1])
 
     #crossover sur P1 : maman
+
     nbPosHpo = 0
-    #tabconflictHpo =Array{Int,1}(undef,sz)
     tabconflictHpo=map(x->0, tab_violation[1])
     for i in Hprio+1:size(ratio)[1]
         for j in 1:sz
             tabconflictHpo[j] = max(tab_violation[i][j],tabconflictHpo[j],0)
         end
     end
+
     PosHpoConflict = findall(x->x>0, tabconflictHpo)
     PosHpo = findall(x->x<=0, tabconflictHpo)
     if size(PosHpo)[1]==0
-        #println(PosHpo)
-        #println(PosHpoConflict)
-        #println(tab_violation)
-        #println(tabconflictHpo)
         println("Mauvaise gestion des conflits -> debbug crossover Prio")
     end
     nbPosHpo = size(PosHpo)[1]
@@ -595,7 +536,6 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     #println("tab voitures avec conflit",PosHpoConflict)
 
     #Step 1 On ajoute un nb de voitures sans conflits
-    #E1 = sequence_maman
 
     elementNul=zeros(Int, length(sequence_maman[1]))
     E1 = Array{Array{Int,1},1}()
@@ -614,7 +554,6 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
 
     if debut+randHpo>size(PosHpo)[1]
-        #deb = randPosHpo + randHpo - size(PosHpo)[1]
         other = vcat(PosHpo[randPosHpo:debut-1],PosHpoConflict)
     else
         other = vcat(PosHpo[1:debut-1],PosHpo[randPosHpo:size(PosHpo)[1]])
@@ -634,7 +573,6 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
 
     for j in 1:nbcar
         voiture, indexVoiture= selectBest!(other,E1,sequence_maman,randOther,ratio,Hprio,2)
-        #println("index",indexVoiture, " voiture ", voiture, "randother",randOther)
 
         E1[randOther]=deepcopy(sequence_maman[voiture])
         fin =size(other)[1]
@@ -664,40 +602,70 @@ function LprioEnfant!(maman::Int, population::Array{Array{Array{Array{Int,1},1},
     end
     ##Evaluation
     tab_violationE1, checkPbl = majData(E1,sequence_maman,ratio,Hprio,inst.pbl)
-    #println("verification couleurs juste à la fin du majData : ")
-    #verifierVoitures(E1)
-    #verifierBlocsCol(E1)
     if !checkPbl
         #println("PBL non admissible : on refait un crossover")
         return LprioEnfant!(maman, population,inst)
     else
-        #println(E1)
+        #println("verification couleurs juste à la fin du majData : ")
+        #verifierVoitures(E1)
+        #verifierBlocsCol(E1)
         return [E1, tab_violationE1, [[0,0,0]]]
     end
 end
 
 function crosshprio!(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, inst::Instance)
-    #println("HprioCross")
     enfant1 = HprioEnfant!(maman, population, inst)
     enfant2 = HprioEnfant!(papa, population, inst)
-    if rand(1:2) == 1
-        #println("Score enfant : ",score2)
-        return enfant2
-    else
-        #println("Score enfant : ",score1)
-        return enfant1
-    end
+    return enfant1, enfant2
 end
 
 function crosslprio!(papa::Int, maman::Int, population::Array{Array{Array{Array{Int,1},1},1},1}, inst::Instance)
-    #println("LprioCross")
     enfant1=LprioEnfant!(maman, population, inst)
     enfant2=LprioEnfant!(papa, population, inst)
-    if rand(1:2) == 1
-        #println("Score enfant : ",score2)
-        return enfant2
-    else
-        #println("Score enfant : ",score1)
-        return enfant1
+    return enfant1, enfant2
+end
+
+
+#-------------------------------fonctions POUR TESTER que le crossover couleur est ok----------------------------
+
+
+#verifier que toutes les voitures de la sequence sont différentes
+function verifierVoitures(enfant::Array{Array{Int,1},1})
+    id = length(enfant[1])
+    idEnfant = []
+    for car in enfant
+        if car[id] in idEnfant
+            error("!!!!!popopo y'a une voiture qui apparait 2 fois laaaa !!!!!")
+        end
+        push!(idEnfant, car[id])
+    end
+end
+
+#verifier qu'on a bien le pere entre cut1 et cut2
+function verifierPapa(enfant::Array{Array{Int,1},1}, papa::Array{Array{Int,1},1}, cut1::Int64, cut2::Int64)
+    id = length(enfant[1])
+    for car in cut1:cut2
+        if enfant[car][id] != papa[car][id]
+            error("!!!!!Le pauvre papa il est pas copié bah c'est pas trop un crossover ca!!!!!!")
+        end
+    end
+end
+
+#verifier que les debuts/fins de blocs de couleur correspondent bien
+function verifierBlocsCol(instance::Array{Array{Int,1},1},verbose = false)
+    debCol = length(instance[1])-2
+    finCol = length(instance[1])-1
+    if verbose println("couleur,debCol,finCol : ", [(instance[i][2], instance[i][debCol], instance[i][finCol]) for i in 1:length(instance)] ) end
+    i = 1
+    while i <= length(instance)
+        col = instance[i][2]
+        debBloc = instance[i][debCol]
+        finBloc = instance[i][finCol]
+        while i <= finBloc
+            if (instance[i][2] != col) | (instance[i][debCol] != debBloc) | (instance[i][finCol] != finBloc)
+                error("euh ya un pb au niveau des blocs de couleur la : indice ", i)
+            end
+            i += 1
+        end
     end
 end
