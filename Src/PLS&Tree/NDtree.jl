@@ -6,7 +6,7 @@
 # NDtree = Sommet()
 #
 # 2) Tentative d'insertion d'une nouvelle solution y::Tuple{Array{Array{Int32,1},1}, Array{Int32,1}, Q}.
-#    Exemple de y : (sequence des vehilcules, [RAF, EP, ENP], table_violation).
+#    Exemple de y : (sequence des vehicules, [RAF, EP, ENP], table_violation).
 #    (Bien conserver cet ordre pour les objectifs.)
 # maj!(NDtree, y) # Retourne un boolean qui dit si la solution est efficasse et a ete inseree.
 #    NB : Les y sont stockes par reference et pas deepcopies.
