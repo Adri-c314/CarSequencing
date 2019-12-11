@@ -48,7 +48,7 @@ function main(ir::Array{Tuple{String,String},1} = [("X", "028_CH2_EP_ENP_RAF_S51
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
+        datas = lectureCSV(i[1], i[2], surLinux)
 
         # Lancement de la VFLS
         score, sol, tmp = VFLS(datas, temps_max, verbose, txtoutput)
@@ -111,10 +111,10 @@ function mainGenetic(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_RAF_
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
+        datas = lectureCSV(i[1], i[2], surLinux)
 
         # Lancement de la VFLS
-        txt, population = genetic(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2, verbose, txtoutput)
+        txt, population = geneticEnfants(datas, nbSol, temps_init, temps_phase1, temps_phaseAutres, temps_popNonElite, temps_global, temps_mutation, mutation2,0, verbose, txtoutput)
 
         # Gestion affichage :
         if txtoutput
@@ -185,7 +185,7 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "022_3_4_EP_R
         end
 
         # Lecture du fichier csv
-        datas = lectureCSV(i[1], i[2])
+        datas = lectureCSV(i[1], i[2], surLinux)
 
         # Creation du NDTree pour le genetic
         NDTree = Sommet()
@@ -261,10 +261,10 @@ end
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 50., temps_max3::Float64 = 2., temps_max4::Float64 = 10., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = true)
-    temps2 = [20,50,100,200]
+function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 50., temps_max3::Float64 = 2., temps_max4::Float64 = 10., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = false)
+    temps2 = [50.,100.,200.]
     for j in 1:4
-        temps_max2 = temps2[i]
+        temps_max2 = temps2[j]
         for i in ir
             # Gestion affichage :
             if txtoutput
@@ -287,7 +287,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP
             end
 
             # Lecture du fichier csv
-            datas = lectureCSV(i[1], i[2],false)
+            datas = lectureCSV(i[1], i[2], surLinux)
 
             # Creation d'un NDTree gloablisé
             NDtree = Sommet()
@@ -314,7 +314,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP
                 ecriture(string(temps_all, " ", temps_max, " ", temps_max2, " ", temps_max3, " ", temps_max4 ,allToCSV(nadir,szscore,sollexico)), pathOS(string(path,i[1],"/PLSsolo",i[2],ttt,"elements",".txt"), surLinux))
             end
             if csvpopulation
-                solutions = get_solutions(NDTree)
+                solutions = get_solutions(NDtree)
                 tmp = ""
                 for ii in 1:length(solutions)
                     tmp = string(tmp, "\n", seqToCSV(solutions[ii][1]))

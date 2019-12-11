@@ -106,7 +106,7 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @return ::String : le string pour le txtoutput
 # @return ::Array{Array{Array{Array{Int,1},1},1},1} : La population
-function geneticEnfants(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool=true, verbose::Bool=true, txtoutput::Bool=true)
+function geneticEnfants(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Float64 = 120., temps_phase1::Float64 = 300., temps_phaseAutres::Float64 = 300., temps_popNonElite::Float64 = 30., temps_global::Float64 = 300., temps_mutation::Float64 = 0.1, mutation2::Bool=true, cota::Int=0, verbose::Bool=true, txtoutput::Bool=true)
     if verbose
         n=0
         st_output = string("Execution : [")
@@ -163,10 +163,9 @@ function geneticEnfants(datas::NTuple{4,DataFrame}, nbSol::Int, temps_init::Floa
             # Ajout de l'enfant courant
             push!(enfants, enfant)
         end
-        println("bite 1")
+
         # insertion dans la pop
-        insertionPotentielleEnfants!(population, enfants, 25)
-        println("bite 2")
+        insertionPotentielleEnfants!(population, enfants, cota)
     end
 
     if verbose
