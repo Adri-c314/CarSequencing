@@ -33,6 +33,9 @@
 # 9) Recuperer les solutions plus les extremes lexicographiques
 # solutions, extremes = get_solutions_plus_extremes(NDtree)
 #
+# 10) Filtrer les .csv non filtres et les enregistre au format blalbla_filtre.csv
+# filtrage_csv()
+#
 
 # Le code est suffisament claire pour pouvoir etre compris avec l'article d'Andrzej Jaszkiewicz et de Thibaut Lust : "ND-Tree-based update: a Fast Algorithm for the Dynamic Non-Dominance Problem", 07/11/2017.
 
@@ -773,6 +776,59 @@ function test_NDtree2(nb_y::Int = 100 ; d::Int = 2)
         end
     end
 end
+
+# Fonction qui lit tous les .csv dans Output
+# et filtre par dominance ceux qui ne contiennent que les 3 colonnes d'objectif.
+# Enregistre les nouveaux au format blalbla_filtre.csv.
+function filtrage_csv(onLinux::Bool = true)
+    path = string("../../Output/")
+    paths = (string(path, "A/"), string(path, "B/"), string(path, "X/"), string(path, "PLS/"))
+    for pt in paths
+        instances = readdir(pt)
+        for inst in instances
+            if length(inst) >= 4
+                if inst[end-2:end] == "csv" &&  inst[end-10:end-4] != "_filtre"
+                    path_tmp = string(pt, "/", inst)
+                    file = pathOS(path_tmp, onLinux)
+                    flux = CSV.read(file,ignoreemptylines=true)
+                    vrai_pareto = Array{Array{Int,1},1}(undef,0)
+                    if length((flux)) == 3
+                        solutions = convert(Matrix, flux)
+                        for i in size(solutions)[1]
+                            z1 = solutions[i,:]
+                            domination = true
+                            for j in size(solutions)[1]
+                                if i != j
+                                    z2 = solutions[j,:]
+                                    domination &= !domine_fortement(([],z2,[]), ([],z1,[]))
+                                end
+                            end
+                            if domination
+                                append!(vrai_pareto, [deepcopy(z1)])
+                            end
+                        end
+                        tmp = ""
+                        try
+                            @assert !isempty(vrai_pareto) && !isempty(flux)
+                        catch
+                            println("")
+                            println("ERREUR, signaler Xavier svp.")
+                            println("")
+                            @assert !isempty(vrai_pareto) && !isempty(flux)
+                        end
+                        for i in 1:length(vrai_pareto)
+                            tmp = string(tmp, vrai_pareto[i][1]," ", vrai_pareto[i][2]," ", vrai_pareto[i][3],"\n")
+                        end
+                        println("Filtrage enregistre dans : ", pathOS(string(file[1:end-3],"_filtre.csv"), onLinux))
+                        ecriture(tmp, pathOS(string(file[1:end-3],"_filtre.csv"), onLinux))
+                    end
+                end
+            end
+        end
+    end
+end
+
+#filtrage_csv()
 
 #test_domination()
 #test_NDtree()
