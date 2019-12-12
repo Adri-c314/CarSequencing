@@ -794,10 +794,15 @@ function filtrage_csv(onLinux::Bool = true)
                     vrai_pareto = Array{Array{Int,1},1}(undef,0)
                     if length((flux)) == 3
                         solutions = convert(Matrix, flux)
-                        for i in size(solutions)[1]
+                        println("")
+                        println("File : ", file)
+                        println("Soltuons : ")
+                        display(solutions)
+                        println("")
+                        for i in 1:size(solutions)[1]
                             z1 = solutions[i,:]
                             domination = true
-                            for j in size(solutions)[1]
+                            for j in 1:size(solutions)[1]
                                 if i != j
                                     z2 = solutions[j,:]
                                     domination &= !domine_fortement(([],z2,[]), ([],z1,[]))
@@ -816,6 +821,8 @@ function filtrage_csv(onLinux::Bool = true)
                             println("")
                             @assert !isempty(vrai_pareto) && !isempty(flux)
                         end
+                        println("vrai_pareto : ")
+                        display(vrai_pareto)
                         for i in 1:length(vrai_pareto)
                             tmp = string(tmp, vrai_pareto[i][1]," ", vrai_pareto[i][2]," ", vrai_pareto[i][3],"\n")
                         end
