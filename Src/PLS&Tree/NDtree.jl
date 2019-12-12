@@ -707,6 +707,23 @@ function y_extremes(NDtree::Sommet)
     end
 end
 
+function filtrage!(pareto::Array{Tuple{Array{U,1}, Array{T,1}, Q},1})  where T <: Real where U where Q
+    exclus = Array{Tuple{Array{U,1}, Array{T,1}, Q},1}(undef,0)
+    for i in 1:length(pareto)
+        local domination = true
+        for j in 1:length(pareto)
+            if i != j
+                domination &= !domine_fortement(pareto[j], pareto[i])
+            end
+        end
+        if !domination
+            append!(exclus, [pareto[i]])
+        end
+    end
+    lambda = ys -> !(ys in exclus)
+    filter!(lambda, pareto)
+end
+
 # Fonction qui isnere une solution efficasse dans une liste, pour comparer avec le NDtree
 function maj!(liste::Array{Tuple{Array{U,1}, Array{T,1}, Q},1}, y::Tuple{Array{U,1}, Array{T,1}, Q}) where T <: Real where U where Q
     drapeau = true
@@ -748,6 +765,12 @@ function test_NDtree2(nb_y::Int = 100 ; d::Int = 2)
     catch
         @assert length(pareto) > length(liste)
         println("length(pareto) : ", length(pareto), " > ", "length(liste) : ", length(liste))
+        filtrage!(pareto)
+        println("length(pareto) : ", length(pareto), " ; ", "length(liste) : ", length(liste))
+        @assert length(pareto) == length(liste)
+        for y in liste
+            @assert y in pareto
+        end
     end
 end
 
