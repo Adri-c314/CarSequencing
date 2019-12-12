@@ -1,0 +1,25 @@
+1) Information sur les données :
+   ---------------------------
+Nombre d'options prioritaires : 5
+PAINT_BATCH_LIMIT : 10
+Nombre de vehicules : 1260
+
+
+2) Creation de la population initiale :
+   ----------------------------------
+Taille de la population :50
+Budjet de calcule pour la phase initiale commune : 300.0 secondes
+Budjet de calcule pour creer le 1er ind elites : 300.0 secondes
+Budjet de calcule pour creer 1 des 5 autres ind elites : 200.0 secondes
+Done !
+Budjet de calcule pour chacune des 44 solutions non elites : 10.0 secondes
+Done !
+Score de la population inital :
+Array{Int64,1}[[143, 426, 229]];Array{Int64,1}[[142, 590, 94]];Array{Int64,1}[[330, 10, 166]];Array{Int64,1}[[265, 204, 0]];Array{Int64,1}[[483, 8, 30]];Array{Int64,1}[[484, 71, 0]];Array{Int64,1}[[802, 69, 170]];Array{Int64,1}[[806, 70, 222]];Array{Int64,1}[[801, 69, 189]];Array{Int64,1}[[845, 62, 206]];Array{Int64,1}[[827, 60, 179]];Array{Int64,1}[[835, 78, 215]];Array{Int64,1}[[848, 70, 197]];Array{Int64,1}[[842, 60, 225]];Array{Int64,1}[[811, 73, 198]];Array{Int64,1}[[845, 65, 213]];Array{Int64,1}[[800, 62, 192]];Array{Int64,1}[[815, 55, 208]];Array{Int64,1}[[837, 62, 194]];Array{Int64,1}[[834, 56, 216]];Array{Int64,1}[[817, 70, 207]];Array{Int64,1}[[815, 61, 204]];Array{Int64,1}[[825, 60, 250]];Array{Int64,1}[[816, 69, 211]];Array{Int64,1}[[825, 67, 163]];Array{Int64,1}[[840, 70, 190]];Array{Int64,1}[[823, 73, 224]];Array{Int64,1}[[811, 67, 189]];Array{Int64,1}[[829, 74, 168]];Array{Int64,1}[[826, 61, 236]];Array{Int64,1}[[805, 62, 200]];Array{Int64,1}[[825, 70, 212]];Array{Int64,1}[[828, 73, 212]];Array{Int64,1}[[810, 69, 215]];Array{Int64,1}[[828, 69, 236]];Array{Int64,1}[[821, 68, 210]];Array{Int64,1}[[815, 68, 187]];Array{Int64,1}[[813, 71, 209]];Array{Int64,1}[[846, 70, 150]];Array{Int64,1}[[825, 53, 237]];Array{Int64,1}[[832, 69, 182]];Array{Int64,1}[[812, 58, 197]];Array{Int64,1}[[811, 74, 219]];Array{Int64,1}[[840, 59, 197]];Array{Int64,1}[[829, 71, 182]];Array{Int64,1}[[837, 71, 191]];Array{Int64,1}[[860, 69, 217]];Array{Int64,1}[[803, 61, 190]];Array{Int64,1}[[843, 70, 224]];Array{Int64,1}[[844, 69, 207]];
+
+
+3) Réalisation de l'algorithme génétique :
+   ----------------------------------
+Budjet de temps de calcule : 600.0 secondes
+Budjet de temps de calcule d'une mutation : 0.01 secondes
+234 enfants ont été insérés
