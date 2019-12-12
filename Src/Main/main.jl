@@ -225,6 +225,7 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF
         end
         if csvscore
             solutions = get_solutions(NDTree)
+            filtrage!(solutions)
             tmp = ""
             for ii in 1:length(solutions)
                 tmp = string(tmp, solutions[ii][2][1]," ", solutions[ii][2][2]," ", solutions[ii][2][3],"\n")
@@ -338,6 +339,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP
             end
             if csvpopulation
                 solutions = get_solutions(NDtree)
+                filtrage!(solutions)
                 tmp = ""
                 for ii in 1:length(solutions)
                     tmp = string(tmp, "\n", seqToCSV(solutions[ii][1]))
