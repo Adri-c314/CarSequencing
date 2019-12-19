@@ -234,10 +234,10 @@ function mainGeneticPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF
         end
 
         # TODO : Verifier que j'ai bien fait
-        final_score, nbscore, nadir, tabchelou = PLS!(NDTree, inst, temps_max, temps_1_moove, nb_efficace_pls, verbose, txtoutput)
+        final_score, nbscore, nadir, tabchelou, ndtree = PLS!(NDTree, inst, temps_max, temps_1_moove, nb_efficace_pls, verbose, txtoutput)
 
         # Gestion affichage :
-        solutions = get_solutions(NDTree)
+        solutions = get_solutions(ndtree)
         if csvscore
             tmp = ""
             for ii in 1:length(solutions)

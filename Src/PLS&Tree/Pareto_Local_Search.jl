@@ -136,7 +136,7 @@ function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps
         end
     end
     println([final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]])
-    return final_score, size(final_score)[1], nadir, [final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]]
+    return final_score, size(final_score)[1], nadir, [final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]], NDtree
 end
 
 
