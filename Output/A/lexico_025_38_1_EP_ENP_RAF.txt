@@ -25,24 +25,24 @@ Valeur sur l'objectif 3 : 6102
    ------------------
 
 Phase 1 :
-Nombre de swap : 3982920
-Nombre d'insertion : 898906
-Nombre de reflection : 618347
-Nombre de shuffle : 112688
+Nombre de swap : 1982920
+Nombre d'insertion : 498906
+Nombre de reflection : 318347
+Nombre de shuffle : 52688
 
 
 Phase 2 :
-Nombre de swap : 829863
-Nombre d'insertion : 750187
+Nombre de swap : 429863
+Nombre d'insertion : 350187
 Nombre de reflection : 355993
-Nombre de shuffle : 39611
+Nombre de shuffle : 29611
 
 
 Phase 3 :
-Nombre de swap : 423636
-Nombre d'insertion : 259757
-Nombre de reflection : 379829
-Nombre de shuffle : 21599
+Nombre de swap : 223636
+Nombre d'insertion : 159757
+Nombre de reflection : 279829
+Nombre de shuffle : 11599
 
 
 ===================================================
@@ -50,4 +50,3 @@ Valeur sur l'objectif 1 : 634
 Valeur sur l'objectif 2 : 0
 Valeur sur l'objectif 3 : 64
 ===================================================
-
