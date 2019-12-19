@@ -270,7 +270,7 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify enfant
 function swap_mutation!(enfant::Array{Array{Array{Int,1},1},1}, k::Int, l::Int, inst::Instance)
-    if swap_valide(enfant, k, l, inst)
+    if eval_pbl_swap(enfant[1],inst.pbl ,k, l)
         # Maj de la seq et du tab violation
         update_tab_violation_and_pbl_swap!(enfant[1], inst.ratio, enfant[2], inst.Hprio, inst.pbl, k, l)
 
