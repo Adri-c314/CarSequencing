@@ -21,7 +21,7 @@
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps_1_moove::Float64 = 10.,nb_efficace_pls::Int = 10, verbose::Bool = true, txtoutput::Bool=true)
-    verifPourBug!(NDtree,inst)
+    NDtree = verifPourBug!(NDtree,inst)
     pareto_tmp = get_solutions(NDtree)
     debutall = time()
     ## le PLS
@@ -157,6 +157,7 @@ function verifPourBug!(NDtree,inst)
     for i in rtn
         maj!(NDtree, i)
     end
+    return NDtree
 end
 
 
