@@ -1,7 +1,7 @@
 ===================================================
 Etude de l'instance : A
 Reference du dossier : 048_39_1_EP_RAF_ENP
-A la date du : 2019-12-19T14:44:48.902
+A la date du : 2019-12-19T20:33:26.605
 ===================================================
 
 
@@ -17,7 +17,7 @@ Nombre de vehicules : 600
    ------------------------------------
 Valeur sur l'objectif 1 : 63
 Valeur sur l'objectif 2 : 1820
-Valeur sur l'objectif 3 : 2681
+Valeur sur l'objectif 3 : 2678
 
 
 
@@ -25,29 +25,29 @@ Valeur sur l'objectif 3 : 2681
    ------------------
 
 Phase 1 :
-Nombre de swap : 2278342
-Nombre d'insertion : 512391
-Nombre de reflection : 352409
-Nombre de shuffle : 63998
+Nombre de swap : 3345077
+Nombre d'insertion : 753510
+Nombre de reflection : 518674
+Nombre de shuffle : 94380
 
 
 Phase 2 :
-Nombre de swap : 956400
-Nombre d'insertion : 215624
-Nombre de reflection : 148183
-Nombre de shuffle : 26565
+Nombre de swap : 959185
+Nombre d'insertion : 216015
+Nombre de reflection : 148242
+Nombre de shuffle : 26959
 
 
 Phase 3 :
-Nombre de swap : 330197
-Nombre d'insertion : 298495
-Nombre de reflection : 141679
-Nombre de shuffle : 15473
+Nombre de swap : 356835
+Nombre d'insertion : 321998
+Nombre de reflection : 152772
+Nombre de shuffle : 17073
 
 
 ===================================================
-Valeur sur l'objectif 1 : 181.0
-Valeur sur l'objectif 2 : 6.0
-Valeur sur l'objectif 3 : 596.0
+Valeur sur l'objectif 1 : 190
+Valeur sur l'objectif 2 : 2
+Valeur sur l'objectif 3 : 544
 ===================================================
 
