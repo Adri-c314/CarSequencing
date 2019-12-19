@@ -1,4 +1,4 @@
-# Projet de PPC
+# Projet de Car sequencing 
 Université de Nantes - Master 2 ORO - Année 2019/2020.
 
 ## Structure générale du dossier
@@ -20,14 +20,16 @@ fonction-thad.jl                - Element de test a inclure dans le code
   \Util                         - Dossier contenant tous les fichiers liés aux fonctions utiles Ex : ecriture
 ```
 
-**Commandes d'éxécutions**
+## Commandes d'éxécutions
 
 ```include("./src/Main/main.jl")```
 
 L'inclusion du main inclu récursivement tout le projet.
 
 Le fichier main est composé de 4 fonctions principales dont les paramètres sont entièrement définis dans le fichier main.jl :
+```
 main()                           - La fonction lancant la VFLS
 mainGenetic()                    - La fonction lançant l'algorithm génétique
 mainGeneticPLS()                 - La fonction lançant le genetique puis la PLS sur les solutions obtenues
-mainTestPLS()                    - La fonction lançant juste le PLS sur la population elite 
+mainTestPLS()                    - La fonction lançant juste le PLS sur la population elite
+```
