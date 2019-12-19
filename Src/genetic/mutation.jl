@@ -211,7 +211,7 @@ end
 #       enfant[3][1] : Array{Int,1} le score sur les 3 obj
 # @param objectif : l'objectif choisi (:pbl!, :hprio!, :lprio!) suivant l'obj qu'on focus
 # @param inst : L'instance du problème étudié cf Util/instance.jl
-# @param nbSwap : le nombre de swap réalisé 
+# @param nbSwap : le nombre de swap réalisé
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @modify ::Array{Array{Array{Int,1},1},1} : L'enfant applique la mutation sur l'enfant
@@ -229,7 +229,9 @@ function mutation2!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, in
             tmp_st=string(tmp_st,"   ] ")
         end
 
-        for i in 1:nbSwap
+        valide = true
+        i = 1
+        while i <= nbSwap && valide
             swap_mutation!(enfant, rand(2:taille-1), rand(2:taille-1), inst)
 
             # Gestion de l'affichage de la plus belle bar de chargement que l'on est jamais vu :)
@@ -245,6 +247,9 @@ function mutation2!(enfant::Array{Array{Array{Int,1},1},1}, objectif::Symbol, in
                     n+=1
                 end
             end
+
+
+            i += 1
         end
 
         # Re evaluation en fin d'exection :
@@ -265,16 +270,93 @@ end
 # @return nothing : Pas de return pour eviter les copies de memoire.
 # @modify enfant
 function swap_mutation!(enfant::Array{Array{Array{Int,1},1},1}, k::Int, l::Int, inst::Instance)
-    # Maj de la seq et du tab violation
-    update_tab_violation_and_pbl_swap!(enfant[1], inst.ratio, enfant[2], inst.Hprio, inst.pbl, k, l)
+    if swap_valide(enfant, k, l, inst)
+        # Maj de la seq et du tab violation
+        update_tab_violation_and_pbl_swap!(enfant[1], inst.ratio, enfant[2], inst.Hprio, inst.pbl, k, l)
 
-    # Reval du score
-    enfant[3][1][1]+=eval_couleur_swap(enfant[1], inst.pbl, k, l)
-    enfant[3][1][2]+=eval_Hprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
-    enfant[3][1][3]+=eval_Lprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
+        # Reval du score
+        enfant[3][1][1]+=eval_couleur_swap(enfant[1], inst.pbl, k, l)
+        enfant[3][1][2]+=eval_Hprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
+        enfant[3][1][3]+=eval_Lprio_swap(enfant[1], inst.ratio, enfant[2], inst.Hprio, k, l)
 
-    # Swap
-    tmp=copy(enfant[1][k])
-    enfant[1][k]=enfant[1][l]
-    enfant[1][l]=tmp
+        # Swap
+        tmp=copy(enfant[1][k])
+        enfant[1][k]=enfant[1][l]
+        enfant[1][l]=tmp
+
+        return true
+    end
+    return false
+end
+
+
+
+function swap_valide(enfant::Array{Array{Array{Int,1},1},1}, k::Int, l::Int, inst::Instance)
+    if k == l
+        return true
+    end
+
+    debCol = length(enfant[1][1])-2
+    finCol = length(enfant[1][1])-1
+
+    if l < k
+        tmp = k
+        k = l
+        l = tmp
+    end
+
+    # Verif de k
+    if k > 1
+        if enfant[1][k-1][finCol] == k-1 #fincol(k-1) est juste avant k
+            if enfant[1][k-1][2] == enfant[1][l][2] #k-1 meme col que k
+                if enfant[1][k+1][debCol] == k+1 #debcol(k+1) est juste apres k
+                    if enfant[1][k+1][2] == enfant[1][l][2] #k+1 meme col que k
+                        if enfant[1][k+1][finCol] - enfant[1][k-1][debCol] > inst.pbl
+                            return false
+                        end
+                    end
+                else
+                    if enfant[1][k-1][finCol]+1 - enfant[1][k-1][debCol] > inst.pbl
+                        return false
+                    end
+                end
+            end
+        end
+    end
+    if enfant[1][k+1][debCol] == k+1 #debcol(k+1) est juste apres k
+        if enfant[1][k+1][2] == enfant[1][l][2] #k+1 meme col que k
+            if enfant[1][k+1][finCol]+1 - enfant[1][k-1][debCol] > inst.pbl
+                return false
+            end
+        end
+    end
+
+    # Verif de l
+    if l < length(enfant[1])
+        if enfant[1][l+1][debCol] == l+1 #debcol(l+1) est juste apres l
+            if enfant[1][l+1][2] == enfant[1][k][2] #l+1 meme col que k
+                if enfant[1][l-1][finCol] == l-1 #fincol(l-1) est juste avant l
+                    if enfant[1][l-1][2] == enfant[1][k][2] #l-1 meme col que k
+                        if enfant[1][l+1][finCol] - enfant[1][l-1][debCol] > inst.pbl
+                            return false
+                        end
+                    end
+                else
+                    if enfant[1][l+1][finCol]+1 - enfant[1][l+1][debCol] > inst.pbl
+                        return false
+                    end
+                end
+            end
+        end
+    end
+    if enfant[1][l-1][finCol] == l-1 #fincol(l-1) est juste avant l
+        if enfant[1][l-1][2] == enfant[1][k][2] #l-1 meme col que k
+            if enfant[1][l+1][finCol] - enfant[1][l-1][debCol] > inst.pbl
+                return false
+            end
+        end
+    end
+
+    return true
+
 end
