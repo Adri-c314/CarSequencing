@@ -21,8 +21,9 @@
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps_1_moove::Float64 = 10.,nb_efficace_pls::Int = 10, verbose::Bool = true, txtoutput::Bool=true)
-    debutall = time()
+    verifPourBug!(NDtree,inst)
     pareto_tmp = get_solutions(NDtree)
+    debutall = time()
     ## le PLS
     OBJ = [[1,2,3],[1,3,2],[2,3,1],[2,1,3],[3,2,1],[3,1,2]]
     tmp_sortie = 0
@@ -138,6 +139,25 @@ function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps
     return final_score, size(final_score)[1], nadir, [final_score[tmpi1],final_score[tmpi2],final_score[tmpi3]]
 end
 
+
+function verifPourBug!(NDtree,inst)
+    sol = get_solutions(NDtree)
+    rtn = Array{Tuple{Array{Array{Int,1},1}, Array{Int,1}, Array{Array{Int,1},1}},1}()
+    for i in sol
+        tmp::Array{Array{Int,1},1} = deepcopy(i[1])
+        ide3,pblAdmissible,ide1 = majData(tmp, inst.sequence_j_avant, inst.ratio, inst.Hprio, inst.pbl)
+        if pblAdmissible
+            push!(rtn, (deepcopy(ide1), deepcopy(i[2]), deepcopy(ide3)))
+        else
+            println("On a une couille dans le poté")
+        end
+    end
+
+    NDtree = Sommet()
+    for i in rtn
+        maj!(NDtree, i)
+    end
+end
 
 
 
