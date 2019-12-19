@@ -21,7 +21,7 @@
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps_1_moove::Float64 = 10.,nb_efficace_pls::Int = 10, verbose::Bool = true, txtoutput::Bool=true)
-    NDtree = verifPourBug!(NDtree,inst)
+    NDtree = postTraitement(NDtree,inst)
     pareto_tmp = get_solutions(NDtree)
     debutall = time()
     ## le PLS
@@ -140,8 +140,15 @@ function PLS!(NDtree::Sommet, inst::Instance, temps_max::Float64 = 2800.0, temps
 end
 
 
-function verifPourBug!(NDtree,inst)
+
+# Fonction qui permet de verifier/corriger toutes les solutions dans le NDTree
+# Normalement cela sert a rien mais suite a un bug c'est necessaire
+# @param NDtree : Le NDTree contenant les sol
+# @param inst : L'instance courante
+# @param ::Sommet : Le NDtree modifier
+function postTraitement(NDtree,inst)
     sol = get_solutions(NDtree)
+    bug = 0
     rtn = Array{Tuple{Array{Array{Int,1},1}, Array{Int,1}, Array{Array{Int,1},1}},1}()
     for i in sol
         tmp::Array{Array{Int,1},1} = deepcopy(i[1])
@@ -149,9 +156,11 @@ function verifPourBug!(NDtree,inst)
         if pblAdmissible
             push!(rtn, (deepcopy(ide1), deepcopy(i[2]), deepcopy(ide3)))
         else
-            println("On a une couille dans le poté")
+            bug += 1
         end
     end
+
+    println(bug, " solutions erronées supprimé !")
 
     NDtree = Sommet()
     for i in rtn
