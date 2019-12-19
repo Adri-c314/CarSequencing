@@ -1,7 +1,7 @@
 ===================================================
 Etude de l'instance : X
 Reference du dossier : 028_CH2_EP_ENP_RAF_S51_J1
-A la date du : 2019-12-07T14:36:18.986
+A la date du : 2019-12-19T19:01:24.935
 ===================================================
 
 
@@ -15,9 +15,9 @@ Nombre de vehicules : 65
 
 2) Information sur la sequence initiale :
    ------------------------------------
-Valeur sur l'objectif 1 : 8
-Valeur sur l'objectif 2 : 30
-Valeur sur l'objectif 3 : 8
+Valeur sur l'objectif 1 : 3
+Valeur sur l'objectif 2 : 40
+Valeur sur l'objectif 3 : 3
 
 
 
@@ -25,29 +25,29 @@ Valeur sur l'objectif 3 : 8
    ------------------
 
 Phase 1 :
-Nombre de swap : 1
-Nombre d'insertion : 1
-Nombre de reflection : 0
-Nombre de shuffle : 0
+Nombre de swap : 2106561
+Nombre d'insertion : 475334
+Nombre de reflection : 326764
+Nombre de shuffle : 59359
 
 
 Phase 2 :
-Nombre de swap : 0
-Nombre d'insertion : 0
-Nombre de reflection : 1
-Nombre de shuffle : 0
+Nombre de swap : 509977
+Nombre d'insertion : 460376
+Nombre de reflection : 219198
+Nombre de shuffle : 24469
 
 
 Phase 3 :
-Nombre de swap : 15
-Nombre d'insertion : 20
-Nombre de reflection : 20
-Nombre de shuffle : 1
+Nombre de swap : 279974
+Nombre d'insertion : 171905
+Nombre de reflection : 250632
+Nombre de shuffle : 14302
 
 
 ===================================================
-Valeur sur l'objectif 1 : 8.0
-Valeur sur l'objectif 2 : 19.0
-Valeur sur l'objectif 3 : 8.0
+Valeur sur l'objectif 1 : 3
+Valeur sur l'objectif 2 : 0
+Valeur sur l'objectif 3 : 0
 ===================================================
 

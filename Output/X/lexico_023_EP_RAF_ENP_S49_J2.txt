@@ -1,0 +1,53 @@
+===================================================
+Etude de l'instance : X
+Reference du dossier : 023_EP_RAF_ENP_S49_J2
+A la date du : 2019-12-19T18:59:45.998
+===================================================
+
+
+1) Information sur l'instance :
+   ----------------------------
+Nombre d'options prioritaires : 5
+PAINT_BATCH_LIMIT : 40
+Nombre de vehicules : 1260
+
+
+
+2) Information sur la sequence initiale :
+   ------------------------------------
+Valeur sur l'objectif 1 : 38
+Valeur sur l'objectif 2 : 2627
+Valeur sur l'objectif 3 : 678
+
+
+
+3) Période des phases :
+   ------------------
+
+Phase 1 :
+Nombre de swap : 4079346
+Nombre d'insertion : 920685
+Nombre de reflection : 631480
+Nombre de shuffle : 114965
+
+
+Phase 2 :
+Nombre de swap : 1785874
+Nombre d'insertion : 402225
+Nombre de reflection : 277069
+Nombre de shuffle : 50566
+
+
+Phase 3 :
+Nombre de swap : 606591
+Nombre d'insertion : 548026
+Nombre de reflection : 259559
+Nombre de shuffle : 29074
+
+
+===================================================
+Valeur sur l'objectif 1 : 212.0
+Valeur sur l'objectif 2 : 0.0
+Valeur sur l'objectif 3 : 40.0
+===================================================
+

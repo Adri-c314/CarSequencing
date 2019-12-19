@@ -25,7 +25,7 @@ global surLinux = true
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
-function main(ir::Array{Tuple{String,String},1} = [("X", "028_CH2_EP_ENP_RAF_S51_J1")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1.0)
+function main(ir::Array{Tuple{String,String},1} = [("A", "048_39_1_EP_RAF_ENP")],  verbose::Bool = true, txtoutput::Bool = true, temps_max::Float64 = 1200.0)
     for i in ir
         # Gestion affichage :
         if txtoutput
@@ -286,9 +286,6 @@ end
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @param temps_max : temps max pour un tuple (milliseconde)
 function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP_ENP_ch2")], temps_all::Float64 = 5000., temps_max::Float64 = 600., temps_max2::Float64 = 50., temps_max3::Float64 = 2., temps_max4::Float64 = 10., verbose::Bool = true, txtoutput::Bool = true, csvscore::Bool = true, csvpopulation::Bool = true)
-    temps4 = [3.,5.,10.,20.]
-    for j in 1:4
-        temps_max4 = temps4[j]
         for i in ir
             # Gestion affichage :
             if txtoutput
@@ -317,8 +314,17 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP
             NDtree = Sommet()
 
             # Lancement de la VFLS
-            @time score, szscore, nadir, sollexico = IniNDtree(datas, NDtree, temps_all, temps_max, temps_max2, temps_max3, temps_max4, verbose, txtoutput)
-
+            ii = 1
+            if ii == 1
+                # avec temps  = tmp4 et on sort si plus de x
+                @time score, szscore, nadir, sollexico = IniNDtree1(datas, NDtree, temps_all, temps_max, temps_max2, temps_max3, temps_max4, verbose, txtoutput)
+            elseif ii ==2
+                #avec apprentissage du temps
+                @time score, szscore, nadir, sollexico = IniNDtree2(datas, NDtree, temps_all, temps_max, temps_max2, temps_max3, temps_max4, verbose, txtoutput)
+            elseif ii ==3
+                #avec tq on trouve une sol en 1s on continue
+                @time score, szscore, nadir, sollexico = IniNDtree3(datas, NDtree, temps_all, temps_max, temps_max2, temps_max3, temps_max4, verbose, txtoutput)
+            end
             # Gestion de l'affichage :
             if verbose
                 println("Score : ", score)
@@ -335,17 +341,7 @@ function mainTestPLS(ir::Array{Tuple{String,String},1} = [("A", "064_38_2_RAF_EP
                 ecriture(scoreToCSV(score), pathOS(string(path,i[1],"/PLSsolo",i[2],ttt,"scores",".txt"), surLinux))
             end
             if txtoutput
-                ecriture(string(temps_all, " ", temps_max, " ", temps_max2, " ", temps_max3, " ", temps_max4 ,allToCSV(nadir,szscore,sollexico)), pathOS(string(path,i[1],"/PLSsolo",i[2],ttt,"elements",".txt"), surLinux))
-            end
-            if csvpopulation
-                solutions = get_solutions(NDtree)
-                filtrage!(solutions)
-                tmp = ""
-                for ii in 1:length(solutions)
-                    tmp = string(tmp, "\n", seqToCSV(solutions[ii][1]))
-                end
-                ecriture(tmp, pathOS(string(path, i[1], "/", "PLSsolo_seq_", i[2],".csv"), surLinux))
+                ecriture(string(temps_all, " ", temps_max, " ", temps_max2, " ", temps_max3, " ", temps_max4, " ", ii, "\n " ,allToCSV(nadir,szscore,sollexico)), pathOS(string(path,i[1],"/PLSsolo",i[2],ttt,"elements",".txt"), surLinux))
             end
         end
-    end
 end

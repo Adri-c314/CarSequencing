@@ -1,0 +1,53 @@
+===================================================
+Etude de l'instance : X
+Reference du dossier : 655_CH1_EP_RAF_ENP_S51_J2_J3_J4
+A la date du : 2019-12-19T19:31:38.657
+===================================================
+
+
+1) Information sur l'instance :
+   ----------------------------
+Nombre d'options prioritaires : 4
+PAINT_BATCH_LIMIT : 10
+Nombre de vehicules : 264
+
+
+
+2) Information sur la sequence initiale :
+   ------------------------------------
+Valeur sur l'objectif 1 : 30
+Valeur sur l'objectif 2 : 12
+Valeur sur l'objectif 3 : 2
+
+
+
+3) Période des phases :
+   ------------------
+
+Phase 1 :
+Nombre de swap : 2176214
+Nombre d'insertion : 491012
+Nombre de reflection : 336943
+Nombre de shuffle : 61307
+
+
+Phase 2 :
+Nombre de swap : 905013
+Nombre d'insertion : 203943
+Nombre de reflection : 140011
+Nombre de shuffle : 25462
+
+
+Phase 3 :
+Nombre de swap : 311258
+Nombre d'insertion : 282236
+Nombre de reflection : 134074
+Nombre de shuffle : 14641
+
+
+===================================================
+Valeur sur l'objectif 1 : 30
+Valeur sur l'objectif 2 : 0
+Valeur sur l'objectif 3 : 0
+===================================================
+

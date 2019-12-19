@@ -1,0 +1,53 @@
+===================================================
+Etude de l'instance : X
+Reference du dossier : 039_CH3_EP_RAF_ENP_S49_J1
+A la date du : 2019-12-19T18:41:26.938
+===================================================
+
+
+1) Information sur l'instance :
+   ----------------------------
+Nombre d'options prioritaires : 2
+PAINT_BATCH_LIMIT : 20
+Nombre de vehicules : 1037
+
+
+
+2) Information sur la sequence initiale :
+   ------------------------------------
+Valeur sur l'objectif 1 : 59
+Valeur sur l'objectif 2 : 964
+Valeur sur l'objectif 3 : 6215
+
+
+
+3) Période des phases :
+   ------------------
+
+Phase 1 :
+Nombre de swap : 2149052
+Nombre d'insertion : 484572
+Nombre de reflection : 333535
+Nombre de shuffle : 60593
+
+
+Phase 2 :
+Nombre de swap : 915623
+Nombre d'insertion : 206176
+Nombre de reflection : 141936
+Nombre de shuffle : 25630
+
+
+Phase 3 :
+Nombre de swap : 313298
+Nombre d'insertion : 283741
+Nombre de reflection : 134465
+Nombre de shuffle : 14913
+
+
+===================================================
+Valeur sur l'objectif 1 : 234.0
+Valeur sur l'objectif 2 : 0.0
+Valeur sur l'objectif 3 : 2.0
+===================================================
+
