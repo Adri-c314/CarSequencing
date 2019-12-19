@@ -141,6 +141,10 @@ end
 
 
 function verifPourBug!(NDtree,inst)
+<<<<<<< HEAD
+=======
+    println("ici")
+>>>>>>> 1409f2c7520dd80548c9cbbcb1cc610b44fb8e80
     sol = get_solutions(NDtree)
     rtn = Array{Tuple{Array{Array{Int,1},1}, Array{Int,1}, Array{Array{Int,1},1}},1}()
     for i in sol
