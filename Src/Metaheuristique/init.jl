@@ -162,7 +162,7 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
     evalrat = [zeros(ratio[i][2]) for i in 1:size(ratio)[1]]
     tmpi=1
 
-    for n in sequence_j_avant
+    #=for n in sequence_j_avant
         tmprio = 1
         for eval in evalrat
             for i in 1:size(eval)[1]
@@ -176,7 +176,7 @@ function evaluation_init(instance::Array{Array{Int,1},1},sequence_j_avant::Array
             tmprio+=1
         end
         tmpi+=1
-    end
+    end=#
     tmpi=1
     col = instance[1][2]
 

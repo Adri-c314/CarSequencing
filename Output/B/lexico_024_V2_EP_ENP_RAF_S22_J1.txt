@@ -1,0 +1,53 @@
+===================================================
+Etude de l'instance : B
+Reference du dossier : 024_V2_EP_ENP_RAF_S22_J1
+A la date du : 2019-12-19T15:40:27.017
+===================================================
+
+
+1) Information sur l'instance :
+   ----------------------------
+Nombre d'options prioritaires : 6
+PAINT_BATCH_LIMIT : 10
+Nombre de vehicules : 1270
+
+
+
+2) Information sur la sequence initiale :
+   ------------------------------------
+Valeur sur l'objectif 1 : 132
+Valeur sur l'objectif 2 : 5294
+Valeur sur l'objectif 3 : 4040
+
+
+
+3) Période des phases :
+   ------------------
+
+Phase 1 :
+Nombre de swap : 2482398
+Nombre d'insertion : 558428
+Nombre de reflection : 384655
+Nombre de shuffle : 69856
+
+
+Phase 2 :
+Nombre de swap : 597973
+Nombre d'insertion : 542876
+Nombre de reflection : 256724
+Nombre de shuffle : 28316
+
+
+Phase 3 :
+Nombre de swap : 330692
+Nombre d'insertion : 202814
+Nombre de reflection : 295943
+Nombre de shuffle : 17005
+
+
+===================================================
+Valeur sur l'objectif 1 : 487.0
+Valeur sur l'objectif 2 : 710.0
+Valeur sur l'objectif 3 : 864.0
+===================================================
+

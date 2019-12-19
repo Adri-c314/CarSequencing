@@ -1,0 +1,53 @@
+===================================================
+Etude de l'instance : X
+Reference du dossier : 035_CH1_RAF_EP_S50_J4
+A la date du : 2019-12-19T18:11:22.043
+===================================================
+
+
+1) Information sur l'instance :
+   ----------------------------
+Nombre d'options prioritaires : 1
+PAINT_BATCH_LIMIT : 1000
+Nombre de vehicules : 90
+
+
+
+2) Information sur la sequence initiale :
+   ------------------------------------
+Valeur sur l'objectif 1 : 5
+Valeur sur l'objectif 2 : 45
+Valeur sur l'objectif 3 : 0
+
+
+
+3) Période des phases :
+   ------------------
+
+Phase 1 :
+Nombre de swap : 1954219
+Nombre d'insertion : 1201336
+Nombre de reflection : 1752408
+Nombre de shuffle : 99751
+
+
+Phase 2 :
+Nombre de swap : 0
+Nombre d'insertion : 0
+Nombre de reflection : 0
+Nombre de shuffle : 0
+
+
+Phase 3 :
+Nombre de swap : 0
+Nombre d'insertion : 0
+Nombre de reflection : 0
+Nombre de shuffle : 0
+
+
+===================================================
+Valeur sur l'objectif 1 : 5.0
+Valeur sur l'objectif 2 : 9.0
+Valeur sur l'objectif 3 : 0.0
+===================================================
+

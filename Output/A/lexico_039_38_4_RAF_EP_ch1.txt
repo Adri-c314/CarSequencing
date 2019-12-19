@@ -1,0 +1,53 @@
+===================================================
+Etude de l'instance : A
+Reference du dossier : 039_38_4_RAF_EP_ch1
+A la date du : 2019-12-19T20:11:44.233
+===================================================
+
+
+1) Information sur l'instance :
+   ----------------------------
+Nombre d'options prioritaires : 5
+PAINT_BATCH_LIMIT : 15
+Nombre de vehicules : 954
+
+
+
+2) Information sur la sequence initiale :
+   ------------------------------------
+Valeur sur l'objectif 1 : 68
+Valeur sur l'objectif 2 : 2563
+Valeur sur l'objectif 3 : 0
+
+
+
+3) Période des phases :
+   ------------------
+
+Phase 1 :
+Nombre de swap : 3372816
+Nombre d'insertion : 2076903
+Nombre de reflection : 3022965
+Nombre de shuffle : 172380
+
+
+Phase 2 :
+Nombre de swap : 0
+Nombre d'insertion : 0
+Nombre de reflection : 0
+Nombre de shuffle : 0
+
+
+Phase 3 :
+Nombre de swap : 0
+Nombre d'insertion : 0
+Nombre de reflection : 0
+Nombre de shuffle : 0
+
+
+===================================================
+Valeur sur l'objectif 1 : 68
+Valeur sur l'objectif 2 : 135
+Valeur sur l'objectif 3 : 0
+===================================================
+

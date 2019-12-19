@@ -40,9 +40,9 @@
 # @param verbose : Si l'on souhaite un affichage console de l'execution
 # @param txtoutput : Si l'on souhaite conserver une sortie txt (/!\ cela ne marche que sur linux et mac je penses)
 # @return : La meilleure sequence
-function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=true, txtoutput::Bool=true)
+function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Bool=false, txtoutput::Bool=true)
     # compute initial sequence :
-    sequence_meilleure,sequence_avant, score_init, tab_violation , ratio_option, Hprio, obj, pbl = compute_initial_sequence(datas)
+    sequence_meilleure,sequence_avant, score_init, tab_violation , ratio_option, Hprio, obj, pbl = compute_initial_sequence_2(datas)
     sz = size(sequence_meilleure)[1]
     szcar = size(sequence_meilleure[1])[1]
     timeOPT, opt = phases_init(obj)
@@ -170,20 +170,15 @@ function VFLS(datas::NTuple{4,DataFrame}, temps_max::Float64 = 1.0, verbose::Boo
         nb_effectiv = [0,0,0,0]
     end
 
-    if verbose
-        for car in sequence_meilleure
-            println(car)
-        end
-    end
-
     # Re evaluation en fin d'exection :
     a,b =evaluation_init(sequence_meilleure,sequence_avant,ratio_option,Hprio)
-
+    println(a)
     if verbose
         println(a)
         println("___________________________________________")
     end
-
+    a =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
+    
     return a, sequence_meilleure, txt
 end
 
@@ -319,17 +314,8 @@ function VFLS_genetic(sol::Array{Array{Int,1},1}, viol::Array{Array{Int,1},1}, s
     end
 
     # Re evaluation en fin d'exection :
-    score_meilleur,b =evaluation_init(sequence_meilleure, inst.sequence_j_avant, inst.ratio, inst.Hprio)
+    score_meilleur =evaluation(sequence_meilleure,tab_violation,ratio_option,Hprio)
 
-    if verbose
-        println(a)
-        for car in sequence_meilleure
-            if (car[szcar-1]-car[szcar-2]+1)>pbl
-                println(car)
-                println(car[szcar-1]-car[szcar-2]+1)
-            end
-        end
-    end
 
     return [sequence_meilleure, tab_violation, [score_meilleur]]
 end

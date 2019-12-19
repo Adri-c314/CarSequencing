@@ -1,0 +1,7 @@
+5000.0 600.0 50.0 2.0 10.049 140 95
+173
+27 138 33
+49 0 0
+36 54 0
+
+avec ajout de temps si on trouve un voisin
